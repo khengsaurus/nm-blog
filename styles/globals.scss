@@ -1,0 +1,71 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital@0;1&display=swap");
+
+html {
+  font-family: "Roboto", sans-serif;
+}
+
+@mixin flex-dir($dir) {
+  display: flex;
+  flex-direction: $dir;
+}
+
+.home-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: grey;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+}
+
+h1 {
+  font-size: 30px;
+  color: white;
+}
+
+.centered {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  justify-self: center;
+  align-items: center;
+  align-self: center;
+  text-align: center;
+  transition: 300ms;
+}
+
+.main {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  font-family: "Roboto", sans-serif;
+  &.no-select {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+  }
+  &.transparent {
+    background-color: transparent;
+  }
+}
+
+.column {
+  @include flex-dir(column);
+  align-items: center;
+  transition: 300ms;
+}
+
+.row {
+  @include flex-dir(drow);
+  justify-content: center;
+  transition: 300ms;
+}
