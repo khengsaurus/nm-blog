@@ -38,12 +38,13 @@ h1 {
   transition: 300ms;
 }
 
-.main {
+main {
   position: fixed;
   top: 0;
   left: 0;
   height: 100vh;
   width: 100vw;
+  background-color: grey;
   font-family: "Roboto", sans-serif;
   &.no-select {
     -webkit-touch-callout: none; /* iOS Safari */
@@ -62,10 +63,21 @@ h1 {
   @include flex-dir(column);
   align-items: center;
   transition: 300ms;
+  background-color: "orange";
+  &.tripple {
+    width: 33%;
+  }
 }
 
 .row {
-  @include flex-dir(drow);
+  @include flex-dir(row);
   justify-content: center;
   transition: 300ms;
+}
+
+.photo {
+  padding: 10px;
+  .shared {
+    max-width: 150px;
+  }
 }

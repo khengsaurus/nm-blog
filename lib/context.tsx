@@ -1,14 +1,7 @@
 import React, { createContext, useEffect, useState } from "react";
-import { IUser } from "../types";
+import { IAlert, IAppContext, IUser } from "../types";
 
-interface IAppContext {
-  user: IUser | null;
-  username: string;
-  setUser: (_?: IUser) => void;
-  setUsername: (_?: string) => void;
-}
-
-const initialContext = {
+const initialContext: IAppContext = {
   user: null,
   username: "",
   setUser: (_?: IUser) => {},
@@ -18,6 +11,7 @@ const initialContext = {
 export const AppContext = createContext<IAppContext>(initialContext);
 
 const AppContextProvider = (props: any) => {
+  const [alert, setAlert] = useState<IAlert>(null);
   const [user, setUser] = useState<IUser>();
   const [username, setUsername] = useState("");
 

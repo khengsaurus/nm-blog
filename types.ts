@@ -1,3 +1,17 @@
+import { Status } from "./enums";
+
+export interface IAppContext {
+  user: IUser;
+  username: string;
+  setUser: (_?: IUser) => void;
+  setUsername: (_?: string) => void;
+}
+
+export interface IAlert {
+  status: Status;
+  message?: string;
+}
+
 interface IHasId {
   id?: string;
   _id?: string;
