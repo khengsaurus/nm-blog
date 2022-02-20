@@ -30,8 +30,3 @@ export async function mongodbConn(): Promise<IMongoAccess> {
     }
   });
 }
-
-// const opts = {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true,
-// };

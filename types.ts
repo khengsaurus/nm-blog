@@ -1,5 +1,15 @@
 import { Status } from "./enums";
 
+/*------------------------------ API ------------------------------*/
+
+export interface IResponse {
+  status?: number;
+  message?: string;
+  data?: any;
+}
+
+/*------------------------------ . ------------------------------*/
+
 export interface IAppContext {
   user: IUser;
   username: string;
