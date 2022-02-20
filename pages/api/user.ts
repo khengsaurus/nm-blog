@@ -2,7 +2,8 @@ import { extend, isEmpty } from "lodash";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { ApiError, ApiInfo } from "../../enum";
 import { mongodbConn } from "../../lib/mongodb";
-import { IResponse, IUser } from "../../types";
+import { IResponse, IUserReq } from "../../types";
+import { generateToken, validateAuth, verify } from "./middlewares/auth";
 import { errorHandler } from "./middlewares/errorHandler";
 import { forwardResponse } from "./middlewares/forwardResponse";
 
@@ -27,11 +28,11 @@ async function getQuery(params: object, limit = 1): Promise<IResponse> {
       if (db) {
         const ref = db.collection("users");
         if (limit === 1) {
-          await ref.findOne(params).then((doc) => {
-            if (isEmpty(doc)) {
+          await ref.findOne(params).then((data) => {
+            if (isEmpty(data)) {
               res({ status: 200, message: ApiInfo.USER_NA });
             } else {
-              res({ status: 200, message: ApiInfo.USER_RETRIEVED, data: doc });
+              res({ status: 200, message: ApiInfo.USER_RETRIEVED, data });
             }
           });
         }
@@ -42,27 +43,53 @@ async function getQuery(params: object, limit = 1): Promise<IResponse> {
   });
 }
 
-async function postQuery(params: object): Promise<IResponse> {
+/**
+ * @param params: username, password, login, ...
+ * Handle login and register depending on login arg.
+ * @resolve Login: {..., token: JWT}
+ * @resolve Register: {..., user: object, token: JWT}
+ */
+async function postQuery(params: Partial<IUserReq>): Promise<IResponse> {
   return new Promise(async (res, rej) => {
+    const { username, password, login } = params;
+    const _p = { username, password };
     try {
       const { db } = await mongodbConn();
       if (db) {
         const ref = db.collection("users");
-        ref.findOne(params).then((existingUser) => {
-          if (isEmpty(existingUser)) {
-            /**
-             * No way to retrieve the inserted doc without another read
-             * @see https://stackoverflow.com/questions/40766654
-             */
-            ref.insertOne(createNewUser(params)).then((doc) => {
+        ref.findOne({ username }).then((existingUser: any) => {
+          if (login && !isEmpty(existingUser)) {
+            if (verify(_p, existingUser)) {
+              const token = generateToken(_p);
               res({
                 status: 200,
-                message: ApiInfo.USER_REGISTERED,
-                data: doc,
+                message: ApiInfo.USER_LOGIN,
+                data: { token },
               });
-            });
+            } else {
+              res({
+                status: 200,
+                message: ApiInfo.USER_LOGIN_WRONG_CREDENTIALS,
+                data: {},
+              });
+            }
           } else {
-            res({ status: 200, message: ApiInfo.USERNAME_TAKEN });
+            // Handle register
+            if (isEmpty(existingUser)) {
+              const user = createNewUser(_p);
+              ref.insertOne(user).then((data) => {
+                if (data?.acknowledged) {
+                  const token = generateToken(user);
+                  res({
+                    status: 200,
+                    message: ApiInfo.USER_REGISTERED,
+                    data: { ...data, user, token },
+                  });
+                }
+              });
+            } else {
+              res({ status: 200, message: ApiInfo.USERNAME_TAKEN });
+            }
           }
         });
       }
@@ -72,7 +99,7 @@ async function postQuery(params: object): Promise<IResponse> {
   });
 }
 
-async function putQuery(params: IUser): Promise<IResponse> {
+async function putQuery(params: Partial<IUserReq>): Promise<IResponse> {
   return new Promise(async (res, rej) => {
     try {
       const { db } = await mongodbConn();
@@ -102,8 +129,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<IResponse | any>
 ) {
-  const userParams = req.query as unknown as IUser; // hacky af lol
-  const { username = "", password = "" } = userParams;
+  const reqParams = req.query as unknown as Partial<IUserReq>; // hacky af lol
+  const { username = "", login = true } = reqParams;
+  const { password = "" } = req.body;
   try {
     if (!username) {
       throw new Error(ApiError.INVALID_FIELDS);
@@ -118,12 +146,13 @@ export default async function handler(
           if (!password) {
             throw new Error(ApiError.INVALID_FIELDS);
           }
-          await postQuery({ username, password }).then((payload) =>
+          await postQuery({ username, password, login }).then((payload) =>
             forwardResponse(res, payload)
           );
           break;
         case "PUT":
-          await putQuery(userParams).then((payload) =>
+          validateAuth(req);
+          await putQuery(reqParams).then((payload) =>
             forwardResponse(res, payload)
           );
           break;

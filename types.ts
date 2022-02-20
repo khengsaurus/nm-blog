@@ -97,6 +97,10 @@ export interface IUser extends IHasId {
   cart: ICartItem[];
 }
 
+export interface IUserReq extends IUser {
+  login: boolean;
+}
+
 export interface IError {
   general?: string;
   username?: string;
