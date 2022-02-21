@@ -1,4 +1,9 @@
+import { AxiosRequestConfig } from "axios";
+import { NextRouter } from "next/router";
+import { DBService, HttpRequestType } from "./enum";
 import { Status } from "./enums";
+
+export type AlertStatus = "success" | "info" | "warning" | "error";
 
 /*------------------------------ API ------------------------------*/
 
@@ -11,10 +16,19 @@ export interface IResponse {
 /*------------------------------ . ------------------------------*/
 
 export interface IAppContext {
+  alert: IAlert;
   user: IUser;
-  username: string;
+  userToken: string;
+  router: NextRouter;
+  makeAuthHttpReq: (
+    service: DBService,
+    method: HttpRequestType,
+    data?: any,
+    config?: AxiosRequestConfig<any>
+  ) => any;
+  setAlert: (_?: IAlert) => void;
   setUser: (_?: IUser) => void;
-  setUsername: (_?: string) => void;
+  setUserToken: (_?: string) => void;
 }
 
 export interface IAlert {

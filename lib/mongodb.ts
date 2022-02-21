@@ -1,6 +1,6 @@
 import { Db, MongoClient } from "mongodb";
 const MONGODB_URI = process.env.MONGODB_URI;
-const MONGODB_DB = process.env.DB_NAME;
+const DB_NAME = process.env.DB_NAME;
 
 interface IMongoAccess {
   client?: MongoClient;
@@ -15,13 +15,13 @@ export async function mongodbConn(): Promise<IMongoAccess> {
       res(cached);
     }
     try {
-      if (!MONGODB_URI || !MONGODB_DB) {
+      if (!MONGODB_URI || !DB_NAME) {
         throw new Error("Check environmental variables");
       }
       const initClient = new MongoClient(MONGODB_URI);
       await initClient.connect().then(() => {
         cached.client = initClient;
-        cached.db = initClient.db(MONGODB_DB);
+        cached.db = initClient.db(DB_NAME);
       });
     } catch (err) {
       console.error(err);

@@ -1,15 +1,25 @@
-import { Collapse, TextField } from "@mui/material";
+import { Alert, Collapse, TextField } from "@mui/material";
 import axios from "axios";
 import { isEmpty } from "lodash";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import HomePage from "../components/HomePage";
+import {
+  DBService,
+  ErrorMessage,
+  HttpRequestType,
+  PageRoute,
+  Transition,
+} from "../enum";
+import { Status } from "../enums";
 import { AppContext } from "../lib/context";
 import { StyledButton } from "../styles/StyledMui";
+import { AlertStatus } from "../types";
 
 const Login = () => {
-  const { setUser, setUsername } = useContext(AppContext);
+  const { alert, makeAuthHttpReq, router, setAlert, setUser, setUserToken } =
+    useContext(AppContext);
   const [email, setEmail] = useState("");
-  const [username, setUsername_] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showRegister, setShowRegister] = useState(false);
@@ -33,7 +43,7 @@ const Login = () => {
   );
 
   function clearForm() {
-    setUsername_("");
+    setUsername("");
     setEmail("");
     setPassword("");
     setConfirmPassword("");
@@ -41,19 +51,55 @@ const Login = () => {
 
   const handleLogin = useCallback(() => {
     axios
-      .get("http://localhost:3000/api/user", { params: { username } })
-      .then((doc) => {
-        if (!isEmpty(doc?.data) && password === doc.data.password) {
-          console.log("Logging in");
-          setUser(doc.data);
-          setUsername(doc.data.username);
+      .post(`api/user`, {
+        username,
+        password,
+        login: true,
+      })
+      .then((res) => {
+        if (!isEmpty(res?.data?.token)) {
+          setUserToken(res.data.token);
+          setUser(res.data.user);
+          setAlert(null);
+          clearForm();
+          //TODO: push to home page
         } else {
-          console.log("Check credentials");
+          setAlert({ status: Status.ERROR, message: res?.data?.message });
+        }
+      })
+      .catch((err) => console.error(err));
+  }, [password, setAlert, setUser, setUserToken, username]);
+
+  const handleRegister = useCallback(() => {
+    if (password === confirmPassword) {
+      makeAuthHttpReq(DBService.USER, HttpRequestType.POST, {
+        email,
+        password,
+        login: false,
+      }).then((res) => {
+        if (!isEmpty(res?.data?.token)) {
+          setUserToken(res.data.token);
+          setUser(res.data.user);
+          setAlert(null);
+          clearForm();
+          router.push(PageRoute.NEWUSER);
+        } else {
+          setAlert({ status: Status.ERROR, message: res?.data?.message });
         }
       });
-  }, [setUser, setUsername, username, password]);
-
-  const handleRegister = useCallback(() => {}, []);
+    } else {
+      setAlert({ status: Status.ERROR, message: ErrorMessage.PW_NOT_MATCHING });
+    }
+  }, [
+    confirmPassword,
+    email,
+    makeAuthHttpReq,
+    password,
+    router,
+    setAlert,
+    setUser,
+    setUserToken,
+  ]);
 
   const renderLoginButton = () => (
     <StyledButton
@@ -76,14 +122,14 @@ const Login = () => {
   );
 
   const markup = (
-    <div className="column">
+    <>
       <TextField
         key="usernameEmail"
         label={showRegister ? "Email" : "Username"}
         onChange={(e) =>
           showRegister
             ? setEmail(e.target.value)
-            : setUsername_(e.target.value?.toLowerCase())
+            : setUsername(e.target.value?.toLowerCase())
         }
         style={{ width: "160px" }}
         type="text"
@@ -118,7 +164,16 @@ const Login = () => {
         }}
       />
       {showRegister ? renderRegisterButton() : renderLoginButton()}
-    </div>
+      <Collapse
+        in={!!alert}
+        timeout={{ enter: Transition.FAST, exit: Transition.INSTANT }}
+        unmountOnExit
+      >
+        <Alert severity={alert?.status as AlertStatus}>
+          {alert?.message || ErrorMessage.TRY_AGAIN}
+        </Alert>
+      </Collapse>
+    </>
   );
 
   return <HomePage title={"Login Page"} markup={markup} />;

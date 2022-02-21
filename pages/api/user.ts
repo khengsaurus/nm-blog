@@ -1,4 +1,4 @@
-import { extend, isEmpty } from "lodash";
+import { extend, isEmpty, reject } from "lodash";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { ApiError, ApiInfo } from "../../enum";
 import { mongodbConn } from "../../lib/mongodb";
@@ -22,105 +22,166 @@ function createNewUser(params: Object) {
 }
 
 async function getQuery(params: object, limit = 1): Promise<IResponse> {
-  return new Promise(async (res, rej) => {
+  return new Promise(async (resolve, reject) => {
     try {
       const { db } = await mongodbConn();
       if (db) {
-        const ref = db.collection("users");
         if (limit === 1) {
+          const ref = db.collection("users");
           await ref.findOne(params).then((data) => {
             if (isEmpty(data)) {
-              res({ status: 200, message: ApiInfo.USER_NA });
+              resolve({ status: 200, message: ApiInfo.USER_NA });
             } else {
-              res({ status: 200, message: ApiInfo.USER_RETRIEVED, data });
+              resolve({
+                status: 200,
+                message: ApiInfo.USER_RETRIEVED,
+                ...data,
+              });
             }
           });
         }
       }
     } catch (err) {
-      rej(err);
+      reject(err);
     }
   });
 }
 
 /**
- * @param params: username, password, login, ...
+ * @param reqBody: username, password, login, ...
  * Handle login and register depending on login arg.
- * @resolve Login: {..., token: JWT}
- * @resolve Register: {..., user: object, token: JWT}
+ * @resolve {..., token: JWT}
  */
-async function postQuery(params: Partial<IUserReq>): Promise<IResponse> {
-  return new Promise(async (res, rej) => {
-    const { username, password, login } = params;
-    const _p = { username, password };
+async function loginQuery(reqBody: Partial<IUserReq>): Promise<IResponse> {
+  return new Promise(async (resolve, reject) => {
+    const { username, password } = reqBody;
     try {
       const { db } = await mongodbConn();
       if (db) {
         const ref = db.collection("users");
         ref.findOne({ username }).then((existingUser: any) => {
-          if (login && !isEmpty(existingUser)) {
-            if (verify(_p, existingUser)) {
-              const token = generateToken(_p);
-              res({
-                status: 200,
-                message: ApiInfo.USER_LOGIN,
-                data: { token },
-              });
-            } else {
-              res({
-                status: 200,
-                message: ApiInfo.USER_LOGIN_WRONG_CREDENTIALS,
-                data: {},
-              });
-            }
-          } else {
-            // Handle register
-            if (isEmpty(existingUser)) {
-              const user = createNewUser(_p);
-              ref.insertOne(user).then((data) => {
-                if (data?.acknowledged) {
-                  const token = generateToken(user);
-                  res({
-                    status: 200,
-                    message: ApiInfo.USER_REGISTERED,
-                    data: { ...data, user, token },
-                  });
-                }
-              });
-            } else {
-              res({ status: 200, message: ApiInfo.USERNAME_TAKEN });
-            }
-          }
-        });
-      }
-    } catch (err) {
-      rej(err);
-    }
-  });
-}
-
-async function putQuery(params: Partial<IUserReq>): Promise<IResponse> {
-  return new Promise(async (res, rej) => {
-    try {
-      const { db } = await mongodbConn();
-      if (db) {
-        const ref = db.collection("users");
-        const user = { username: params.username };
-        const updatedUser = { $set: params };
-        ref.updateOne(user, updatedUser, (err, _res) => {
-          if (err) {
-            rej(err);
-          } else {
-            res({
+          if (
+            isEmpty(existingUser) ||
+            !verify({ username, password }, existingUser)
+          ) {
+            resolve({
               status: 200,
-              message: ApiInfo.USER_UPDATED,
-              data: _res,
+              message: ApiInfo.USER_LOGIN_WRONG_CREDENTIALS,
+              data: { token: null },
+            });
+          } else {
+            const token = generateToken(existingUser.email, username);
+            delete existingUser.password;
+            resolve({
+              status: 200,
+              message: ApiInfo.USER_LOGIN,
+              data: { token, user: existingUser },
             });
           }
         });
       }
     } catch (err) {
-      rej(err);
+      reject(err);
+    }
+  });
+}
+
+/**
+ * @param reqBody: username, password, login, ...
+ * Handle login and register depending on login arg.
+ * @resolve {..., token: JWT, user: user object without username}
+ */
+async function registerQuery(reqBody: Partial<IUserReq>): Promise<IResponse> {
+  return new Promise(async (resolve, reject) => {
+    const { email, password } = reqBody;
+    try {
+      const { db } = await mongodbConn();
+      if (db) {
+        const ref = db.collection("users");
+        ref.findOne({ email }).then((existingUser: any) => {
+          if (isEmpty(existingUser)) {
+            // Create acc without setting username
+            const user = createNewUser({ email, password });
+            ref.insertOne(user).then((res) => {
+              if (res.acknowledged) {
+                const token = generateToken(email, email);
+                delete user.password;
+                resolve({
+                  status: 200,
+                  message: ApiInfo.EMAIL_AVAIL,
+                  data: { token, user },
+                });
+              } else {
+                console.info("MDB failed to acknowledge request");
+                reject(new Error(ApiError.INTERNAL_500));
+              }
+            });
+          } else {
+            resolve({ status: 200, message: ApiInfo.EMAIL_USED });
+          }
+        });
+      }
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+async function putQuery(body: Partial<IUserReq>): Promise<IResponse> {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { db } = await mongodbConn();
+      if (db) {
+        const ref = db.collection("users");
+        const { email, username } = body;
+        // provide username only on req to change
+        if (username) {
+          ref.findOne({ username }).then((existingUser: any) => {
+            if (!isEmpty(existingUser)) {
+              resolve({
+                status: 200,
+                message: ApiInfo.USERNAME_TAKEN,
+                data: {},
+              });
+            }
+          });
+        }
+        ref.updateOne({ email }, { $set: body }, (err, _res) => {
+          if (err) {
+            reject(err);
+          } else {
+            const token = generateToken(email, username);
+            resolve({
+              status: 200,
+              message: ApiInfo.USER_UPDATED,
+              data: { ..._res, token },
+            });
+          }
+        });
+      }
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+async function deleteQuery(searchParams) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { db } = await mongodbConn();
+      if (db) {
+        const ref = db.collection("users");
+        // not working... doing it as per @see https://docs.mongodb.com/drivers/node/current/usage-examples/deleteOne/
+        await ref.deleteOne(searchParams).then((res) => {
+          if (res.acknowledged) {
+            resolve({ status: 200, message: ApiInfo.USER_DELETED });
+          } else {
+            reject(new Error(ApiError.INTERNAL_500));
+          }
+        });
+      }
+    } catch (err) {
+      reject(err);
     }
   });
 }
@@ -129,82 +190,50 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<IResponse | any>
 ) {
-  const reqParams = req.query as unknown as Partial<IUserReq>; // hacky af lol
-  const { username = "", login = true } = reqParams;
-  const { password = "" } = req.body;
   try {
-    if (!username) {
-      throw new Error(ApiError.INVALID_FIELDS);
-    } else {
-      switch (req.method) {
-        case "GET":
-          await getQuery({ username }).then((payload) =>
+    const reqBody = req.body as Partial<IUserReq>;
+    const reqParams = req.query as Partial<IUserReq>;
+    let valid = false;
+    switch (req.method) {
+      case "GET":
+        if (!reqParams.username) {
+          throw new Error(ApiError.INVALID_FIELDS);
+        } else {
+          await getQuery(reqParams).then((payload) =>
             forwardResponse(res, payload)
           );
-          break;
-        case "POST":
-          if (!password) {
-            throw new Error(ApiError.INVALID_FIELDS);
-          }
-          await postQuery({ username, password, login }).then((payload) =>
+        }
+        break;
+      case "POST":
+        const { email = "", password = "", login = true } = req.body;
+        if (!password || (!login && !email)) {
+          throw new Error(ApiError.INVALID_FIELDS);
+        } else {
+          await (login ? loginQuery(reqBody) : registerQuery(reqBody)).then(
+            (payload) => forwardResponse(res, payload)
+          );
+        }
+        break;
+      case "PUT":
+        valid = await validateAuth(req);
+        if (valid) {
+          await putQuery(reqBody).then((payload) =>
             forwardResponse(res, payload)
           );
-          break;
-        case "PUT":
-          validateAuth(req);
-          await putQuery(reqParams).then((payload) =>
-            forwardResponse(res, payload)
-          );
-          break;
-        case "DELETE":
-          res.status(200).json({ message: "delete ok" });
-          break;
-        default:
-          res.status(400).json({ message: "Bad request" });
-          break;
-      }
+        }
+        break;
+      case "DELETE":
+        valid = await validateAuth(req);
+        if (valid) {
+          deleteQuery(reqBody);
+        }
+        res.status(200).json({ message: "delete ok" });
+        break;
+      default:
+        res.status(400).json({ message: "Bad request" });
+        break;
     }
   } catch (err) {
     errorHandler(err, req, res);
   }
 }
-
-// userApi.post("/create", async (req, res, next) => {
-//   const { username = "", email = "", password = "" } = req.body;
-//   if (!username || !email || !password) {
-//     res.status(400);
-//     res.send(`Required fields not provided`);
-//   } else {
-//     try {
-//       await UserModel.findOne({ username }).then((doc) => {
-//         res.status(200);
-//         if (isEmpty(doc)) {
-//           createUser(email, username, password).then(() => {
-//             res.send(`User doc created successfully`);
-//           });
-//         } else {
-//           res.send(`Username already taken`);
-//         }
-//       });
-//     } catch (err) {
-//       res.status(500);
-//       res.send(`Server failed to register user`);
-//     }
-//   }
-// });
-
-// async function createUser(email: String, username: String, password: String) {
-//   const newUser = new UserModel({
-//     email,
-//     username,
-//     password,
-//     avatar: "",
-//     bio: "",
-//     color: "",
-//     createdAt: "",
-//     cart: null,
-//   });
-//   await newUser.save();
-// }
-
-// export default userApi;
