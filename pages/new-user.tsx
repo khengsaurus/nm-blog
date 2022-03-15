@@ -44,8 +44,8 @@ const NewUser = () => {
 
   function cancelRegister() {
     setAlert(null);
-    makeAuthHttpReq(DBService.USER, HttpRequestType.DELETE, { user });
-    router.push(PageRoute.LOGIN);
+    makeAuthHttpReq(DBService.USERS, HttpRequestType.DELETE, { user });
+    // router.push(PageRoute.LOGIN);
   }
 
   function registerUsername(
@@ -53,9 +53,8 @@ const NewUser = () => {
     user: IUser,
     callback?: () => void
   ) {
-    makeAuthHttpReq(DBService.USER, HttpRequestType.PUT, {
-      username,
-      email: user.email,
+    makeAuthHttpReq(DBService.USERS, HttpRequestType.PUT, {
+      user: { ...user, username },
     }).then((res) => {
       if (res.data?.token) {
         setUserToken(res.data.token);

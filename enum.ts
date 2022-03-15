@@ -1,7 +1,7 @@
 export enum DBService {
-  POST = "post",
-  PRODUCT = "product",
-  USER = "user",
+  POSTS = "posts",
+  ITEMS = "items",
+  USERS = "users",
 }
 
 export enum HttpRequestType {
@@ -33,6 +33,7 @@ export enum ApiError {
 export enum ApiInfo {
   EMAIL_AVAIL = "Email available",
   EMAIL_USED = "Email already used",
+  ITEM_NA = "Item cannot be found",
   USER_LOGIN = "User logged in successfully",
   USER_DELETED = "User deleted successfully",
   USER_NA = "User does not exist",

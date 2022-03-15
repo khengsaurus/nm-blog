@@ -71,8 +71,8 @@ export interface IReview extends IHasId, IHasCreatedAt, IHasUserRef, IHasBody {
   likes: ILike[];
 }
 
-export interface IProduct extends IHasId, IHasUserRef {
-  product_name: string;
+export interface IItem extends IHasId, IHasUserRef {
+  item_name: string;
   description: string;
   condition: string;
   images: string[];
@@ -95,7 +95,7 @@ export interface IPost extends IHasId, IHasCreatedAt, IHasUserRef {
 }
 
 export interface ICartItem {
-  productId: string;
+  itemId: string;
   quantity: number;
   price: number;
 }
@@ -121,7 +121,7 @@ export interface IError {
   email?: string;
   password?: string;
   confirmPassword?: string;
-  product_name?: string;
+  item_name?: string;
   price?: string;
   condition?: string;
   body?: string;

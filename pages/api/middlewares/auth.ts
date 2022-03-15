@@ -1,8 +1,7 @@
 import jwt from "jsonwebtoken";
-import { WithId } from "mongodb";
 import { NextApiRequest } from "next";
 import { ApiError } from "../../../enum";
-import { IUser, IUserReq } from "../../../types";
+import { IUserReq } from "../../../types";
 const SECRET_KEY = "secret-key";
 
 export function generateToken(email: string, username: string) {
@@ -18,7 +17,7 @@ export function generateToken(email: string, username: string) {
 
 export async function validateAuth(req: NextApiRequest): Promise<boolean> {
   return new Promise((resolve, reject) => {
-    const { email = "", username = "" } = req.body?.user || {};
+    const { email = "", username = "" } = req.body.user || {};
     let token: any = req.headers?.authorization || "Basic ";
     token = token.split("Basic ")[1];
     if (!token) {

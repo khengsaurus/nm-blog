@@ -13,11 +13,7 @@ const Home: React.FC = () => {
     }
   }, [router, user]);
 
-  return (
-    <main>
-      <div>Home</div>
-    </main>
-  );
+  return <main>Index</main>;
 };
 
 export default Home;

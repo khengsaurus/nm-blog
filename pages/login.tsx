@@ -50,12 +50,11 @@ const Login = () => {
   }
 
   const handleLogin = useCallback(() => {
-    axios
-      .post(`api/user`, {
-        username,
-        password,
-        login: true,
-      })
+    makeAuthHttpReq(DBService.USERS, HttpRequestType.POST, {
+      username,
+      password,
+      login: true,
+    })
       .then((res) => {
         if (!isEmpty(res?.data?.token)) {
           setUserToken(res.data.token);
@@ -68,11 +67,11 @@ const Login = () => {
         }
       })
       .catch((err) => console.error(err));
-  }, [password, setAlert, setUser, setUserToken, username]);
+  }, [makeAuthHttpReq, password, setAlert, setUser, setUserToken, username]);
 
   const handleRegister = useCallback(() => {
     if (password === confirmPassword) {
-      makeAuthHttpReq(DBService.USER, HttpRequestType.POST, {
+      makeAuthHttpReq(DBService.USERS, HttpRequestType.POST, {
         email,
         password,
         login: false,

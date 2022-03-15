@@ -1,13 +1,13 @@
-import { extend, isEmpty, reject } from "lodash";
+import { extend, isEmpty } from "lodash";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { ApiError, ApiInfo } from "../../enum";
+import { ApiError, ApiInfo, DBService, HttpRequestType } from "../../enum";
 import { mongodbConn } from "../../lib/mongodb";
 import { IResponse, IUserReq } from "../../types";
 import { generateToken, validateAuth, verify } from "./middlewares/auth";
 import { errorHandler } from "./middlewares/errorHandler";
 import { forwardResponse } from "./middlewares/forwardResponse";
 
-function createNewUser(params: Object) {
+function createObj(params: Object) {
   const baseUser = {
     avatar: "",
     bio: "",
@@ -21,13 +21,54 @@ function createNewUser(params: Object) {
   return extend(baseUser, params);
 }
 
-async function getQuery(params: object, limit = 1): Promise<IResponse> {
+/**
+ * @param reqBody: username, password, login, ...
+ * Handle login and register depending on login arg.
+ * @resolve {..., token: JWT, user: user object without username}
+ */
+async function createDoc(reqBody: Partial<IUserReq>): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
+    const { email, password } = reqBody;
     try {
       const { db } = await mongodbConn();
       if (db) {
-        if (limit === 1) {
-          const ref = db.collection("users");
+        const ref = db.collection(DBService.USERS);
+        ref.findOne({ email }).then((existingUser: any) => {
+          if (isEmpty(existingUser)) {
+            // Create acc without setting username
+            const user = createObj({ email, password });
+            ref.insertOne(user).then((res) => {
+              if (res.acknowledged) {
+                const token = generateToken(email, email);
+                delete user.password;
+                resolve({
+                  status: 200,
+                  message: ApiInfo.EMAIL_AVAIL,
+                  data: { token, user },
+                });
+              } else {
+                console.info("MDB failed to acknowledge request");
+                reject(new Error(ApiError.INTERNAL_500));
+              }
+            });
+          } else {
+            resolve({ status: 200, message: ApiInfo.EMAIL_USED });
+          }
+        });
+      }
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+async function getDoc(params: object, limit = 1): Promise<IResponse> {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { db } = await mongodbConn();
+      if (limit === 1) {
+        if (db) {
+          const ref = db.collection(DBService.USERS);
           await ref.findOne(params).then((data) => {
             if (isEmpty(data)) {
               resolve({ status: 200, message: ApiInfo.USER_NA });
@@ -52,13 +93,13 @@ async function getQuery(params: object, limit = 1): Promise<IResponse> {
  * Handle login and register depending on login arg.
  * @resolve {..., token: JWT}
  */
-async function loginQuery(reqBody: Partial<IUserReq>): Promise<IResponse> {
+async function runTransaction(reqBody: Partial<IUserReq>): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     const { username, password } = reqBody;
     try {
       const { db } = await mongodbConn();
       if (db) {
-        const ref = db.collection("users");
+        const ref = db.collection(DBService.USERS);
         ref.findOne({ username }).then((existingUser: any) => {
           if (
             isEmpty(existingUser) ||
@@ -86,53 +127,12 @@ async function loginQuery(reqBody: Partial<IUserReq>): Promise<IResponse> {
   });
 }
 
-/**
- * @param reqBody: username, password, login, ...
- * Handle login and register depending on login arg.
- * @resolve {..., token: JWT, user: user object without username}
- */
-async function registerQuery(reqBody: Partial<IUserReq>): Promise<IResponse> {
-  return new Promise(async (resolve, reject) => {
-    const { email, password } = reqBody;
-    try {
-      const { db } = await mongodbConn();
-      if (db) {
-        const ref = db.collection("users");
-        ref.findOne({ email }).then((existingUser: any) => {
-          if (isEmpty(existingUser)) {
-            // Create acc without setting username
-            const user = createNewUser({ email, password });
-            ref.insertOne(user).then((res) => {
-              if (res.acknowledged) {
-                const token = generateToken(email, email);
-                delete user.password;
-                resolve({
-                  status: 200,
-                  message: ApiInfo.EMAIL_AVAIL,
-                  data: { token, user },
-                });
-              } else {
-                console.info("MDB failed to acknowledge request");
-                reject(new Error(ApiError.INTERNAL_500));
-              }
-            });
-          } else {
-            resolve({ status: 200, message: ApiInfo.EMAIL_USED });
-          }
-        });
-      }
-    } catch (err) {
-      reject(err);
-    }
-  });
-}
-
-async function putQuery(body: Partial<IUserReq>): Promise<IResponse> {
+async function updateDoc(body: Partial<IUserReq>): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     try {
       const { db } = await mongodbConn();
       if (db) {
-        const ref = db.collection("users");
+        const ref = db.collection(DBService.USERS);
         const { email, username } = body;
         // provide username only on req to change
         if (username) {
@@ -165,14 +165,14 @@ async function putQuery(body: Partial<IUserReq>): Promise<IResponse> {
   });
 }
 
-async function deleteQuery(searchParams) {
+async function deleteDoc(searchParams) {
   return new Promise(async (resolve, reject) => {
     try {
       const { db } = await mongodbConn();
       if (db) {
-        const ref = db.collection("users");
+        const ref = db.collection(DBService.USERS);
         // not working... doing it as per @see https://docs.mongodb.com/drivers/node/current/usage-examples/deleteOne/
-        await ref.deleteOne(searchParams).then((res) => {
+        ref.deleteOne(searchParams).then((res) => {
           if (res.acknowledged) {
             resolve({ status: 200, message: ApiInfo.USER_DELETED });
           } else {
@@ -186,6 +186,11 @@ async function deleteQuery(searchParams) {
   });
 }
 
+function handleBadRequest(res: NextApiResponse) {
+  res.status(400).json({ message: "Bad request" });
+  return;
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<IResponse | any>
@@ -195,42 +200,45 @@ export default async function handler(
     const reqParams = req.query as Partial<IUserReq>;
     let valid = false;
     switch (req.method) {
-      case "GET":
+      case HttpRequestType.GET:
         if (!reqParams.username) {
           throw new Error(ApiError.INVALID_FIELDS);
         } else {
-          await getQuery(reqParams).then((payload) =>
+          await getDoc(reqParams).then((payload) =>
             forwardResponse(res, payload)
           );
         }
         break;
-      case "POST":
+      case HttpRequestType.POST:
         const { email = "", password = "", login = true } = req.body;
         if (!password || (!login && !email)) {
           throw new Error(ApiError.INVALID_FIELDS);
         } else {
-          await (login ? loginQuery(reqBody) : registerQuery(reqBody)).then(
+          await (login ? runTransaction(reqBody) : createDoc(reqBody)).then(
             (payload) => forwardResponse(res, payload)
           );
         }
         break;
-      case "PUT":
-        valid = await validateAuth(req);
-        if (valid) {
-          await putQuery(reqBody).then((payload) =>
-            forwardResponse(res, payload)
-          );
-        }
+      case HttpRequestType.PUT:
+        validateAuth(req).then((valid) => {
+          if (valid) {
+            updateDoc(reqBody).then((payload) => forwardResponse(res, payload));
+          } else {
+            handleBadRequest(res);
+          }
+        });
         break;
-      case "DELETE":
-        valid = await validateAuth(req);
-        if (valid) {
-          deleteQuery(reqBody);
-        }
-        res.status(200).json({ message: "delete ok" });
+      case HttpRequestType.DELETE:
+        validateAuth(req).then((valid) => {
+          if (valid) {
+            deleteDoc(reqBody).then((payload) => forwardResponse(res, payload));
+          } else {
+            handleBadRequest(res);
+          }
+        });
         break;
       default:
-        res.status(400).json({ message: "Bad request" });
+        handleBadRequest(res);
         break;
     }
   } catch (err) {

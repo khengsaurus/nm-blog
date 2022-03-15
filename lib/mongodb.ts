@@ -1,4 +1,5 @@
-import { Db, MongoClient } from "mongodb";
+import { Collection, Db, MongoClient } from "mongodb";
+import { DBService } from "../enum";
 const MONGODB_URI = process.env.MONGODB_URI;
 const DB_NAME = process.env.DB_NAME;
 
@@ -29,4 +30,19 @@ export async function mongodbConn(): Promise<IMongoAccess> {
       res(cached);
     }
   });
+}
+
+export async function getConnection(
+  service: DBService
+): Promise<Collection<Document>> {
+  try {
+    const { db } = await mongodbConn();
+    if (db) {
+      return db.collection(service);
+    } else {
+      return null;
+    }
+  } catch (err) {
+    throw err;
+  }
 }
