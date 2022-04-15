@@ -55,7 +55,11 @@ const NewUser = () => {
       if (res.data?.token) {
         handleUserToken(res.data.token);
         setUser({ ...user, username }); // not returning user obj...
-        setAlert(null);
+        setAlert({
+          status: Status.SUCCESS,
+          message: "Successfully registered",
+        });
+        setTimeout(() => router.push(PageRoute.HOME), 2000);
       } else {
         setAlert({ status: Status.ERROR, message: res.data?.message });
       }

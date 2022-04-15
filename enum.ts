@@ -12,6 +12,7 @@ export enum HttpRequestType {
 }
 
 export enum PageRoute {
+  HOME = "/",
   LOGIN = "/login",
   NEWUSER = "/new-user",
 }
@@ -23,11 +24,15 @@ export enum Transition {
   INSTANT = 0,
 }
 
-export enum ApiError {
-  AUTH_FAILED = "Authorization failed",
-  AUTH_HEADER_NA = 'No auth token found. Auth header must be in the form "Bearer <token>',
-  INTERNAL_500 = "Internal server error",
-  INVALID_FIELDS = "Invalid fields",
+export enum HTTP_RES {
+  _200 = "Success",
+  _400 = "Bad request",
+  _401 = "Unauthorized request",
+  _404 = "Failed to find resource",
+  _500 = "Internal server error",
+  BAD_LOGIN = "Incorrect username or password",
+  SERVER_LISTENING = "Server listening on port ",
+  USERNAME_TAKEN = "Username already taken",
 }
 
 export enum ApiInfo {

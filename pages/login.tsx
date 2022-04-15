@@ -61,13 +61,13 @@ const Login = () => {
           setUser(res.data.user);
           setAlert(null);
           clearForm();
-          //TODO: push to home page
+          router.push(PageRoute.HOME);
         } else {
           setAlert({ status: Status.ERROR, message: res?.data?.message });
         }
       })
       .catch((err) => console.error(err));
-  }, [password, setAlert, setUser, handleUserToken, username]);
+  }, [password, setAlert, setUser, handleUserToken, router, username]);
 
   const handleRegister = useCallback(() => {
     if (password === confirmPassword) {

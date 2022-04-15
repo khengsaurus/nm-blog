@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { ApiError } from "../../../enum";
+import { HTTP_RES } from "../../../enum";
 import { forwardResponse } from "./forwardResponse";
 
 export function errorHandler(
@@ -8,14 +8,14 @@ export function errorHandler(
   res: NextApiResponse
 ) {
   switch (err.message) {
-    case ApiError.INTERNAL_500:
+    case HTTP_RES._500:
       console.info(err.message);
       console.info("Request URL: " + req.url);
       console.info("Query: " + JSON.stringify(req.query));
       console.info("Body: " + JSON.stringify(req.body));
-      forwardResponse(res, { status: 500, message: ApiError.INTERNAL_500 });
+      forwardResponse(res, { status: 500, message: HTTP_RES._500 });
       break;
-    case ApiError.INVALID_FIELDS:
-      forwardResponse(res, { status: 400, message: ApiError.INVALID_FIELDS });
+    case HTTP_RES._400:
+      forwardResponse(res, { status: 400, message: HTTP_RES._400 });
   }
 }

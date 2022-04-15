@@ -1,7 +1,8 @@
 import { extend, isEmpty } from "lodash";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { ApiError, ApiInfo, DBService, HttpRequestType } from "../../enum";
+import { HTTP_RES, ApiInfo, DBService, HttpRequestType } from "../../enum";
 import { mongodbConn } from "../../lib/server/mongodb";
+import { hashPassword } from "../../lib/server/validation";
 import { IResponse, IUserReq } from "../../types";
 import { generateToken, validateAuth, verify } from "./middlewares/auth";
 import { errorHandler } from "./middlewares/errorHandler";
@@ -36,7 +37,7 @@ async function createDoc(reqBody: Partial<IUserReq>): Promise<IResponse> {
         ref.findOne({ email }).then((existingUser: any) => {
           if (isEmpty(existingUser)) {
             // Create acc without setting username
-            const user = createObj({ email, password });
+            const user = createObj({ email, password: hashPassword(password) });
             ref.insertOne(user).then((res) => {
               if (res.acknowledged) {
                 const token = generateToken(email, email);
@@ -48,7 +49,7 @@ async function createDoc(reqBody: Partial<IUserReq>): Promise<IResponse> {
                 });
               } else {
                 console.info("MDB failed to acknowledge request");
-                reject(new Error(ApiError.INTERNAL_500));
+                reject(new Error(HTTP_RES._500));
               }
             });
           } else {
@@ -176,7 +177,7 @@ async function deleteDoc(searchParams) {
           if (res.acknowledged) {
             resolve({ status: 200, message: ApiInfo.USER_DELETED });
           } else {
-            reject(new Error(ApiError.INTERNAL_500));
+            reject(new Error(HTTP_RES._500));
           }
         });
       }
@@ -201,7 +202,7 @@ export default async function handler(
     switch (req.method) {
       case HttpRequestType.GET:
         if (!reqParams.username) {
-          throw new Error(ApiError.INVALID_FIELDS);
+          throw new Error(HTTP_RES._400);
         } else {
           await getDoc(reqParams).then((payload) =>
             forwardResponse(res, payload)
@@ -211,7 +212,7 @@ export default async function handler(
       case HttpRequestType.POST:
         const { email = "", password = "", login = true } = req.body;
         if (!password || (!login && !email)) {
-          throw new Error(ApiError.INVALID_FIELDS);
+          throw new Error(HTTP_RES._400);
         } else {
           await (login ? runTransaction(reqBody) : createDoc(reqBody)).then(
             (payload) => forwardResponse(res, payload)
