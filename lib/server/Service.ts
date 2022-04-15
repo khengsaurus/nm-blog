@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { DBService } from "../enum";
-import { IResponse } from "../types";
+import { DBService } from "../../enum";
+import { IResponse } from "../../types";
 
 export abstract class Service {
   protected service: DBService;

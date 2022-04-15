@@ -1,6 +1,6 @@
-import { extend, isEmpty, reject } from "lodash";
+import { extend, isEmpty } from "lodash";
 import { ApiInfo, DBService } from "../../enum";
-import { mongodbConn } from "../../lib/mongodb";
+import { mongodbConn } from "../../lib/server/mongodb";
 import { IItem, IResponse } from "../../types";
 
 function createItem(params: Object) {

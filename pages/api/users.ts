@@ -1,7 +1,7 @@
 import { extend, isEmpty } from "lodash";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { ApiError, ApiInfo, DBService, HttpRequestType } from "../../enum";
-import { mongodbConn } from "../../lib/mongodb";
+import { mongodbConn } from "../../lib/server/mongodb";
 import { IResponse, IUserReq } from "../../types";
 import { generateToken, validateAuth, verify } from "./middlewares/auth";
 import { errorHandler } from "./middlewares/errorHandler";
@@ -198,7 +198,6 @@ export default async function handler(
   try {
     const reqBody = req.body as Partial<IUserReq>;
     const reqParams = req.query as Partial<IUserReq>;
-    let valid = false;
     switch (req.method) {
       case HttpRequestType.GET:
         if (!reqParams.username) {

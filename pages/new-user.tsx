@@ -4,20 +4,14 @@ import { useContext, useEffect, useRef, useState } from "react";
 import HomePage from "../components/HomePage";
 import { DBService, HttpRequestType, PageRoute, Transition } from "../enum";
 import { Status } from "../enums";
-import { AppContext } from "../lib/context";
+import { AppContext } from "../hooks/context";
+import { HTTPService } from "../lib/client";
 import { StyledButton } from "../styles/StyledMui";
 import { AlertStatus, IUser } from "../types";
 
 const NewUser = () => {
-  const {
-    alert,
-    router,
-    makeAuthHttpReq,
-    setAlert,
-    setUser,
-    setUserToken,
-    user,
-  } = useContext(AppContext);
+  const { alert, router, setAlert, setUser, handleUserToken, user } =
+    useContext(AppContext);
   const [username, setUsername] = useState("");
   // const [toDeleteIfUnload, setToDeleteIfUnload] = useState(true);
   // const checkAuthTimeoutRef = useRef<NodeJS.Timeout>(null);
@@ -44,7 +38,9 @@ const NewUser = () => {
 
   function cancelRegister() {
     setAlert(null);
-    makeAuthHttpReq(DBService.USERS, HttpRequestType.DELETE, { user });
+    HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequestType.DELETE, {
+      user,
+    });
     // router.push(PageRoute.LOGIN);
   }
 
@@ -53,11 +49,11 @@ const NewUser = () => {
     user: IUser,
     callback?: () => void
   ) {
-    makeAuthHttpReq(DBService.USERS, HttpRequestType.PUT, {
+    HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequestType.PUT, {
       user: { ...user, username },
     }).then((res) => {
       if (res.data?.token) {
-        setUserToken(res.data.token);
+        handleUserToken(res.data.token);
         setUser({ ...user, username }); // not returning user obj...
         setAlert(null);
       } else {

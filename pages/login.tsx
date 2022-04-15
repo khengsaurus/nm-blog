@@ -1,5 +1,4 @@
 import { Alert, Collapse, TextField } from "@mui/material";
-import axios from "axios";
 import { isEmpty } from "lodash";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import HomePage from "../components/HomePage";
@@ -11,12 +10,13 @@ import {
   Transition,
 } from "../enum";
 import { Status } from "../enums";
-import { AppContext } from "../lib/context";
+import { AppContext } from "../hooks";
+import { HTTPService } from "../lib/client";
 import { StyledButton } from "../styles/StyledMui";
 import { AlertStatus } from "../types";
 
 const Login = () => {
-  const { alert, makeAuthHttpReq, router, setAlert, setUser, setUserToken } =
+  const { alert, router, setAlert, setUser, handleUserToken } =
     useContext(AppContext);
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -50,14 +50,14 @@ const Login = () => {
   }
 
   const handleLogin = useCallback(() => {
-    makeAuthHttpReq(DBService.USERS, HttpRequestType.POST, {
+    HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequestType.POST, {
       username,
       password,
       login: true,
     })
       .then((res) => {
         if (!isEmpty(res?.data?.token)) {
-          setUserToken(res.data.token);
+          handleUserToken(res.data.token);
           setUser(res.data.user);
           setAlert(null);
           clearForm();
@@ -67,17 +67,17 @@ const Login = () => {
         }
       })
       .catch((err) => console.error(err));
-  }, [makeAuthHttpReq, password, setAlert, setUser, setUserToken, username]);
+  }, [password, setAlert, setUser, handleUserToken, username]);
 
   const handleRegister = useCallback(() => {
     if (password === confirmPassword) {
-      makeAuthHttpReq(DBService.USERS, HttpRequestType.POST, {
+      HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequestType.POST, {
         email,
         password,
         login: false,
       }).then((res) => {
         if (!isEmpty(res?.data?.token)) {
-          setUserToken(res.data.token);
+          handleUserToken(res.data.token);
           setUser(res.data.user);
           setAlert(null);
           clearForm();
@@ -92,12 +92,11 @@ const Login = () => {
   }, [
     confirmPassword,
     email,
-    makeAuthHttpReq,
     password,
     router,
     setAlert,
     setUser,
-    setUserToken,
+    handleUserToken,
   ]);
 
   const renderLoginButton = () => (
