@@ -53,3 +53,8 @@ export enum ErrorMessage {
   TRY_AGAIN = "Please try again",
   PW_NOT_MATCHING = "Passwords do not match",
 }
+
+export enum APIAction {
+  USER_TOKEN_LOGIN = "user-token-login",
+  USER_SET_USERNAME = "user-set-username",
+}

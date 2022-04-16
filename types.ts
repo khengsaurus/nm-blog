@@ -1,6 +1,6 @@
 import { AxiosRequestConfig } from "axios";
 import { NextRouter } from "next/router";
-import { DBService, HttpRequestType } from "./enum";
+import { APIAction, DBService, HttpRequestType } from "./enum";
 import { Status } from "./enums";
 
 export type AlertStatus = "success" | "info" | "warning" | "error";
@@ -16,11 +16,10 @@ export interface IResponse {
 /*------------------------------ . ------------------------------*/
 
 export interface IAppContext {
-  alert: IAlert;
   user: IUser;
   userToken: string;
   router: NextRouter;
-  setAlert: (_?: IAlert) => void;
+  logout: () => void;
   setUser: (_?: IUser) => void;
   handleUserToken: (_?: string) => void;
 }
@@ -97,7 +96,6 @@ export interface ICartItem {
 export interface IUser extends IHasId {
   avatar: string;
   bio: string;
-  color: string;
   createdAt: string;
   email: string;
   password: string;
@@ -107,6 +105,7 @@ export interface IUser extends IHasId {
 
 export interface IUserReq extends IUser {
   login: boolean;
+  action: APIAction;
 }
 
 export interface IError {

@@ -13,16 +13,22 @@ import { Status } from "../enums";
 import { AppContext } from "../hooks";
 import { HTTPService } from "../lib/client";
 import { StyledButton } from "../styles/StyledMui";
-import { AlertStatus } from "../types";
+import { AlertStatus, IAlert } from "../types";
 
 const Login = () => {
-  const { alert, router, setAlert, setUser, handleUserToken } =
-    useContext(AppContext);
+  const { router, user, setUser, handleUserToken } = useContext(AppContext);
+  const [alert, setAlert] = useState<IAlert>(null);
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showRegister, setShowRegister] = useState(false);
+
+  useEffect(() => {
+    if (!!user) {
+      router.push(PageRoute.HOME);
+    }
+  }, [router, user]);
 
   useEffect(() => {
     setConfirmPassword("");

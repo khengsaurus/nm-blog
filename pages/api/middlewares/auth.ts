@@ -16,17 +16,23 @@ export function generateToken(email: string, username: string) {
   );
 }
 
+export function decodeToken<T>(req: NextApiRequest) {
+  let token: any = req.headers?.authorization || "Bearer ";
+  token = token.split("Bearer ")[1];
+  return jwt.verify(token, SECRET_KEY) as T;
+}
+
 export async function validateAuth(req: NextApiRequest): Promise<boolean> {
   return new Promise((resolve, reject) => {
-    const { email = "", username = "" } = req.body.user || {};
+    const { email = "" } = req.body || {};
     let token: any = req.headers?.authorization || "Bearer ";
     token = token.split("Bearer ")[1];
     if (!token) {
       throw new Error(HTTP_RES._401);
     }
     token = jwt.verify(token, SECRET_KEY);
-    const { username: _u, email: _e } = token;
-    if (_e === email && (!username || _u === username)) {
+    const { email: _e } = token;
+    if (_e === email) {
       resolve(true);
     } else {
       reject(new Error(HTTP_RES._401));

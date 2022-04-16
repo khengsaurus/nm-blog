@@ -1,26 +1,18 @@
-import { useRouter } from "next/router";
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import HomePage from "../components/HomePage";
-import { PageRoute } from "../enum";
 import { AppContext } from "../hooks";
 
 const Home: React.FC = () => {
-  const router = useRouter();
-  const { user } = useContext(AppContext);
-
-  useEffect(() => {
-    if (!user) {
-      router?.push(PageRoute.LOGIN);
-    }
-  }, [router, user]);
+  const { user, logout } = useContext(AppContext);
 
   const markup = (
     <div>
       <h1>Welcome {user?.username}</h1>
+      <button onClick={logout}>Logout</button>
     </div>
   );
 
-  return <HomePage title={"Home Page"} markup={markup} />;
+  return <HomePage title={"Home Page"} markup={markup} requireAuth />;
 };
 
 export default Home;

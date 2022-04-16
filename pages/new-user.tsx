@@ -2,17 +2,23 @@ import { Alert, Collapse, TextField } from "@mui/material";
 import { isEmpty } from "lodash";
 import { useContext, useEffect, useRef, useState } from "react";
 import HomePage from "../components/HomePage";
-import { DBService, HttpRequestType, PageRoute, Transition } from "../enum";
+import {
+  APIAction,
+  DBService,
+  HttpRequestType,
+  PageRoute,
+  Transition,
+} from "../enum";
 import { Status } from "../enums";
 import { AppContext } from "../hooks/context";
 import { HTTPService } from "../lib/client";
 import { StyledButton } from "../styles/StyledMui";
-import { AlertStatus, IUser } from "../types";
+import { AlertStatus, IAlert, IUser } from "../types";
 
 const NewUser = () => {
-  const { alert, router, setAlert, setUser, handleUserToken, user } =
-    useContext(AppContext);
+  const { router, setUser, handleUserToken, user } = useContext(AppContext);
   const [username, setUsername] = useState("");
+  const [alert, setAlert] = useState<IAlert>(null);
   // const [toDeleteIfUnload, setToDeleteIfUnload] = useState(true);
   // const checkAuthTimeoutRef = useRef<NodeJS.Timeout>(null);
 
@@ -41,16 +47,19 @@ const NewUser = () => {
     HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequestType.DELETE, {
       user,
     });
-    // router.push(PageRoute.LOGIN);
+    router.push(PageRoute.LOGIN);
   }
 
   function registerUsername(
+    email: string,
     username: string,
     user: IUser,
     callback?: () => void
   ) {
     HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequestType.PUT, {
-      user: { ...user, username },
+      email,
+      username,
+      action: APIAction.USER_SET_USERNAME,
     }).then((res) => {
       if (res.data?.token) {
         handleUserToken(res.data.token);
@@ -90,7 +99,7 @@ const NewUser = () => {
               autoFocus
               type="submit"
               disabled={username.trim() === ""}
-              onClick={() => registerUsername(username, user)}
+              onClick={() => registerUsername(user?.email, username, user)}
             />
           </>
         )}

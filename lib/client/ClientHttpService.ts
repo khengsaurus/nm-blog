@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
-import { DBService, HttpRequestType } from "../../enum";
+import { APIAction, DBService, HttpRequestType } from "../../enum";
 
 class ClientHTTPService {
   private instance: AxiosInstance;
@@ -13,6 +13,12 @@ class ClientHTTPService {
 
   setBearerToken(token: string) {
     this.bearerToken = token;
+  }
+
+  handleTokenLogin() {
+    return this.makeAuthHttpReq(DBService.USERS, HttpRequestType.POST, {
+      action: APIAction.USER_TOKEN_LOGIN,
+    });
   }
 
   makeAuthHttpReq(

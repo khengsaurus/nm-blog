@@ -1,10 +1,21 @@
 import { extend, isEmpty } from "lodash";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { HTTP_RES, ApiInfo, DBService, HttpRequestType } from "../../enum";
+import {
+  HTTP_RES,
+  ApiInfo,
+  DBService,
+  HttpRequestType,
+  APIAction,
+} from "../../enum";
 import { mongodbConn } from "../../lib/server/mongodb";
 import { hashPassword } from "../../lib/server/validation";
-import { IResponse, IUserReq } from "../../types";
-import { generateToken, validateAuth, verify } from "./middlewares/auth";
+import { IResponse, IUser, IUserReq } from "../../types";
+import {
+  decodeToken,
+  generateToken,
+  validateAuth,
+  verify,
+} from "./middlewares/auth";
 import { errorHandler } from "./middlewares/errorHandler";
 import { forwardResponse } from "./middlewares/forwardResponse";
 
@@ -12,7 +23,6 @@ function createObj(params: Object) {
   const baseUser = {
     avatar: "",
     bio: "",
-    color: "",
     createdAt: "",
     email: "",
     password: "",
@@ -41,11 +51,10 @@ async function createDoc(reqBody: Partial<IUserReq>): Promise<IResponse> {
             ref.insertOne(user).then((res) => {
               if (res.acknowledged) {
                 const token = generateToken(email, email);
-                delete user.password;
                 resolve({
                   status: 200,
                   message: ApiInfo.EMAIL_AVAIL,
-                  data: { token, user },
+                  data: { token, user: processUserData(user) },
                 });
               } else {
                 console.info("MDB failed to acknowledge request");
@@ -74,10 +83,13 @@ async function getDoc(params: object, limit = 1): Promise<IResponse> {
             if (isEmpty(data)) {
               resolve({ status: 200, message: ApiInfo.USER_NA });
             } else {
+              const user = processUserData(data);
               resolve({
                 status: 200,
                 message: ApiInfo.USER_RETRIEVED,
-                ...data,
+                data: {
+                  user,
+                },
               });
             }
           });
@@ -94,7 +106,7 @@ async function getDoc(params: object, limit = 1): Promise<IResponse> {
  * Handle login and register depending on login arg.
  * @resolve {..., token: JWT}
  */
-async function runTransaction(reqBody: Partial<IUserReq>): Promise<IResponse> {
+async function handleLogin(reqBody: Partial<IUserReq>): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     const { username, password } = reqBody;
     try {
@@ -113,11 +125,10 @@ async function runTransaction(reqBody: Partial<IUserReq>): Promise<IResponse> {
             });
           } else {
             const token = generateToken(existingUser.email, username);
-            delete existingUser.password;
             resolve({
               status: 200,
               message: ApiInfo.USER_LOGIN,
-              data: { token, user: existingUser },
+              data: { token, user: processUserData(existingUser) },
             });
           }
         });
@@ -128,37 +139,75 @@ async function runTransaction(reqBody: Partial<IUserReq>): Promise<IResponse> {
   });
 }
 
+async function handleTokenLogin(
+  req: NextApiRequest,
+  res: NextApiResponse<IResponse | any>
+): Promise<IResponse> {
+  return new Promise(async (_, reject) => {
+    const { email, username } = decodeToken<Partial<IUser>>(req);
+    if (!email) {
+      reject(new Error(HTTP_RES._401));
+    } else {
+      try {
+        await getDoc({ email, username }).then((payload) =>
+          forwardResponse(res, payload)
+        );
+      } catch (err) {
+        reject(err);
+      }
+    }
+  });
+}
+
 async function updateDoc(body: Partial<IUserReq>): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     try {
       const { db } = await mongodbConn();
       if (db) {
         const ref = db.collection(DBService.USERS);
-        const { email, username } = body;
-        // provide username only on req to change
-        if (username) {
-          ref.findOne({ username }).then((existingUser: any) => {
-            if (!isEmpty(existingUser)) {
+        const { email, username, action } = body;
+        if (email) {
+          if (action === APIAction.USER_SET_USERNAME) {
+            ref.findOne({ username }).then((existingUser: any) => {
+              if (!isEmpty(existingUser)) {
+                resolve({
+                  status: 200,
+                  message: ApiInfo.USERNAME_TAKEN,
+                  data: {},
+                });
+                return;
+              }
+            });
+          }
+          ref.findOne({ email }).then((existingUser: any) => {
+            if (isEmpty(existingUser)) {
               resolve({
-                status: 200,
-                message: ApiInfo.USERNAME_TAKEN,
+                status: 400,
+                message: ApiInfo.USER_NA,
                 data: {},
+              });
+            } else {
+              ref.updateOne({ email }, { $set: body }, (err, _res) => {
+                if (err) {
+                  reject(err);
+                } else {
+                  const token = generateToken(email, username);
+                  resolve({
+                    status: 200,
+                    message: ApiInfo.USER_UPDATED,
+                    data: { ..._res, token },
+                  });
+                }
               });
             }
           });
+        } else {
+          resolve({
+            status: 400,
+            message: HTTP_RES._400,
+            data: {},
+          });
         }
-        ref.updateOne({ email }, { $set: body }, (err, _res) => {
-          if (err) {
-            reject(err);
-          } else {
-            const token = generateToken(email, username);
-            resolve({
-              status: 200,
-              message: ApiInfo.USER_UPDATED,
-              data: { ..._res, token },
-            });
-          }
-        });
       }
     } catch (err) {
       reject(err);
@@ -210,11 +259,18 @@ export default async function handler(
         }
         break;
       case HttpRequestType.POST:
-        const { email = "", password = "", login = true } = req.body;
-        if (!password || (!login && !email)) {
+        const {
+          email = "",
+          password = "",
+          login = true,
+          action = "",
+        } = req.body;
+        if (action === APIAction.USER_TOKEN_LOGIN) {
+          handleTokenLogin(req, res);
+        } else if (!password || (!login && !email)) {
           throw new Error(HTTP_RES._400);
         } else {
-          await (login ? runTransaction(reqBody) : createDoc(reqBody)).then(
+          await (login ? handleLogin(reqBody) : createDoc(reqBody)).then(
             (payload) => forwardResponse(res, payload)
           );
         }
@@ -244,4 +300,14 @@ export default async function handler(
   } catch (err) {
     errorHandler(err, req, res);
   }
+}
+
+function processUserData(user: any) {
+  return {
+    username: user.username,
+    email: user.email,
+    avatar: user.avatar || "",
+    bio: user.bio || "",
+    cart: user.cart || [],
+  };
 }

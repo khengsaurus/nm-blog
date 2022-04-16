@@ -1,3 +1,4 @@
 import { AppContext } from "./context";
+import useFirstEffect from "./useFirstEffect";
 
-export { AppContext };
+export { AppContext, useFirstEffect };
