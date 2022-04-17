@@ -62,7 +62,6 @@ const Login = () => {
       login: true,
     })
       .then((res) => {
-        console.log(res);
         if (!isEmpty(res?.data?.token)) {
           handleUserToken(res.data.token);
           setUser(res.data.user);

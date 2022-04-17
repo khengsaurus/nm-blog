@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { NextApiRequest } from "next";
-import { HTTP_RES } from "../../../enum";
+import { HttpResponse } from "../../../enum";
 import { verifyPassword } from "../../../lib/server/validation";
 import { IUserReq } from "../../../types";
 const SECRET_KEY = "secret-key";
@@ -23,19 +23,19 @@ export function decodeToken<T>(req: NextApiRequest) {
 }
 
 export async function validateAuth(req: NextApiRequest): Promise<boolean> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const { email = "" } = req.body || {};
     let token: any = req.headers?.authorization || "Bearer ";
     token = token.split("Bearer ")[1];
     if (!token) {
-      throw new Error(HTTP_RES._401);
+      throw new Error(HttpResponse._401);
     }
     token = jwt.verify(token, SECRET_KEY);
     const { email: _e } = token;
     if (_e === email) {
       resolve(true);
     } else {
-      reject(new Error(HTTP_RES._401));
+      throw new Error(HttpResponse._401);
     }
   });
 }

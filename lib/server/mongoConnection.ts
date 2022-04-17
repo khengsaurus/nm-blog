@@ -4,14 +4,14 @@ import { UserSchema } from "./schemas";
 const MONGODB_URI = process.env.MONGODB_URI;
 
 export const mongoConnection = async () => {
-  let conn;
+  let connection;
   if (mongoose.connection.readyState === 0 || 3) {
-    conn = await mongoose
+    connection = await mongoose
       .connect(MONGODB_URI as string)
-      .catch((err) => console.log(err));
+      .catch((err) => console.error(err));
   }
 
   const User = mongoose.models.User || mongoose.model("User", UserSchema); // prevent OverwriteModelError
 
-  return { conn, User };
+  return { User };
 };

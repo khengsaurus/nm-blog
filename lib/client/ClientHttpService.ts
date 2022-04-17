@@ -40,7 +40,6 @@ class ClientHTTPService {
       case HttpRequest.GET:
         return this.instance.get(`api/${service}`, { params });
       case HttpRequest.POST:
-        console.log("-> POST");
         return this.instance.post(`api/${service}`, data, reqConfig);
       case HttpRequest.PUT:
         return this.instance.put(`api/${service}`, data, reqConfig);

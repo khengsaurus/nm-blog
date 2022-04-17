@@ -1,10 +1,21 @@
 import { extend, isEmpty } from "lodash";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { APIAction, ApiInfo, HttpRequest, HTTP_RES } from "../../enum";
+import {
+  APIAction,
+  ServerInfo,
+  HttpRequest,
+  HttpResponse,
+  ServerError,
+} from "../../enum";
 import { mongoConnection } from "../../lib/server/mongoConnection";
 import { hashPassword } from "../../lib/server/validation";
 import { IResponse, IUser, IUserReq } from "../../types";
-import { handleBadRequest, processUserData } from "../../util/serverUtil";
+import {
+  createUserObject,
+  handleBadRequest,
+  handleInternalError,
+  processUserData,
+} from "../../util/serverUtil";
 import {
   decodeToken,
   generateToken,
@@ -14,17 +25,68 @@ import {
 import { errorHandler } from "./middlewares/errorHandler";
 import { forwardResponse } from "./middlewares/forwardResponse";
 
-function createObj(params: Object) {
-  const baseUser = {
-    avatar: "",
-    bio: "",
-    createdAt: "",
-    email: "",
-    password: "",
-    username: "",
-    cart: null,
-  };
-  return extend(baseUser, params);
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  switch (req.method) {
+    case HttpRequest.GET:
+      handleGet(req, res);
+      break;
+    case HttpRequest.POST:
+      handlePost(req, res);
+      break;
+    case HttpRequest.PUT:
+      handlePut(req, res);
+      break;
+    case HttpRequest.DELETE:
+      handleDelete(req, res);
+      break;
+    default:
+      handleBadRequest(res);
+      break;
+  }
+}
+
+async function handleGet(req: NextApiRequest, res: NextApiResponse) {
+  const reqQuery = req.query as Partial<IUserReq>;
+  if (!reqQuery.username) {
+    handleBadRequest(res);
+  } else {
+    await getDoc(reqQuery)
+      .then((payload) => forwardResponse(res, payload))
+      .catch((err) => handleInternalError(res, err));
+  }
+}
+
+async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+  const reqBody = req.body as Partial<IUserReq>;
+  const { email = "", password = "", login = true, action = "" } = reqBody;
+  if (action === APIAction.USER_TOKEN_LOGIN) {
+    handleTokenLogin(req, res);
+  } else if (!password || (!login && !email)) {
+    handleBadRequest(res);
+  } else {
+    await (login ? handleLogin(reqBody) : createDoc(reqBody))
+      .then((payload) => forwardResponse(res, payload))
+      .catch((err) => handleInternalError(res, err));
+  }
+}
+
+async function handlePut(req: NextApiRequest, res: NextApiResponse) {
+  const reqBody = req.body as Partial<IUserReq>;
+  validateAuth(req)
+    .then(() => updateDoc(reqBody))
+    .then((payload) => forwardResponse(res, payload))
+    .catch((err) => handleBadRequest(res, err));
+}
+
+async function handleDelete(req: NextApiRequest, res: NextApiResponse) {
+  const reqBody = req.body as Partial<IUserReq>;
+  validateAuth(req)
+    .then(() => deleteDoc(reqBody))
+    .then((payload) => forwardResponse(res, payload))
+    .catch((err) => handleBadRequest(res, err));
 }
 
 /**
@@ -39,21 +101,24 @@ async function createDoc(reqBody: Partial<IUserReq>): Promise<IResponse> {
       const { User } = await mongoConnection();
       User.findOne({ email }).then((existingUser: any) => {
         if (!isEmpty(existingUser)) {
-          resolve({ status: 200, message: ApiInfo.EMAIL_USED });
+          resolve({ status: 200, message: ServerInfo.EMAIL_USED });
         } else {
           // Create acc without setting username
-          const user = createObj({ email, password: hashPassword(password) });
+          const user = createUserObject({
+            email,
+            password: hashPassword(password),
+          });
           User.create(user).then((res) => {
             if (!!res.id) {
               const token = generateToken(email, email);
               resolve({
                 status: 200,
-                message: ApiInfo.EMAIL_AVAIL,
+                message: ServerInfo.USER_DOC_CREATED,
                 data: { token, user: processUserData(user) },
               });
             } else {
-              console.info("Failed to create new user");
-              reject(new Error(HTTP_RES._500));
+              console.info(ServerError.CREATE_USER);
+              reject(new Error(HttpResponse._500));
             }
           });
         }
@@ -67,15 +132,14 @@ async function createDoc(reqBody: Partial<IUserReq>): Promise<IResponse> {
 async function getDoc(params: object): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     try {
-      console.log("getDoc called");
       const { User } = await mongoConnection();
       await User.findOne(params).then((userData) => {
         if (isEmpty(userData)) {
-          resolve({ status: 200, message: ApiInfo.USER_NA });
+          resolve({ status: 200, message: ServerInfo.USER_NA });
         } else {
           resolve({
             status: 200,
-            message: ApiInfo.USER_RETRIEVED,
+            message: ServerInfo.USER_RETRIEVED,
             data: {
               user: processUserData(userData),
             },
@@ -105,14 +169,14 @@ async function handleLogin(reqBody: Partial<IUserReq>): Promise<IResponse> {
         ) {
           resolve({
             status: 200,
-            message: ApiInfo.USER_LOGIN_WRONG_CREDENTIALS,
+            message: ServerInfo.USER_BAD_LOGIN,
             data: { token: null },
           });
         } else {
           const token = generateToken(existingUser.email, username);
           resolve({
             status: 200,
-            message: ApiInfo.USER_LOGIN,
+            message: ServerInfo.USER_LOGIN,
             data: { token, user: processUserData(existingUser) },
           });
         }
@@ -130,16 +194,11 @@ async function handleTokenLogin(
   return new Promise(async (_, reject) => {
     const { email, username } = decodeToken<Partial<IUser>>(req);
     if (!email) {
-      reject(new Error(HTTP_RES._401));
+      reject(new Error(HttpResponse._401));
     } else {
-      try {
-        await getDoc({ email, username }).then((payload) =>
-          forwardResponse(res, payload)
-        );
-      } catch (err) {
-        console.log(err);
-        reject(err);
-      }
+      await getDoc({ email, username })
+        .then((payload) => forwardResponse(res, payload))
+        .catch((err) => handleInternalError(res, err));
     }
   });
 }
@@ -154,8 +213,7 @@ async function updateDoc(body: Partial<IUserReq>): Promise<IResponse> {
           if (!isEmpty(existingUser)) {
             resolve({
               status: 200,
-              message: ApiInfo.USERNAME_TAKEN,
-              data: {},
+              message: ServerInfo.USERNAME_TAKEN,
             });
             return;
           } else {
@@ -163,8 +221,7 @@ async function updateDoc(body: Partial<IUserReq>): Promise<IResponse> {
               if (isEmpty(existingUser)) {
                 resolve({
                   status: 400,
-                  message: ApiInfo.USER_NA,
-                  data: {},
+                  message: ServerInfo.USER_NA,
                 });
               } else {
                 User.updateOne({ email }, { $set: body }, (err, _res) => {
@@ -174,7 +231,7 @@ async function updateDoc(body: Partial<IUserReq>): Promise<IResponse> {
                     const token = generateToken(email, username);
                     resolve({
                       status: 200,
-                      message: ApiInfo.USER_UPDATED,
+                      message: ServerInfo.USER_UPDATED,
                       data: { ..._res, token },
                     });
                   }
@@ -196,74 +253,13 @@ async function deleteDoc(searchParams) {
       const { User } = await mongoConnection();
       User.deleteOne(searchParams).then((res) => {
         if (res.acknowledged) {
-          resolve({ status: 200, message: ApiInfo.USER_DELETED });
+          resolve({ status: 200, message: ServerInfo.USER_DELETED });
         } else {
-          reject(new Error(HTTP_RES._500));
+          reject(new Error(HttpResponse._500));
         }
       });
     } catch (err) {
       reject(err);
     }
   });
-}
-
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<IResponse | any>
-) {
-  try {
-    const reqBody = req.body as Partial<IUserReq>;
-    const reqQuery = req.query as Partial<IUserReq>;
-    switch (req.method) {
-      case HttpRequest.GET:
-        if (!reqQuery.username) {
-          throw new Error(HTTP_RES._400);
-        } else {
-          await getDoc(reqQuery).then((payload) =>
-            forwardResponse(res, payload)
-          );
-        }
-        break;
-      case HttpRequest.POST:
-        const {
-          email = "",
-          password = "",
-          login = true,
-          action = "",
-        } = reqBody;
-        if (action === APIAction.USER_TOKEN_LOGIN) {
-          handleTokenLogin(req, res);
-        } else if (!password || (!login && !email)) {
-          throw new Error(HTTP_RES._400);
-        } else {
-          await (login ? handleLogin(reqBody) : createDoc(reqBody)).then(
-            (payload) => forwardResponse(res, payload)
-          );
-        }
-        break;
-      case HttpRequest.PUT:
-        validateAuth(req).then((valid) => {
-          if (valid) {
-            updateDoc(reqBody).then((payload) => forwardResponse(res, payload));
-          } else {
-            handleBadRequest(res);
-          }
-        });
-        break;
-      case HttpRequest.DELETE:
-        validateAuth(req).then((valid) => {
-          if (valid) {
-            deleteDoc(reqBody).then((payload) => forwardResponse(res, payload));
-          } else {
-            handleBadRequest(res);
-          }
-        });
-        break;
-      default:
-        handleBadRequest(res);
-        break;
-    }
-  } catch (err) {
-    errorHandler(err, req, res);
-  }
 }

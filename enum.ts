@@ -24,7 +24,7 @@ export enum Transition {
   INSTANT = 0,
 }
 
-export enum HTTP_RES {
+export enum HttpResponse {
   _200 = "Success",
   _400 = "Bad request",
   _401 = "Unauthorized request",
@@ -35,10 +35,10 @@ export enum HTTP_RES {
   USERNAME_TAKEN = "Username already taken",
 }
 
-export enum ApiInfo {
-  EMAIL_AVAIL = "Email available",
+export enum ServerInfo {
+  BAD_REQUEST = "Bad request",
   EMAIL_USED = "Email already used",
-  ITEM_NA = "Item cannot be found",
+  USER_DOC_CREATED = "Email available",
   USER_LOGIN = "User logged in successfully",
   USER_DELETED = "User deleted successfully",
   USER_NA = "User does not exist",
@@ -46,7 +46,11 @@ export enum ApiInfo {
   USER_RETRIEVED = "User retrieved",
   USER_UPDATED = "User updated",
   USERNAME_TAKEN = "Username already taken",
-  USER_LOGIN_WRONG_CREDENTIALS = "Incorrect username or password",
+  USER_BAD_LOGIN = "Incorrect username or password",
+}
+
+export enum ServerError {
+  CREATE_USER = "Failed to create new user doc",
 }
 
 export enum ErrorMessage {
