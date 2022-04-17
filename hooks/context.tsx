@@ -46,6 +46,7 @@ const AppContextProvider = (props: any) => {
   const logout = useCallback(() => {
     HTTPService.setBearerToken("");
     setUserToken("");
+    setUser(null);
     router.push(PageRoute.LOGIN);
   }, [setUserToken, router]);
 

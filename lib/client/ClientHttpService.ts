@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
-import { APIAction, DBService, HttpRequestType } from "../../enum";
+import { APIAction, DBService, HttpRequest } from "../../enum";
 
 class ClientHTTPService {
   private instance: AxiosInstance;
@@ -16,15 +16,16 @@ class ClientHTTPService {
   }
 
   handleTokenLogin() {
-    return this.makeAuthHttpReq(DBService.USERS, HttpRequestType.POST, {
+    return this.makeAuthHttpReq(DBService.USERS, HttpRequest.POST, {
       action: APIAction.USER_TOKEN_LOGIN,
     });
   }
 
   makeAuthHttpReq(
     service: DBService,
-    method: HttpRequestType,
+    method: HttpRequest,
     data?: any,
+    params?: object,
     config?: AxiosRequestConfig<any>
   ) {
     const reqConfig = {
@@ -36,13 +37,14 @@ class ClientHTTPService {
     };
 
     switch (method) {
-      case HttpRequestType.GET:
-        return this.instance.get(`api/${service}`, data);
-      case HttpRequestType.POST:
+      case HttpRequest.GET:
+        return this.instance.get(`api/${service}`, { params });
+      case HttpRequest.POST:
+        console.log("-> POST");
         return this.instance.post(`api/${service}`, data, reqConfig);
-      case HttpRequestType.PUT:
+      case HttpRequest.PUT:
         return this.instance.put(`api/${service}`, data, reqConfig);
-      case HttpRequestType.DELETE:
+      case HttpRequest.DELETE:
         return this.instance.delete(`api/${service}`, { ...reqConfig, data });
       default:
         return null;

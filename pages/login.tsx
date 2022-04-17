@@ -5,7 +5,7 @@ import HomePage from "../components/HomePage";
 import {
   DBService,
   ErrorMessage,
-  HttpRequestType,
+  HttpRequest,
   PageRoute,
   Transition,
 } from "../enum";
@@ -56,12 +56,13 @@ const Login = () => {
   }
 
   const handleLogin = useCallback(() => {
-    HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequestType.POST, {
+    HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequest.POST, {
       username,
       password,
       login: true,
     })
       .then((res) => {
+        console.log(res);
         if (!isEmpty(res?.data?.token)) {
           handleUserToken(res.data.token);
           setUser(res.data.user);
@@ -77,7 +78,7 @@ const Login = () => {
 
   const handleRegister = useCallback(() => {
     if (password === confirmPassword) {
-      HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequestType.POST, {
+      HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequest.POST, {
         email,
         password,
         login: false,

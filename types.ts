@@ -1,6 +1,6 @@
 import { AxiosRequestConfig } from "axios";
 import { NextRouter } from "next/router";
-import { APIAction, DBService, HttpRequestType } from "./enum";
+import { APIAction, DBService, HttpRequest } from "./enum";
 import { Status } from "./enums";
 
 export type AlertStatus = "success" | "info" | "warning" | "error";

@@ -4,7 +4,7 @@ export enum DBService {
   USERS = "users",
 }
 
-export enum HttpRequestType {
+export enum HttpRequest {
   DELETE = "DELETE",
   GET = "GET",
   POST = "POST",

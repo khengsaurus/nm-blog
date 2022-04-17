@@ -5,7 +5,7 @@ import HomePage from "../components/HomePage";
 import {
   APIAction,
   DBService,
-  HttpRequestType,
+  HttpRequest,
   PageRoute,
   Transition,
 } from "../enum";
@@ -44,7 +44,7 @@ const NewUser = () => {
 
   function cancelRegister() {
     setAlert(null);
-    HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequestType.DELETE, {
+    HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequest.DELETE, {
       user,
     });
     router.push(PageRoute.LOGIN);
@@ -56,7 +56,7 @@ const NewUser = () => {
     user: IUser,
     callback?: () => void
   ) {
-    HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequestType.PUT, {
+    HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequest.PUT, {
       email,
       username,
       action: APIAction.USER_SET_USERNAME,
