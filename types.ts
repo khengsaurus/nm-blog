@@ -16,10 +16,12 @@ export interface IResponse {
 export interface IAppContext {
   user: IUser;
   userToken: string;
+  darkmode: boolean;
   router: NextRouter;
   logout: () => void;
   setUser: (_?: IUser) => void;
   handleUserToken: (_?: string) => void;
+  setDarkmode: (_?: boolean) => void;
 }
 
 export interface IAlert {

@@ -17,6 +17,13 @@ export enum PageRoute {
   NEWUSER = "/new-user",
 }
 
+export enum TransitionSpeed {
+  SLOW = "800ms",
+  MEDIUM = "450ms",
+  FAST = "300ms",
+  INSTANT = "0ms",
+}
+
 export enum Transition {
   SLOW = 800,
   MEDIUM = 450,

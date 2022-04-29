@@ -15,7 +15,6 @@ const Input = (props: IInput) => {
   const { password = false, variant = "standard", style = {}, ...rest } = props;
   return (
     <TextField
-      // key="password"
       {...rest}
       type={password ? "password" : "text"}
       variant={variant}

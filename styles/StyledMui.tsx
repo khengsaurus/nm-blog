@@ -5,7 +5,16 @@ interface IStyledTextProps {
   text: string;
   color?: string;
   padding?: string;
-  variant?: "h6" | "subtitle1" | "subtitle2" | "body1" | "body2";
+  variant?:
+    | "h2"
+    | "h3"
+    | "h4"
+    | "h5"
+    | "h6"
+    | "subtitle1"
+    | "subtitle2"
+    | "body1"
+    | "body2";
   textAlign?: "left" | "center" | "right";
   placeSelf?: "left" | "center" | "right";
   style?: any;
@@ -99,7 +108,7 @@ export const HomeButton = ({
 export const StyledText = ({
   text,
   color,
-  variant = "h6",
+  variant = "body1",
   padding = variant.startsWith("body") ? "0px" : "5px 0px",
   textAlign = "left",
   placeSelf = "center",
@@ -125,7 +134,7 @@ export const StyledCenterText = ({
   text,
   padding,
   style,
-  variant = "body2",
+  variant = "body1",
 }: IStyledTextProps) => (
   <Typography
     style={{

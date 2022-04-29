@@ -2,11 +2,11 @@ import { useRouter } from "next/router";
 import { useContext, useEffect } from "react";
 import { PageRoute } from "../enums";
 import { AppContext } from "../hooks";
-import { StyledCenterText } from "../styles/StyledMui";
+import NavBar from "./NavBar";
 
 interface HomePageProps {
   markup: React.FC | JSX.Element;
-  title: string;
+  title?: string;
   requireAuth?: boolean;
 }
 
@@ -21,10 +21,10 @@ const HomePage = ({ markup, title, requireAuth = false }: HomePageProps) => {
   }, [requireAuth, router, user]);
 
   return (
-    <div className="home-page">
-      <StyledCenterText text={title} variant="h6" padding="0px 10px 10px" />
+    <main>
+      <NavBar title={title} />
       <div className="centered">{markup}</div>
-    </div>
+    </main>
   );
 };
 
