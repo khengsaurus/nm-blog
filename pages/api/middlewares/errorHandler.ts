@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { HttpResponse } from "../../../enum";
+import { HttpResponse } from "../../../enums";
 import { forwardResponse } from "./forwardResponse";
 
 export function errorHandler(

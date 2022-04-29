@@ -1,14 +1,15 @@
-import { Alert, Collapse, TextField } from "@mui/material";
+import { Alert, Collapse } from "@mui/material";
 import { isEmpty } from "lodash";
-import { useContext, useEffect, useRef, useState } from "react";
-import HomePage from "../components/HomePage";
+import { useContext, useEffect, useState } from "react";
+import { HomePage, Input } from "../components";
 import {
   APIAction,
   DBService,
   HttpRequest,
   PageRoute,
+  PageTitle,
   Transition,
-} from "../enum";
+} from "../enums";
 import { Status } from "../enums";
 import { AppContext } from "../hooks/context";
 import { HTTPService } from "../lib/client";
@@ -78,14 +79,12 @@ const NewUser = () => {
 
   const markup = (
     <>
-      <TextField
-        inputProps={{ maxLength: 8 }}
+      <Input
         label={"Username"}
+        value={username}
         onChange={(e) => setUsername(e.target.value.toLowerCase())}
         style={{ margin: "-5px 0px 5px", width: "150px" }}
-        type="text"
-        value={username}
-        variant="standard"
+        inputProps={{ maxLength: 8 }}
       />
       <div
         className="row"
@@ -110,7 +109,7 @@ const NewUser = () => {
     </>
   );
 
-  return <HomePage title={"New User Page"} markup={markup} />;
+  return <HomePage title={PageTitle.NEW_USER} markup={markup} />;
 };
 
 export default NewUser;

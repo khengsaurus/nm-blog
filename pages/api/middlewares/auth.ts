@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { NextApiRequest } from "next";
-import { HttpResponse } from "../../../enum";
+import { HttpResponse } from "../../../enums";
 import { verifyPassword } from "../../../lib/server/validation";
 import { IUserReq } from "../../../types";
 const SECRET_KEY = "secret-key";

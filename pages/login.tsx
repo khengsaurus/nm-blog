@@ -1,14 +1,15 @@
-import { Alert, Collapse, TextField } from "@mui/material";
+import { Alert, Collapse } from "@mui/material";
 import { isEmpty } from "lodash";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
-import HomePage from "../components/HomePage";
+import { HomePage, Input } from "../components";
 import {
   DBService,
   ErrorMessage,
   HttpRequest,
   PageRoute,
+  PageTitle,
   Transition,
-} from "../enum";
+} from "../enums";
 import { Status } from "../enums";
 import { AppContext } from "../hooks";
 import { HTTPService } from "../lib/client";
@@ -127,37 +128,27 @@ const Login = () => {
 
   const markup = (
     <>
-      <TextField
-        key="usernameEmail"
+      <Input
         label={showRegister ? "Email" : "Username"}
+        value={showRegister ? email : username}
         onChange={(e) =>
           showRegister
             ? setEmail(e.target.value)
             : setUsername(e.target.value?.toLowerCase())
         }
-        style={{ width: "160px" }}
-        type="text"
-        value={showRegister ? email : username}
-        variant="standard"
       />
-      <TextField
-        key="password"
+      <Input
         label={"Password"}
-        onChange={(e) => setPassword(e.target.value)}
-        style={{ margin: "5px 0", width: "160px" }}
-        type="password"
         value={password}
-        variant="standard"
+        onChange={(e) => setPassword(e.target.value)}
+        password
       />
       <Collapse in={showRegister} timeout={300} unmountOnExit>
-        <TextField
-          key="confirmPassword"
+        <Input
           label={"Confirm Password"}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          style={{ margin: "5px 0", width: "160px" }}
-          type="password"
           value={confirmPassword}
-          variant="standard"
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          password
         />
       </Collapse>
       <StyledButton
@@ -180,7 +171,7 @@ const Login = () => {
     </>
   );
 
-  return <HomePage title={"Login Page"} markup={markup} />;
+  return <HomePage title={PageTitle.LOGIN} markup={markup} />;
 };
 
 export default Login;

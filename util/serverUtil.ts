@@ -1,6 +1,6 @@
 import { extend } from "lodash";
 import { NextApiResponse } from "next";
-import { HttpResponse } from "../enum";
+import { HttpResponse } from "../enums";
 
 export function handleBadRequest(res: NextApiResponse, err?: Error) {
   console.info(err.message);

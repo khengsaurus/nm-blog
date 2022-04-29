@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { DBService } from "../../enum";
+import { DBService } from "../../enums";
 import { IResponse } from "../../types";
 
 export abstract class Service {

@@ -1,14 +1,12 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
-import { APIAction, DBService, HttpRequest } from "../../enum";
+import { APIAction, DBService, HttpRequest } from "../../enums";
 
 class ClientHTTPService {
   private instance: AxiosInstance;
-  // private config: AxiosRequestConfig;
   private bearerToken: string;
 
   constructor() {
     this.instance = axios.create();
-    // this.config = {};
   }
 
   setBearerToken(token: string) {

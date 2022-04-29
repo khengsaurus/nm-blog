@@ -1,8 +1,8 @@
 import { useRouter } from "next/router";
 import React, { createContext, useCallback, useState } from "react";
-import { PageRoute } from "../enum";
+import { PageRoute } from "../enums";
 import { HTTPService } from "../lib/client";
-import { IAlert, IAppContext, IUser } from "../types";
+import { IAppContext, IUser } from "../types";
 import useLocalStorage from "../util/hooks/useLocalStorage";
 import useFirstEffect from "./useFirstEffect";
 

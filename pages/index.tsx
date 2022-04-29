@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import HomePage from "../components/HomePage";
+import { PageTitle } from "../enums";
 import { AppContext } from "../hooks";
 
 const Home: React.FC = () => {
@@ -12,7 +13,7 @@ const Home: React.FC = () => {
     </div>
   );
 
-  return <HomePage title={"Home Page"} markup={markup} requireAuth />;
+  return <HomePage title={PageTitle.HOME} markup={markup} requireAuth />;
 };
 
 export default Home;

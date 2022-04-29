@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { useContext, useEffect } from "react";
-import { PageRoute } from "../enum";
+import { PageRoute } from "../enums";
 import { AppContext } from "../hooks";
 import { StyledCenterText } from "../styles/StyledMui";
 

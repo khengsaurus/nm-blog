@@ -1,12 +1,12 @@
-import { extend, isEmpty } from "lodash";
+import { isEmpty } from "lodash";
 import type { NextApiRequest, NextApiResponse } from "next";
 import {
   APIAction,
-  ServerInfo,
   HttpRequest,
   HttpResponse,
   ServerError,
-} from "../../enum";
+  ServerInfo,
+} from "../../enums";
 import { mongoConnection } from "../../lib/server/mongoConnection";
 import { hashPassword } from "../../lib/server/validation";
 import { IResponse, IUser, IUserReq } from "../../types";
@@ -22,7 +22,6 @@ import {
   validateAuth,
   verify,
 } from "./middlewares/auth";
-import { errorHandler } from "./middlewares/errorHandler";
 import { forwardResponse } from "./middlewares/forwardResponse";
 
 export default async function handler(
