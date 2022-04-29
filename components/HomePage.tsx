@@ -1,11 +1,11 @@
 import { useRouter } from "next/router";
-import { useContext, useEffect } from "react";
+import { ReactNode, useContext, useEffect } from "react";
+import { NavBar } from "../components";
 import { PageRoute } from "../enums";
 import { AppContext } from "../hooks";
-import NavBar from "./NavBar";
 
 interface HomePageProps {
-  markup: React.FC | JSX.Element;
+  markup: ReactNode;
   title?: string;
   requireAuth?: boolean;
 }

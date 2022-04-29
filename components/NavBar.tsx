@@ -10,7 +10,7 @@ interface INavBar {
   title: string;
 }
 
-const NavBar = ({ title }: INavBar) => {
+const NavBar: React.FC<INavBar> = ({ title }) => {
   return (
     <AppBar position="fixed">
       <Toolbar variant="dense">

@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+
+module.exports = {
   reactStrictMode: true,
   env: {
     MONGODB_URI:
@@ -11,6 +12,8 @@ const nextConfig = {
   images: {
     domains: ["images.unsplash.com"],
   },
+  experimental: {
+    runtime: "nodejs",
+    serverComponents: true,
+  },
 };
-
-module.exports = nextConfig;
