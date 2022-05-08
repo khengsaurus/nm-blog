@@ -1,4 +1,3 @@
-import { useRouter } from "next/router";
 import { ReactNode, useContext, useEffect } from "react";
 import { NavBar } from "../components";
 import { PageRoute } from "../enums";
@@ -7,12 +6,17 @@ import { AppContext } from "../hooks";
 interface HomePageProps {
   markup: ReactNode;
   title?: string;
+  showNavbar?: boolean;
   requireAuth?: boolean;
 }
 
-const HomePage = ({ markup, title, requireAuth = false }: HomePageProps) => {
-  const router = useRouter();
-  const { user } = useContext(AppContext);
+const HomePage = ({
+  markup,
+  title,
+  showNavbar = true,
+  requireAuth = false,
+}: HomePageProps) => {
+  const { router, user } = useContext(AppContext);
 
   useEffect(() => {
     if (requireAuth && !user) {
@@ -22,7 +26,7 @@ const HomePage = ({ markup, title, requireAuth = false }: HomePageProps) => {
 
   return (
     <main>
-      <NavBar title={title} />
+      {showNavbar && <NavBar title={title} />}
       <div className="centered">{markup}</div>
     </main>
   );

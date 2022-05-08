@@ -5,19 +5,19 @@ import { TransitionSpeed } from "../../enums";
 import { AppContext } from "../../hooks";
 
 export const HomeTheme = (props: any) => {
-  const { darkmode } = useContext(AppContext);
+  const { darkMode } = useContext(AppContext);
   const _theme = useMemo(() => {
-    return newMuiTheme(darkmode);
-  }, [darkmode]);
+    return newMuiTheme(darkMode);
+  }, [darkMode]);
 
   return <ThemeProvider theme={_theme} {...props} />;
 };
 
-function newMuiTheme(darkmode: boolean) {
-  const backgroundColor = darkmode ? grey[900] : grey[500];
-  const componentHighlight = darkmode ? amber[900] : amber[900];
-  const mainText = darkmode ? grey[100] : grey[900];
-  const highlightColor = darkmode ? amber[700] : blue[800];
+function newMuiTheme(darkMode: boolean) {
+  const backgroundColor = darkMode ? grey[900] : grey[500];
+  const componentHighlight = darkMode ? amber[900] : amber[900];
+  const mainText = darkMode ? grey[100] : grey[900];
+  const highlightColor = darkMode ? amber[700] : blue[800];
   const accordionWidth = {
     minWidth: "200px",
     width: "80vw",

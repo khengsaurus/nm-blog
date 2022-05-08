@@ -10,11 +10,11 @@ const initialContext: IAppContext = {
   router: null,
   user: null,
   userToken: "",
-  darkmode: false,
+  darkMode: false,
   logout: () => {},
   setUser: (_?: IUser) => {},
   handleUserToken: (_?: string) => {},
-  setDarkmode: (_?: boolean) => {},
+  setDarkMode: (_?: boolean) => {},
 };
 
 export const AppContext = createContext<IAppContext>(initialContext);
@@ -22,7 +22,7 @@ export const AppContext = createContext<IAppContext>(initialContext);
 const AppContextProvider = (props: any) => {
   const [user, setUser] = useState<IUser>();
   const [userToken, setUserToken] = useLocalStorage("userToken", "");
-  const [darkmode, setDarkmode] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
   const router = useRouter();
 
   const userTokenLogin = useCallback(() => {
@@ -59,11 +59,11 @@ const AppContextProvider = (props: any) => {
         router,
         user,
         userToken,
-        darkmode,
+        darkMode,
         logout,
         setUser,
         handleUserToken,
-        setDarkmode,
+        setDarkMode,
       }}
       {...props}
     />

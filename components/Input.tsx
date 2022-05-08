@@ -4,11 +4,11 @@ import React, { ChangeEventHandler, CSSProperties } from "react";
 interface IInput {
   label: string;
   value: string | number;
-  onChange: ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement>;
+  variant?: "standard";
+  password?: boolean;
   style?: CSSProperties;
   inputProps?: InputBaseComponentProps;
-  password?: boolean;
-  variant?: "standard";
+  onChange: ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement>;
 }
 
 const Input = (props: IInput) => {

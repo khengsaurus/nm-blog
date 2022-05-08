@@ -1,4 +1,5 @@
 import { AppContext } from "./context";
 import useFirstEffect from "./useFirstEffect";
+import useIsoEffect from "./useIsoEffect";
 
-export { AppContext, useFirstEffect };
+export { AppContext, useFirstEffect, useIsoEffect };
