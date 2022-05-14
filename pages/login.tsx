@@ -63,7 +63,7 @@ const Login = () => {
     })
       .then((res) => {
         if (!isEmpty(res?.data?.token)) {
-          handleUserToken(res.data.token);
+          handleUserToken(res.data.token, res.data);
           setUser(res.data.user);
           setAlert(null);
           clearForm();
@@ -82,8 +82,8 @@ const Login = () => {
         password,
         login: false,
       }).then((res) => {
-        if (!isEmpty(res?.data?.token)) {
-          handleUserToken(res.data.token);
+        if (!isEmpty(res?.data?.user)) {
+          handleUserToken(res.data.token, res.data.user.id);
           setUser(res.data.user);
           setAlert(null);
           clearForm();

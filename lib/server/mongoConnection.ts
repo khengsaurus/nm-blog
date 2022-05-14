@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { UserSchema } from "./schemas";
+import { PostSchema, UserSchema } from "./schemas";
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -12,6 +12,7 @@ export const mongoConnection = async () => {
   }
 
   const User = mongoose.models.User || mongoose.model("User", UserSchema); // prevent OverwriteModelError
+  const Post = mongoose.models.Post || mongoose.model("Post", PostSchema);
 
-  return { User };
+  return { Post, User };
 };

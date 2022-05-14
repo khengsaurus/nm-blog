@@ -28,10 +28,11 @@ const AppContextProvider = (props: any) => {
 
   const userTokenLogin = useCallback(async () => {
     if (userToken) {
-      HTTPService.setBearerToken(userToken);
+      HTTPService.setBearer(userToken, "");
       HTTPService.handleTokenLogin().then((res) => {
         if (res.data?.user) {
           setUser(res.data.user);
+          HTTPService.setBearer(userToken, res.data.user.id);
           return true;
         }
       });
@@ -47,15 +48,15 @@ const AppContextProvider = (props: any) => {
   );
 
   const handleUserToken = useCallback(
-    (token: string) => {
-      HTTPService.setBearerToken(token);
+    (token: string, id: string) => {
+      HTTPService.setBearer(token, id);
       setUserToken(token);
     },
     [setUserToken]
   );
 
   const logout = useCallback(() => {
-    HTTPService.setBearerToken("");
+    HTTPService.setBearer("", "");
     setUserToken("");
     setUser(null);
     router.push(PageRoute.LOGIN);

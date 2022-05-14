@@ -4,13 +4,15 @@ import { APIAction, DBService, HttpRequest } from "../../enums";
 class ClientHTTPService {
   private instance: AxiosInstance;
   private bearerToken: string;
+  private userId: string;
 
   constructor() {
     this.instance = axios.create();
   }
 
-  setBearerToken(token: string) {
+  setBearer(token: string, userId: string) {
     this.bearerToken = token;
+    this.userId = userId;
   }
 
   handleTokenLogin() {
@@ -38,11 +40,23 @@ class ClientHTTPService {
       case HttpRequest.GET:
         return this.instance.get(`api/${service}`, { params });
       case HttpRequest.POST:
-        return this.instance.post(`api/${service}`, data, reqConfig);
+        return this.instance.post(
+          `api/${service}`,
+          { ...data, userId: this.userId },
+          reqConfig
+        );
       case HttpRequest.PUT:
-        return this.instance.put(`api/${service}`, data, reqConfig);
+        return this.instance.put(
+          `api/${service}`,
+          { ...data, userId: this.userId },
+          reqConfig
+        );
       case HttpRequest.DELETE:
-        return this.instance.delete(`api/${service}`, { ...reqConfig, data });
+        return this.instance.delete(`api/${service}`, {
+          ...reqConfig,
+          ...data,
+          userId: this.userId,
+        });
       default:
         return null;
     }

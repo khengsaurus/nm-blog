@@ -44,9 +44,7 @@ export enum HttpResponse {
 }
 
 export enum ServerInfo {
-  BAD_REQUEST = "Bad request",
   EMAIL_USED = "Email already used",
-  USER_DOC_CREATED = "Email available",
   USER_LOGIN = "User logged in successfully",
   USER_DELETED = "User deleted successfully",
   USER_NA = "User does not exist",
@@ -55,10 +53,15 @@ export enum ServerInfo {
   USER_UPDATED = "User updated",
   USERNAME_TAKEN = "Username already taken",
   USER_BAD_LOGIN = "Incorrect username or password",
-}
 
-export enum ServerError {
-  CREATE_USER = "Failed to create new user doc",
+  POST_SLUG_TAKEN = "Slug already used",
+  POST_CREATED = "Post created",
+  POST_DELETED = "Post deleted",
+  POST_RETRIEVED = "Post retrieved",
+  POST_UPDATED = "Post updated",
+  POST_NA = "Post does not exist",
+
+  REQUEST_FAILED = "Server request failed",
 }
 
 export enum ErrorMessage {

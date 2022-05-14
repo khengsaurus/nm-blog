@@ -124,6 +124,9 @@ function newMuiTheme(darkMode: boolean) {
             "&:disabled": {
               color: "rgb(75, 75, 75) !important",
             },
+            "&.MuiCheckbox-root.Mui-checked": {
+              color: highlightColor,
+            },
             margin: 0,
           },
         },

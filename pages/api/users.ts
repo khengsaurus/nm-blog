@@ -1,19 +1,14 @@
 import { isEmpty } from "lodash";
 import type { NextApiRequest, NextApiResponse } from "next";
-import {
-  APIAction,
-  HttpRequest,
-  HttpResponse,
-  ServerError,
-  ServerInfo,
-} from "../../enums";
+import { APIAction, HttpRequest, ServerInfo } from "../../enums";
 import { mongoConnection } from "../../lib/server/mongoConnection";
+import ServerError from "../../lib/server/ServerError";
 import { hashPassword } from "../../lib/server/validation";
 import { IResponse, IUser, IUserReq } from "../../types";
 import {
   createUserObject,
+  handleAPIError,
   handleBadRequest,
-  handleInternalError,
   processUserData,
 } from "../../util/serverUtil";
 import {
@@ -36,10 +31,10 @@ export default async function handler(
       handlePost(req, res);
       break;
     case HttpRequest.PUT:
-      handlePut(req, res);
+      handleRequest(req, res, updateDoc);
       break;
     case HttpRequest.DELETE:
-      handleDelete(req, res);
+      handleRequest(req, res, deleteDoc);
       break;
     default:
       handleBadRequest(res);
@@ -54,7 +49,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
   } else {
     await getDoc(reqQuery)
       .then((payload) => forwardResponse(res, payload))
-      .catch((err) => handleInternalError(res, err));
+      .catch((err) => handleAPIError(res, err));
   }
 }
 
@@ -68,24 +63,19 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   } else {
     await (login ? handleLogin(reqBody) : createDoc(reqBody))
       .then((payload) => forwardResponse(res, payload))
-      .catch((err) => handleInternalError(res, err));
+      .catch((err) => handleAPIError(res, err));
   }
 }
 
-async function handlePut(req: NextApiRequest, res: NextApiResponse) {
-  const reqBody = req.body as Partial<IUserReq>;
+async function handleRequest(
+  req: NextApiRequest,
+  res: NextApiResponse,
+  callback: (p: Partial<IUserReq>) => Promise<IResponse>
+) {
   validateAuth(req)
-    .then(() => updateDoc(reqBody))
+    .then(() => callback(req.body))
     .then((payload) => forwardResponse(res, payload))
-    .catch((err) => handleBadRequest(res, err));
-}
-
-async function handleDelete(req: NextApiRequest, res: NextApiResponse) {
-  const reqBody = req.body as Partial<IUserReq>;
-  validateAuth(req)
-    .then(() => deleteDoc(reqBody))
-    .then((payload) => forwardResponse(res, payload))
-    .catch((err) => handleBadRequest(res, err));
+    .catch((err) => handleAPIError(res, err));
 }
 
 /**
@@ -98,8 +88,8 @@ async function createDoc(reqBody: Partial<IUserReq>): Promise<IResponse> {
     const { email, password } = reqBody;
     try {
       const { User } = await mongoConnection();
-      User.findOne({ email }).then((existingUser: any) => {
-        if (!isEmpty(existingUser)) {
+      User.findOne({ email }).then((userData: any) => {
+        if (!isEmpty(userData)) {
           resolve({ status: 200, message: ServerInfo.EMAIL_USED });
         } else {
           // Create acc without setting username
@@ -109,21 +99,20 @@ async function createDoc(reqBody: Partial<IUserReq>): Promise<IResponse> {
           });
           User.create(user).then((res) => {
             if (!!res.id) {
-              const token = generateToken(email, email);
+              const token = generateToken(email, email, res.id);
               resolve({
                 status: 200,
-                message: ServerInfo.USER_DOC_CREATED,
-                data: { token, user: processUserData(user) },
+                message: ServerInfo.USER_REGISTERED,
+                data: { token, user: processUserData(user, res.id) },
               });
             } else {
-              console.info(ServerError.CREATE_USER);
-              reject(new Error(HttpResponse._500));
+              reject(new ServerError());
             }
           });
         }
       });
     } catch (err) {
-      reject(err);
+      reject(new ServerError(500, err.message));
     }
   });
 }
@@ -140,13 +129,13 @@ async function getDoc(params: object): Promise<IResponse> {
             status: 200,
             message: ServerInfo.USER_RETRIEVED,
             data: {
-              user: processUserData(userData),
+              user: processUserData(userData, userData._id),
             },
           });
         }
       });
     } catch (err) {
-      reject(err);
+      reject(new ServerError(500, err.message));
     }
   });
 }
@@ -161,27 +150,27 @@ async function handleLogin(reqBody: Partial<IUserReq>): Promise<IResponse> {
     const { username, password } = reqBody;
     try {
       const { User } = await mongoConnection();
-      User.findOne({ username }).then((existingUser) => {
-        if (
-          isEmpty(existingUser) ||
-          !verify({ username, password }, existingUser)
-        ) {
+      User.findOne({ username }).then((userData) => {
+        if (isEmpty(userData) || !verify({ username, password }, userData)) {
           resolve({
             status: 200,
             message: ServerInfo.USER_BAD_LOGIN,
             data: { token: null },
           });
         } else {
-          const token = generateToken(existingUser.email, username);
+          const token = generateToken(userData.email, username, userData._id);
           resolve({
             status: 200,
             message: ServerInfo.USER_LOGIN,
-            data: { token, user: processUserData(existingUser) },
+            data: {
+              token,
+              user: processUserData(userData, userData._id),
+            },
           });
         }
       });
     } catch (err) {
-      reject(err);
+      reject(new ServerError(500, err.message));
     }
   });
 }
@@ -191,13 +180,14 @@ async function handleTokenLogin(
   res: NextApiResponse<IResponse | any>
 ): Promise<IResponse> {
   return new Promise(async (_, reject) => {
-    const { email, username } = decodeToken<Partial<IUser>>(req);
-    if (!email) {
-      reject(new Error(HttpResponse._401));
+    const token = decodeToken<Partial<IUser>>(req);
+    const { id } = token;
+    if (!id) {
+      reject(new ServerError(401));
     } else {
-      await getDoc({ email, username })
+      await getDoc({ _id: id })
         .then((payload) => forwardResponse(res, payload))
-        .catch((err) => handleInternalError(res, err));
+        .catch((err) => handleAPIError(res, err));
     }
   });
 }
@@ -208,16 +198,16 @@ async function updateDoc(body: Partial<IUserReq>): Promise<IResponse> {
       const { User } = await mongoConnection();
       const { email, username, action } = body;
       if (action === APIAction.USER_SET_USERNAME) {
-        User.findOne({ username }).then((existingUser: any) => {
-          if (!isEmpty(existingUser)) {
+        User.findOne({ username }).then((userData: any) => {
+          if (!isEmpty(userData)) {
             resolve({
               status: 200,
               message: ServerInfo.USERNAME_TAKEN,
             });
             return;
           } else {
-            User.findOne({ email }).then((existingUser: any) => {
-              if (isEmpty(existingUser)) {
+            User.findOne({ email }).then((userData) => {
+              if (isEmpty(userData)) {
                 resolve({
                   status: 400,
                   message: ServerInfo.USER_NA,
@@ -225,9 +215,9 @@ async function updateDoc(body: Partial<IUserReq>): Promise<IResponse> {
               } else {
                 User.updateOne({ email }, { $set: body }, (err, _res) => {
                   if (err) {
-                    reject(err);
+                    reject(new ServerError(500, err.message));
                   } else {
-                    const token = generateToken(email, username);
+                    const token = generateToken(email, username, userData._id);
                     resolve({
                       status: 200,
                       message: ServerInfo.USER_UPDATED,
@@ -241,7 +231,7 @@ async function updateDoc(body: Partial<IUserReq>): Promise<IResponse> {
         });
       }
     } catch (err) {
-      reject(err);
+      reject(new ServerError(500, err.message));
     }
   });
 }
@@ -254,11 +244,11 @@ async function deleteDoc(searchParams) {
         if (res.acknowledged) {
           resolve({ status: 200, message: ServerInfo.USER_DELETED });
         } else {
-          reject(new Error(HttpResponse._500));
+          reject(new ServerError());
         }
       });
     } catch (err) {
-      reject(err);
+      reject(new ServerError(500, err.message));
     }
   });
 }

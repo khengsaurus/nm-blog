@@ -14,6 +14,7 @@ interface IInput {
   style?: CSSProperties;
   inputProps?: InputBaseComponentProps;
   onChange: ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement>;
+  onClick?: (e: React.MouseEvent) => void;
 }
 
 const Input = (props: IInput) => {

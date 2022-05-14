@@ -21,7 +21,7 @@ export interface IAppContext {
   router: NextRouter;
   logout: () => void;
   setUser: (_?: IUser) => void;
-  handleUserToken: (_?: string) => void;
+  handleUserToken: (_: string, __: string) => void;
   setDarkMode: (_?: boolean) => void;
 }
 
@@ -35,73 +35,34 @@ interface IHasId {
   _id?: string;
 }
 
-interface IRef extends IHasId {
-  type: string;
-  ref: string;
-}
-
 interface IHasCreatedAt {
   createdAt: string;
 }
 
-interface IHasUserRef {
-  user: IRef;
-}
-
-interface IHasBody {
+export interface IPost extends IHasId, IHasCreatedAt {
+  user: IUser;
+  title: string;
+  slug: string;
   body: string;
+  isPrivate: boolean;
+  userId: string;
+  // comments: IComment[];
+  // likes: ILike[];
 }
 
-export interface IRating {
-  type: number;
-  min: number;
-  max: number;
-}
-
-export interface ILike extends IHasId, IHasCreatedAt, IHasUserRef {}
-
-export interface IReview extends IHasId, IHasCreatedAt, IHasUserRef, IHasBody {
-  rating: number;
-  likes: ILike[];
-}
-
-export interface IItem extends IHasId, IHasUserRef {
-  item_name: string;
-  description: string;
-  condition: string;
-  images: string[];
-  createdAt: string;
-  updatedAt: string;
-  price: number;
-  status: string;
-  reviews: IReview[];
-  likes: ILike[];
-}
-
-export interface IComment extends IHasId, IHasCreatedAt, IHasUserRef, IHasBody {
-  likes: ILike[];
-}
-
-export interface IPost extends IHasId, IHasCreatedAt, IHasUserRef {
-  body: string;
-  comments: IComment[];
-  likes: ILike[];
-}
-
-export interface ICartItem {
-  itemId: string;
-  quantity: number;
-  price: number;
+export interface IPostReq extends IPost {
+  update: boolean;
+  count?: number;
 }
 
 export interface IUser extends IHasId {
+  id: string;
   avatar: string;
   bio: string;
   createdAt: string;
   email: string;
   password: string;
   username: string;
-  cart: ICartItem[];
 }
 
 export interface IUserReq extends IUser {
@@ -119,5 +80,4 @@ export interface IError {
   price?: string;
   condition?: string;
   body?: string;
-  rating?: string;
 }
