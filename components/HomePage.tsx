@@ -16,13 +16,15 @@ const HomePage = ({
   showNavbar = true,
   requireAuth = false,
 }: HomePageProps) => {
-  const { router, user } = useContext(AppContext);
+  const { router, sessionActive } = useContext(AppContext);
 
   useEffect(() => {
-    if (requireAuth && !user) {
-      router?.push(PageRoute.LOGIN);
-    }
-  }, [requireAuth, router, user]);
+    Promise.resolve().then(() => {
+      if (requireAuth && !sessionActive) {
+        router?.push(PageRoute.LOGIN);
+      }
+    });
+  }, [requireAuth, router, sessionActive]);
 
   return (
     <main>

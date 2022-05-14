@@ -10,8 +10,7 @@ html {
 }
 
 main {
-  display: flex;
-  flex-direction: column;
+  @include flex-dir(column);
   align-items: center;
   justify-content: center;
   background-color: grey;
@@ -20,6 +19,13 @@ main {
   left: 0;
   height: 100vh;
   width: 100vw;
+  &.left {
+    padding: 60px 20px;
+    height: calc(100vh - 120px);
+    width: calc(100vw - 40px);
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
 }
 
 h1 {

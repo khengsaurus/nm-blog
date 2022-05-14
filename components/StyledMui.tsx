@@ -38,14 +38,14 @@ export const StyledButton = ({
   label,
   navigate,
   color,
+  type,
   padding = "10px",
   size = "medium",
   variant = "text",
   autoFocus = false,
-  onClick,
-  type,
   disabled = false,
   style = {},
+  onClick,
 }: IStyledButtonProps) => {
   const router = useRouter();
 

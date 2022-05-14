@@ -1,8 +1,7 @@
 import React, { useContext } from "react";
-import HomePage from "../components/HomePage";
+import { HomePage, StyledButton, StyledCenterText } from "../components";
 import { PageTitle } from "../enums";
 import { AppContext } from "../hooks";
-import { StyledCenterText } from "../styles/StyledMui";
 
 const Home: React.FC = () => {
   const { user, logout } = useContext(AppContext);
@@ -10,7 +9,7 @@ const Home: React.FC = () => {
   const markup = (
     <div>
       <StyledCenterText text={"Welcome" + ` ${user?.username || ""}`} />
-      {!!user && <button onClick={logout}>Logout</button>}
+      {!!user && <StyledButton label={"Logout"} onClick={logout} />}
     </div>
   );
 

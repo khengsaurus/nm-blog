@@ -3,14 +3,15 @@ import React, { createContext, useCallback, useState } from "react";
 import { PageRoute } from "../enums";
 import { HTTPService } from "../lib/client";
 import { IAppContext, IUser } from "../types";
-import useLocalStorage from "../util/hooks/useLocalStorage";
+import useLocalStorage from "./useLocalStorage";
 import useFirstEffect from "./useFirstEffect";
 
 const initialContext: IAppContext = {
-  router: null,
   user: null,
   userToken: "",
   darkMode: false,
+  sessionActive: false,
+  router: null,
   logout: () => {},
   setUser: (_?: IUser) => {},
   handleUserToken: (_?: string) => {},
@@ -25,18 +26,25 @@ const AppContextProvider = (props: any) => {
   const [darkMode, setDarkMode] = useState(false);
   const router = useRouter();
 
-  const userTokenLogin = useCallback(() => {
+  const userTokenLogin = useCallback(async () => {
     if (userToken) {
       HTTPService.setBearerToken(userToken);
       HTTPService.handleTokenLogin().then((res) => {
         if (res.data?.user) {
           setUser(res.data.user);
+          return true;
         }
       });
+    } else {
+      return false;
     }
   }, [userToken]);
 
-  useFirstEffect(userTokenLogin, !!userToken ? [userToken] : [], true);
+  const { status: sessionActive } = useFirstEffect(
+    userTokenLogin,
+    !!userToken ? [userToken] : [],
+    true
+  );
 
   const handleUserToken = useCallback(
     (token: string) => {
@@ -60,6 +68,7 @@ const AppContextProvider = (props: any) => {
         user,
         userToken,
         darkMode,
+        sessionActive,
         logout,
         setUser,
         handleUserToken,

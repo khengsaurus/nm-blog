@@ -14,6 +14,7 @@ export enum HttpRequest {
 export enum PageRoute {
   HOME = "/",
   LOGIN = "/login",
+  NEWITEM = "/new-item",
   NEWUSER = "/new-user",
 }
 

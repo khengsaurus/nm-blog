@@ -115,13 +115,14 @@ function newMuiTheme(darkMode: boolean) {
       MuiButtonBase: {
         styleOverrides: {
           root: {
+            color: mainText,
             primary: mainText,
             secondary: highlightColor,
             "&:hover": {
               color: highlightColor,
             },
             "&:disabled": {
-              color: "rgb(75, 75, 75)",
+              color: "rgb(75, 75, 75) !important",
             },
             margin: 0,
           },
@@ -130,14 +131,12 @@ function newMuiTheme(darkMode: boolean) {
       MuiButton: {
         styleOverrides: {
           root: {
+            color: mainText,
             primary: mainText,
             secondary: highlightColor,
             backgroundColor: "transparent !important",
-            // "&:hover": {
-            //   transition: "150ms !important",
-            // },
             "&:disabled": {
-              color: "rgb(75, 75, 75)",
+              color: "rgb(75, 75, 75) !important",
             },
           },
         },
@@ -231,9 +230,21 @@ function newMuiTheme(darkMode: boolean) {
           },
         },
       },
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: {
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: highlightColor,
+              borderWidth: "2px",
+            },
+            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+              borderColor: highlightColor,
+            },
+          },
+        },
+      },
       MuiList: {
         styleOverrides: {
-          // root: { backgroundColor },
           padding: {
             paddingTop: "0px",
             paddingBottom: "0px",

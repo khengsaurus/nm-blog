@@ -1,19 +1,18 @@
 import { Alert, Collapse } from "@mui/material";
 import { isEmpty } from "lodash";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { HomePage, Input } from "../components";
+import { HomePage, Input, StyledButton } from "../components";
 import {
   DBService,
   ErrorMessage,
   HttpRequest,
   PageRoute,
   PageTitle,
+  Status,
   Transition,
 } from "../enums";
-import { Status } from "../enums";
 import { AppContext } from "../hooks";
 import { HTTPService } from "../lib/client";
-import { StyledButton } from "../styles/StyledMui";
 import { AlertStatus, IAlert } from "../types";
 
 const Login = () => {
