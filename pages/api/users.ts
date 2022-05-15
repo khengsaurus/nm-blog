@@ -1,23 +1,19 @@
 import { isEmpty } from "lodash";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { APIAction, HttpRequest, ServerInfo } from "../../enums";
-import { mongoConnection } from "../../lib/server/mongoConnection";
-import ServerError from "../../lib/server/ServerError";
-import { hashPassword } from "../../lib/server/validation";
+import { hashPassword, mongoConnection, ServerError } from "../../lib/server";
 import { IResponse, IUser, IUserReq } from "../../types";
 import {
   createUserObject,
+  decodeToken,
+  forwardResponse,
+  generateToken,
   handleAPIError,
   handleBadRequest,
+  handleRequest,
   processUserData,
-} from "../../util/serverUtil";
-import {
-  decodeToken,
-  generateToken,
-  validateAuth,
   verify,
-} from "./middlewares/auth";
-import { forwardResponse } from "./middlewares/forwardResponse";
+} from "./middlewares";
 
 export default async function handler(
   req: NextApiRequest,
@@ -25,29 +21,24 @@ export default async function handler(
 ) {
   switch (req.method) {
     case HttpRequest.GET:
-      handleGet(req, res);
-      break;
+      return handleGet(req, res);
     case HttpRequest.POST:
-      handlePost(req, res);
-      break;
+      return handlePost(req, res);
     case HttpRequest.PUT:
-      handleRequest(req, res, updateDoc);
-      break;
+      return handleRequest(req, res, updateDoc);
     case HttpRequest.DELETE:
-      handleRequest(req, res, deleteDoc);
-      break;
+      return handleRequest(req, res, deleteDoc);
     default:
-      handleBadRequest(res);
-      break;
+      return handleBadRequest(res);
   }
 }
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse) {
   const reqQuery = req.query as Partial<IUserReq>;
   if (!reqQuery.username) {
-    handleBadRequest(res);
+    return handleBadRequest(res);
   } else {
-    await getDoc(reqQuery)
+    return getDoc(reqQuery)
       .then((payload) => forwardResponse(res, payload))
       .catch((err) => handleAPIError(res, err));
   }
@@ -57,25 +48,14 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const reqBody = req.body as Partial<IUserReq>;
   const { email = "", password = "", login = true, action = "" } = reqBody;
   if (action === APIAction.USER_TOKEN_LOGIN) {
-    handleTokenLogin(req, res);
+    return handleTokenLogin(req, res);
   } else if (!password || (!login && !email)) {
-    handleBadRequest(res);
+    return handleBadRequest(res);
   } else {
-    await (login ? handleLogin(reqBody) : createDoc(reqBody))
+    return (login ? handleLogin(reqBody) : createDoc(reqBody))
       .then((payload) => forwardResponse(res, payload))
       .catch((err) => handleAPIError(res, err));
   }
-}
-
-async function handleRequest(
-  req: NextApiRequest,
-  res: NextApiResponse,
-  callback: (p: Partial<IUserReq>) => Promise<IResponse>
-) {
-  validateAuth(req)
-    .then(() => callback(req.body))
-    .then((payload) => forwardResponse(res, payload))
-    .catch((err) => handleAPIError(res, err));
 }
 
 /**
@@ -88,7 +68,7 @@ async function createDoc(reqBody: Partial<IUserReq>): Promise<IResponse> {
     const { email, password } = reqBody;
     try {
       const { User } = await mongoConnection();
-      User.findOne({ email }).then((userData: any) => {
+      await User.findOne({ email }).then(async (userData: any) => {
         if (!isEmpty(userData)) {
           resolve({ status: 200, message: ServerInfo.EMAIL_USED });
         } else {
@@ -97,7 +77,7 @@ async function createDoc(reqBody: Partial<IUserReq>): Promise<IResponse> {
             email,
             password: hashPassword(password),
           });
-          User.create(user).then((res) => {
+          await User.create(user).then((res) => {
             if (!!res.id) {
               const token = generateToken(email, email, res.id);
               resolve({
@@ -150,7 +130,7 @@ async function handleLogin(reqBody: Partial<IUserReq>): Promise<IResponse> {
     const { username, password } = reqBody;
     try {
       const { User } = await mongoConnection();
-      User.findOne({ username }).then((userData) => {
+      await User.findOne({ username }).then((userData) => {
         if (isEmpty(userData) || !verify({ username, password }, userData)) {
           resolve({
             status: 200,
@@ -180,8 +160,7 @@ async function handleTokenLogin(
   res: NextApiResponse<IResponse | any>
 ): Promise<IResponse> {
   return new Promise(async (_, reject) => {
-    const token = decodeToken<Partial<IUser>>(req);
-    const { id } = token;
+    const { id } = decodeToken<Partial<IUser>>(req);
     if (!id) {
       reject(new ServerError(401));
     } else {
@@ -198,7 +177,7 @@ async function updateDoc(body: Partial<IUserReq>): Promise<IResponse> {
       const { User } = await mongoConnection();
       const { email, username, action } = body;
       if (action === APIAction.USER_SET_USERNAME) {
-        User.findOne({ username }).then((userData: any) => {
+        await User.findOne({ username }).then(async (userData: any) => {
           if (!isEmpty(userData)) {
             resolve({
               status: 200,
@@ -206,14 +185,14 @@ async function updateDoc(body: Partial<IUserReq>): Promise<IResponse> {
             });
             return;
           } else {
-            User.findOne({ email }).then((userData) => {
+            await User.findOne({ email }).then(async (userData) => {
               if (isEmpty(userData)) {
                 resolve({
                   status: 400,
                   message: ServerInfo.USER_NA,
                 });
               } else {
-                User.updateOne({ email }, { $set: body }, (err, _res) => {
+                await User.updateOne({ email }, { $set: body }, (err, _res) => {
                   if (err) {
                     reject(new ServerError(500, err.message));
                   } else {
@@ -240,7 +219,7 @@ async function deleteDoc(searchParams) {
   return new Promise(async (resolve, reject) => {
     try {
       const { User } = await mongoConnection();
-      User.deleteOne(searchParams).then((res) => {
+      await User.deleteOne(searchParams).then((res) => {
         if (res.acknowledged) {
           resolve({ status: 200, message: ServerInfo.USER_DELETED });
         } else {

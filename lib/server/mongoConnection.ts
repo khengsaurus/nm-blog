@@ -3,7 +3,7 @@ import { PostSchema, UserSchema } from "./schemas";
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
-export const mongoConnection = async () => {
+const mongoConnection = async () => {
   let connection;
   if (mongoose.connection.readyState === 0 || 3) {
     connection = await mongoose
@@ -16,3 +16,5 @@ export const mongoConnection = async () => {
 
   return { Post, User };
 };
+
+export default mongoConnection;

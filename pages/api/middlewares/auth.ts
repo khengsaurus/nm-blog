@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
 import { NextApiRequest } from "next";
-import ServerError from "../../../lib/server/ServerError";
-import { verifyPassword } from "../../../lib/server/validation";
+import { ServerError, verifyPassword } from "../../../lib/server";
 import { IUserReq } from "../../../types";
 const SECRET_KEY = "secret-key";
 
@@ -33,7 +32,7 @@ export async function validateAuth(req: NextApiRequest): Promise<boolean> {
     let token: any = req.headers?.authorization || "Bearer ";
     token = token.split("Bearer ")[1];
     if (!token) {
-      throw new ServerError(401);
+      reject(new ServerError(401));
     }
     token = jwt.verify(token, SECRET_KEY) as object;
     if (token?.id === userId) {

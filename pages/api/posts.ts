@@ -1,12 +1,14 @@
 import { isEmpty } from "lodash";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { HttpRequest, ServerInfo } from "../../enums";
-import { mongoConnection } from "../../lib/server/mongoConnection";
-import ServerError from "../../lib/server/ServerError";
+import { mongoConnection, ServerError } from "../../lib/server";
 import { IPostReq, IResponse } from "../../types";
-import { handleAPIError, handleBadRequest } from "../../util/serverUtil";
-import { validateAuth } from "./middlewares/auth";
-import { forwardResponse } from "./middlewares/forwardResponse";
+import {
+  forwardResponse,
+  handleAPIError,
+  handleBadRequest,
+  handleRequest,
+} from "./middlewares";
 
 export default async function handler(
   req: NextApiRequest,
@@ -14,20 +16,15 @@ export default async function handler(
 ) {
   switch (req.method) {
     case HttpRequest.GET:
-      handleGet(req, res);
-      break;
+      return handleGet(req, res);
     case HttpRequest.POST:
-      handleRequest(req, res, createDoc);
-      break;
+      return handleRequest(req, res, createDoc);
     case HttpRequest.PUT:
-      handleRequest(req, res, updateDoc);
-      break;
+      return handleRequest(req, res, updateDoc);
     case HttpRequest.DELETE:
-      handleRequest(req, res, deleteDoc);
-      break;
+      return handleRequest(req, res, deleteDoc);
     default:
-      handleBadRequest(res);
-      break;
+      return handleBadRequest(res);
   }
 }
 
@@ -47,37 +44,26 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-async function handleRequest(
-  req: NextApiRequest,
-  res: NextApiResponse,
-  callback: (p: Partial<IPostReq>) => Promise<IResponse>
-) {
-  validateAuth(req)
-    .then(() => callback(req.body))
-    .then((payload) => forwardResponse(res, payload))
-    .catch((err) => handleAPIError(res, err));
-}
-
 async function createDoc(reqBody: Partial<IPostReq>): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     const { slug, userId } = reqBody;
     try {
       const { Post } = await mongoConnection();
-      Post.findOne({ slug, userId }).then((existingPost) => {
+      await Post.findOne({ slug, userId }).then((existingPost) => {
         if (!isEmpty(existingPost)) {
           resolve({ status: 200, message: ServerInfo.POST_SLUG_TAKEN });
-        } else {
-          Post.create(reqBody).then((res) => {
-            if (!!res.id) {
-              resolve({
-                status: 200,
-                message: ServerInfo.POST_CREATED,
-                data: { postId: res.id, post: res },
-              });
-            } else {
-              reject(new ServerError());
-            }
+          return;
+        }
+      });
+      await Post.create(reqBody).then((res) => {
+        if (!!res.id) {
+          resolve({
+            status: 200,
+            message: ServerInfo.POST_CREATED,
+            data: { postId: res.id, post: res },
           });
+        } else {
+          reject(new ServerError());
         }
       });
     } catch (err) {
@@ -113,7 +99,7 @@ async function updateDoc(req: Partial<IPostReq>): Promise<IResponse> {
       const { Post } = await mongoConnection();
       const { user, id, update } = req;
       if (update) {
-        Post.updateOne({ user, id }, { $set: req }, (err, _res) => {
+        await Post.updateOne({ user, id }, { $set: req }, (err, _res) => {
           if (err) {
             reject(new ServerError(500, err.message));
           } else {
@@ -125,7 +111,7 @@ async function updateDoc(req: Partial<IPostReq>): Promise<IResponse> {
           }
         });
       } else {
-        Post.findOne({ user, id }).then((existPost: any) => {
+        await Post.findOne({ user, id }).then((existPost: any) => {
           if (!isEmpty(existPost)) {
             resolve({
               status: 200,
@@ -133,6 +119,7 @@ async function updateDoc(req: Partial<IPostReq>): Promise<IResponse> {
             });
             return;
           } else {
+            // TODO:
           }
         });
       }
@@ -147,7 +134,7 @@ async function deleteDoc(req: Partial<IPostReq>): Promise<IResponse> {
     const { user, id } = req;
     try {
       const { Post } = await mongoConnection();
-      Post.deleteOne({ user, id }).then((res) => {
+      await Post.deleteOne({ user, id }).then((res) => {
         if (res.acknowledged) {
           resolve({ status: 200, message: ServerInfo.POST_DELETED });
         } else {
