@@ -11,14 +11,16 @@ export const UserSchema = new Schema<IUser>({
 });
 
 export const PostSchema = new Schema<IPost>({
-  user: UserSchema,
-  userId: Schema.Types.String,
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+  },
   title: Schema.Types.String,
   slug: Schema.Types.String,
   body: Schema.Types.String,
   isPrivate: Schema.Types.Boolean,
   createdAt: Schema.Types.String,
   updatedAt: Schema.Types.String,
-  // comments: IComment[];
-  // likes: ILike[];
 });
+
+PostSchema.set("toObject", { getters: true, flattenMaps: true });

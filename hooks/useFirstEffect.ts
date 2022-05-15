@@ -1,27 +1,15 @@
-import { useRef, useState } from "react";
-import { Status } from "../enums";
-import useIsoEffect from "./useIsoEffect";
+import React, { useEffect, useRef } from "react";
 
-const useFirstEffect = (
-  callback: () => Promise<boolean>,
-  deps: any[],
-  requireDeps = false
-) => {
-  const [status, setStatus] = useState(Status.IDLE);
+const useFirstEffect = (callback: () => any, deps: any[]) => {
   const calledRef = useRef(false);
 
-  useIsoEffect(() => {
-    if ((!requireDeps || deps.length > 0) && !calledRef.current) {
-      setStatus(Status.PENDING);
+  useEffect(() => {
+    if (!calledRef.current) {
       calledRef.current = true;
-      callback().then((success) =>
-        setStatus(success ? Status.SUCCESS : Status.ERROR)
-      );
+      callback();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [callback, requireDeps, JSON.stringify(deps)]);
-
-  return { status };
+  }, deps);
 };
 
 export default useFirstEffect;

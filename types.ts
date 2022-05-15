@@ -20,8 +20,7 @@ export interface IAppContext {
   sessionActive: boolean;
   router: NextRouter;
   logout: () => void;
-  setUser: (_?: IUser) => void;
-  handleUserToken: (_: string, __: string) => void;
+  handleUser: (token: string, user: IUser) => void;
   setDarkMode: (_?: boolean) => void;
 }
 
@@ -66,6 +65,7 @@ export interface IUser extends IHasId {
 export interface IUserReq extends IUser {
   login: boolean;
   action: APIAction;
+  userId: string;
 }
 
 export interface IError {

@@ -1,7 +1,7 @@
 import { Alert, Collapse } from "@mui/material";
 import { isEmpty } from "lodash";
 import { useContext, useEffect, useState } from "react";
-import { HomePage, Input, StyledButton } from "../components";
+import { HomePage, Input, Row, StyledButton } from "../components";
 import {
   APIAction,
   DBService,
@@ -16,18 +16,18 @@ import { HTTPService } from "../lib/client";
 import { AlertStatus, IAlert, IUser } from "../types";
 
 const NewUser = () => {
-  const { router, setUser, handleUserToken, user } = useContext(AppContext);
+  const { router, handleUser, user, logout } = useContext(AppContext);
   const [username, setUsername] = useState("");
   const [alert, setAlert] = useState<IAlert>(null);
   // const [toDeleteIfUnload, setToDeleteIfUnload] = useState(true);
   // const checkAuthTimeoutRef = useRef<NodeJS.Timeout>(null);
 
-  useEffect(() => {
-    if (isEmpty(user)) {
-      router.push(PageRoute.LOGIN);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router, JSON.stringify(user)]);
+  // useEffect(() => {
+  //   if (isEmpty(user)) {
+  //     router.push(PageRoute.LOGIN);
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [router, JSON.stringify(user)]);
 
   // If user ends session before setting username, delete records of email from DB to preserve email availability
   // useEffect(() => {
@@ -46,8 +46,16 @@ const NewUser = () => {
     setAlert(null);
     HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequest.DELETE, {
       user,
-    });
-    router.push(PageRoute.LOGIN);
+    })
+      .then((res) => {
+        if (res.status === 200) {
+          logout();
+          router.push(PageRoute.LOGIN);
+        } else {
+          console.info(res);
+        }
+      })
+      .catch((err) => console.error(err));
   }
 
   function registerUsername(
@@ -62,8 +70,7 @@ const NewUser = () => {
       action: APIAction.USER_SET_USERNAME,
     }).then((res) => {
       if (res.data?.token) {
-        handleUserToken(res.data.token);
-        setUser({ ...user, username }); // not returning user obj...
+        handleUser(res.data.token, res.data.user);
         setAlert({
           status: Status.SUCCESS,
           message: "Successfully registered",
@@ -85,10 +92,7 @@ const NewUser = () => {
         style={{ margin: "-5px 0px 5px", width: "150px" }}
         inputProps={{ maxLength: 8 }}
       />
-      <div
-        className="row"
-        style={{ width: "170px", justifyContent: "space-between" }}
-      >
+      <Row style={{ width: "170px" }}>
         {alert?.status !== Status.SUCCESS && (
           <>
             <StyledButton label="Cancel" onClick={cancelRegister} />
@@ -101,7 +105,7 @@ const NewUser = () => {
             />
           </>
         )}
-      </div>
+      </Row>
       <Collapse in={!!alert} timeout={Transition.FAST} unmountOnExit>
         <Alert severity={alert?.status as AlertStatus}>{alert?.message}</Alert>
       </Collapse>

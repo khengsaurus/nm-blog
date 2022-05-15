@@ -68,8 +68,8 @@ async function createDoc(reqBody: Partial<IUserReq>): Promise<IResponse> {
     const { email, password } = reqBody;
     try {
       const { User } = await mongoConnection();
-      await User.findOne({ email }).then(async (userData: any) => {
-        if (!isEmpty(userData)) {
+      await User.exists({ email }).then((exists) => {
+        if (exists) {
           resolve({ status: 200, message: ServerInfo.EMAIL_USED });
         } else {
           // Create acc without setting username
@@ -77,7 +77,7 @@ async function createDoc(reqBody: Partial<IUserReq>): Promise<IResponse> {
             email,
             password: hashPassword(password),
           });
-          await User.create(user).then((res) => {
+          User.create(user).then((res) => {
             if (!!res.id) {
               const token = generateToken(email, email, res.id);
               resolve({
@@ -175,37 +175,31 @@ async function updateDoc(body: Partial<IUserReq>): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     try {
       const { User } = await mongoConnection();
-      const { email, username, action } = body;
+      const { email, username, action, userId } = body;
       if (action === APIAction.USER_SET_USERNAME) {
-        await User.findOne({ username }).then(async (userData: any) => {
-          if (!isEmpty(userData)) {
+        await User.exists({ username }).then(async (exists) => {
+          if (exists) {
             resolve({
               status: 200,
               message: ServerInfo.USERNAME_TAKEN,
             });
-            return;
           } else {
-            await User.findOne({ email }).then(async (userData) => {
-              if (isEmpty(userData)) {
+            const user = await User.findById(userId);
+            user.username = username;
+            await user
+              .save()
+              .then((userData) => {
+                const token = generateToken(email, username, userData._id);
                 resolve({
-                  status: 400,
-                  message: ServerInfo.USER_NA,
+                  status: 200,
+                  message: ServerInfo.USER_UPDATED,
+                  data: {
+                    user: processUserData(userData, userData._id),
+                    token,
+                  },
                 });
-              } else {
-                await User.updateOne({ email }, { $set: body }, (err, _res) => {
-                  if (err) {
-                    reject(new ServerError(500, err.message));
-                  } else {
-                    const token = generateToken(email, username, userData._id);
-                    resolve({
-                      status: 200,
-                      message: ServerInfo.USER_UPDATED,
-                      data: { ..._res, token },
-                    });
-                  }
-                });
-              }
-            });
+              })
+              .catch((err) => reject(new ServerError(500, err.message)));
           }
         });
       }
@@ -215,15 +209,15 @@ async function updateDoc(body: Partial<IUserReq>): Promise<IResponse> {
   });
 }
 
-async function deleteDoc(searchParams) {
+async function deleteDoc(body: Partial<IUserReq>) {
   return new Promise(async (resolve, reject) => {
     try {
       const { User } = await mongoConnection();
-      await User.deleteOne(searchParams).then((res) => {
-        if (res.acknowledged) {
-          resolve({ status: 200, message: ServerInfo.USER_DELETED });
+      User.findByIdAndDelete(body.userId, (err, _, __) => {
+        if (!!err) {
+          reject(new ServerError(500, err.message));
         } else {
-          reject(new ServerError());
+          resolve({ status: 200, message: ServerInfo.USER_DELETED });
         }
       });
     } catch (err) {

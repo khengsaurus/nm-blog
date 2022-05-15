@@ -49,16 +49,18 @@ async function createDoc(reqBody: Partial<IPostReq>): Promise<IResponse> {
     const { slug, userId } = reqBody;
     try {
       const { Post } = await mongoConnection();
-      await Post.findOne({ slug, userId }).then((existingPost) => {
-        if (!isEmpty(existingPost)) {
+      await Post.exists({ slug, user: userId }).then((exists) => {
+        if (exists) {
           resolve({ status: 200, message: ServerInfo.POST_SLUG_TAKEN });
         } else {
-          Post.create(reqBody).then((res) => {
+          const { userId, ...post } = reqBody;
+          const newPost = new Post({ ...post, user: userId });
+          newPost.save().then((res) => {
             if (!!res.id) {
               resolve({
                 status: 200,
                 message: ServerInfo.POST_CREATED,
-                data: { postId: res.id, post: res },
+                data: { post: res },
               });
             } else {
               reject(new ServerError());
@@ -115,8 +117,8 @@ async function updateDoc(req: Partial<IPostReq>): Promise<IResponse> {
           }
         );
       } else {
-        await Post.findOne({ userId, _id: id }).then((existPost: any) => {
-          if (!isEmpty(existPost)) {
+        await Post.exists({ userId, _id: id }).then((exists) => {
+          if (exists) {
             resolve({
               status: 200,
               message: ServerInfo.POST_SLUG_TAKEN,

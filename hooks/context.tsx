@@ -4,7 +4,7 @@ import { PageRoute } from "../enums";
 import { HTTPService } from "../lib/client";
 import { IAppContext, IUser } from "../types";
 import useLocalStorage from "./useLocalStorage";
-import useFirstEffect from "./useFirstEffect";
+import useFirstEffectAsync from "./useFirstEffectAsync";
 
 const initialContext: IAppContext = {
   user: null,
@@ -13,8 +13,7 @@ const initialContext: IAppContext = {
   sessionActive: false,
   router: null,
   logout: () => {},
-  setUser: (_?: IUser) => {},
-  handleUserToken: (_?: string) => {},
+  handleUser: (token: string, user: IUser) => {},
   setDarkMode: (_?: boolean) => {},
 };
 
@@ -41,16 +40,17 @@ const AppContextProvider = (props: any) => {
     }
   }, [userToken]);
 
-  const { status: sessionActive } = useFirstEffect(
+  const { status: sessionActive } = useFirstEffectAsync(
     userTokenLogin,
     !!userToken ? [userToken] : [],
     true
   );
 
-  const handleUserToken = useCallback(
-    (token: string, id: string) => {
-      HTTPService.setBearer(token, id);
+  const handleUser = useCallback(
+    (token: string, user: IUser) => {
+      HTTPService.setBearer(token, user.id);
       setUserToken(token);
+      setUser(user);
     },
     [setUserToken]
   );
@@ -71,8 +71,7 @@ const AppContextProvider = (props: any) => {
         darkMode,
         sessionActive,
         logout,
-        setUser,
-        handleUserToken,
+        handleUser,
         setDarkMode,
       }}
       {...props}

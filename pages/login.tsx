@@ -11,12 +11,12 @@ import {
   Status,
   Transition,
 } from "../enums";
-import { AppContext } from "../hooks";
+import { AppContext, useFirstEffect, useFirstEffectAsync } from "../hooks";
 import { HTTPService } from "../lib/client";
 import { AlertStatus, IAlert } from "../types";
 
 const Login = () => {
-  const { router, user, setUser, handleUserToken } = useContext(AppContext);
+  const { router, user, handleUser } = useContext(AppContext);
   const [alert, setAlert] = useState<IAlert>(null);
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -24,7 +24,7 @@ const Login = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showRegister, setShowRegister] = useState(false);
 
-  useEffect(() => {
+  useFirstEffect(() => {
     if (!!user) {
       router.push(PageRoute.HOME);
     }
@@ -62,9 +62,8 @@ const Login = () => {
       login: true,
     })
       .then((res) => {
-        if (!isEmpty(res?.data?.token)) {
-          handleUserToken(res.data.token, res.data);
-          setUser(res.data.user);
+        if (res?.data?.token) {
+          handleUser(res.data.token, res.data.user);
           setAlert(null);
           clearForm();
           router.push(PageRoute.HOME);
@@ -73,7 +72,7 @@ const Login = () => {
         }
       })
       .catch((err) => console.error(err));
-  }, [password, setAlert, setUser, handleUserToken, router, username]);
+  }, [password, setAlert, handleUser, router, username]);
 
   const handleRegister = useCallback(() => {
     if (password === confirmPassword) {
@@ -82,9 +81,8 @@ const Login = () => {
         password,
         login: false,
       }).then((res) => {
-        if (!isEmpty(res?.data?.user)) {
-          handleUserToken(res.data.token, res.data.user.id);
-          setUser(res.data.user);
+        if (res?.data?.token) {
+          handleUser(res.data.token, res.data.user);
           setAlert(null);
           clearForm();
           router.push(PageRoute.NEWUSER);
@@ -95,15 +93,7 @@ const Login = () => {
     } else {
       setAlert({ status: Status.ERROR, message: ErrorMessage.PW_NOT_MATCHING });
     }
-  }, [
-    confirmPassword,
-    email,
-    password,
-    router,
-    setAlert,
-    setUser,
-    handleUserToken,
-  ]);
+  }, [confirmPassword, email, password, router, setAlert, handleUser]);
 
   const renderLoginButton = () => (
     <StyledButton

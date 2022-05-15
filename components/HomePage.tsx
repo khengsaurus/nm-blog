@@ -2,6 +2,7 @@ import { ReactNode, useContext, useEffect } from "react";
 import { NavBar } from "../components";
 import { PageRoute } from "../enums";
 import { AppContext } from "../hooks";
+import { Centered } from "./StyledComponents";
 
 interface HomePageProps {
   markup: ReactNode;
@@ -29,7 +30,7 @@ const HomePage = ({
   return (
     <main>
       {showNavbar && <NavBar title={title} />}
-      <div className="centered">{markup}</div>
+      <Centered>{markup}</Centered>
     </main>
   );
 };

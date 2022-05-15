@@ -58,8 +58,7 @@ class ClientHTTPService {
       case HttpRequest.DELETE:
         return this.instance.delete(`api/${service}`, {
           ...reqConfig,
-          ...data,
-          userId: this.userId,
+          data: { ...data, userId: this.userId },
         });
       default:
         return null;
