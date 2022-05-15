@@ -30,11 +30,11 @@ export default async function handler(
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse) {
   const reqQuery = req.query as Partial<IPostReq>;
-  const { user, slug, count = 1 } = reqQuery;
+  const { userId, slug, count = 1 } = reqQuery;
   if (count > 1) {
     // fetch a few
   } else {
-    if (!user || !slug) {
+    if (!userId || !slug) {
       handleBadRequest(res);
     } else {
       await getDoc(reqQuery)
@@ -52,18 +52,18 @@ async function createDoc(reqBody: Partial<IPostReq>): Promise<IResponse> {
       await Post.findOne({ slug, userId }).then((existingPost) => {
         if (!isEmpty(existingPost)) {
           resolve({ status: 200, message: ServerInfo.POST_SLUG_TAKEN });
-          return;
-        }
-      });
-      await Post.create(reqBody).then((res) => {
-        if (!!res.id) {
-          resolve({
-            status: 200,
-            message: ServerInfo.POST_CREATED,
-            data: { postId: res.id, post: res },
-          });
         } else {
-          reject(new ServerError());
+          Post.create(reqBody).then((res) => {
+            if (!!res.id) {
+              resolve({
+                status: 200,
+                message: ServerInfo.POST_CREATED,
+                data: { postId: res.id, post: res },
+              });
+            } else {
+              reject(new ServerError());
+            }
+          });
         }
       });
     } catch (err) {
@@ -97,21 +97,25 @@ async function updateDoc(req: Partial<IPostReq>): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     try {
       const { Post } = await mongoConnection();
-      const { user, id, update } = req;
+      const { userId, id, update } = req;
       if (update) {
-        await Post.updateOne({ user, id }, { $set: req }, (err, _res) => {
-          if (err) {
-            reject(new ServerError(500, err.message));
-          } else {
-            resolve({
-              status: 200,
-              message: ServerInfo.POST_UPDATED,
-              data: { ..._res },
-            });
+        await Post.updateOne(
+          { userId, _id: id },
+          { $set: req },
+          (err, _res) => {
+            if (err) {
+              reject(new ServerError(500, err.message));
+            } else {
+              resolve({
+                status: 200,
+                message: ServerInfo.POST_UPDATED,
+                data: { ..._res },
+              });
+            }
           }
-        });
+        );
       } else {
-        await Post.findOne({ user, id }).then((existPost: any) => {
+        await Post.findOne({ userId, _id: id }).then((existPost: any) => {
           if (!isEmpty(existPost)) {
             resolve({
               status: 200,
@@ -131,10 +135,10 @@ async function updateDoc(req: Partial<IPostReq>): Promise<IResponse> {
 
 async function deleteDoc(req: Partial<IPostReq>): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
-    const { user, id } = req;
+    const { userId, id } = req;
     try {
       const { Post } = await mongoConnection();
-      await Post.deleteOne({ user, id }).then((res) => {
+      await Post.deleteOne({ userId, _id: id }).then((res) => {
         if (res.acknowledged) {
           resolve({ status: 200, message: ServerInfo.POST_DELETED });
         } else {

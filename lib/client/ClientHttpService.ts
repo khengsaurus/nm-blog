@@ -21,6 +21,10 @@ class ClientHTTPService {
     });
   }
 
+  makeGetReq(service: DBService, params?: Object) {
+    return this.instance.get(`api/${service}`);
+  }
+
   makeAuthHttpReq(
     service: DBService,
     method: HttpRequest,

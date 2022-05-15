@@ -35,17 +35,15 @@ interface IHasId {
   _id?: string;
 }
 
-interface IHasCreatedAt {
-  createdAt: string;
-}
-
-export interface IPost extends IHasId, IHasCreatedAt {
+export interface IPost extends IHasId {
   user: IUser;
+  userId: string;
   title: string;
   slug: string;
   body: string;
   isPrivate: boolean;
-  userId: string;
+  createdAt: string;
+  updatedAt: string;
   // comments: IComment[];
   // likes: ILike[];
 }

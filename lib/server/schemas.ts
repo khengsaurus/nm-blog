@@ -12,11 +12,13 @@ export const UserSchema = new Schema<IUser>({
 
 export const PostSchema = new Schema<IPost>({
   user: UserSchema,
-  createdAt: Schema.Types.String,
+  userId: Schema.Types.String,
   title: Schema.Types.String,
   slug: Schema.Types.String,
   body: Schema.Types.String,
   isPrivate: Schema.Types.Boolean,
+  createdAt: Schema.Types.String,
+  updatedAt: Schema.Types.String,
   // comments: IComment[];
   // likes: ILike[];
 });

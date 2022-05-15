@@ -32,12 +32,17 @@ const NewItem = () => {
   }, [title]);
 
   const handleSave = useCallback(() => {
+    const createdAt = new Date();
     HTTPService.makeAuthHttpReq(DBService.POSTS, HttpRequest.POST, {
+      user,
       title,
       slug,
       body,
+      createdAt,
+      updatedAt: createdAt,
     }).then((res) => console.log(res));
-  }, [title, slug, body]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, title, slug, body]);
 
   const markup = (
     <main className="left">
