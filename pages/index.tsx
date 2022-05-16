@@ -14,11 +14,18 @@ import { docToObject } from "../util";
 
 interface IHomeProps {
   posts: IPost[];
+  cursor: string;
 }
 
 const LIMIT = 5;
 
-export async function getServerSideProps() {
+export async function getServerSideProps({ res }) {
+  console.info("-> Home getServerSideProps()");
+  res.setHeader(
+    "Cache-Control",
+    "public, max-age=300, s-maxage=600, stale-while-revalidate=30"
+  );
+
   const { Post } = await mongoConnection();
   const postQuery = await Post.find()
     .sort({ createdAt: -1 })
@@ -27,13 +34,14 @@ export async function getServerSideProps() {
     .lean()
     .exec();
   const posts = postQuery.map((post) => docToObject(post));
+  const cursor = posts.length > 0 ? posts[posts.length - 1].createdAt : "";
 
   return {
-    props: { posts },
+    props: { posts, cursor },
   };
 }
 
-const Home: React.FC = ({ posts }: IHomeProps) => {
+const Home: React.FC = ({ posts, cursor }: IHomeProps) => {
   const { user, logout } = useContext(AppContext);
 
   const markup = (

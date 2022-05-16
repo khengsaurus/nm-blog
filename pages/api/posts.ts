@@ -30,11 +30,11 @@ export default async function handler(
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse) {
   const reqQuery = req.query as Partial<IPostReq>;
-  const { userId, slug, count = 1 } = reqQuery;
+  const { username, slug, count = 1 } = reqQuery;
   if (count > 1) {
     // fetch a few
   } else {
-    if (!userId || !slug) {
+    if (!username || !slug) {
       handleBadRequest(res);
     } else {
       await getDoc(reqQuery)

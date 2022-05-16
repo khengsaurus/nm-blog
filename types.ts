@@ -68,15 +68,3 @@ export interface IUserReq extends IUser, IRequest {
   login: boolean;
   action: APIAction;
 }
-
-export interface IError {
-  general?: string;
-  username?: string;
-  email?: string;
-  password?: string;
-  confirmPassword?: string;
-  item_name?: string;
-  price?: string;
-  condition?: string;
-  body?: string;
-}

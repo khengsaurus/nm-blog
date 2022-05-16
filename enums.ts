@@ -1,6 +1,5 @@
 export enum DBService {
   POSTS = "posts",
-  ITEMS = "items",
   USERS = "users",
 }
 
@@ -14,7 +13,7 @@ export enum HttpRequest {
 export enum PageRoute {
   HOME = "/",
   LOGIN = "/login",
-  NEWITEM = "/new-item",
+  NEWPOST = "/new-post",
   NEWUSER = "/new-user",
 }
 
@@ -89,5 +88,5 @@ export enum PageTitle {
   LOGIN = "Login",
   POST = "Post",
   NEW_USER = "New User",
-  NEW_ITEM = "New Item",
+  NEW_POST = "New Post",
 }

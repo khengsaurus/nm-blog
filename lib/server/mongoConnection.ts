@@ -5,7 +5,7 @@ const MONGODB_URI = process.env.MONGODB_URI;
 
 const mongoConnection = async () => {
   let connection;
-  if (mongoose.connection.readyState === 0 || 3) {
+  if (mongoose.connection?.readyState === 0 || 3) {
     connection = await mongoose
       .connect(MONGODB_URI as string)
       .catch((err) => console.error(err));

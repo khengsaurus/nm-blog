@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { HomePage } from "../../components";
-import { PageTitle } from "../../enums";
+import { DBService, PageTitle } from "../../enums";
+import { useIsoEffect } from "../../hooks";
 import { HTTPService } from "../../lib/client";
 import { mongoConnection } from "../../lib/server";
 import { IPost } from "../../types";
@@ -13,6 +14,7 @@ interface IPostPage {
 }
 
 export async function getStaticProps({ params }) {
+  console.info("-> [username][slug] getStaticProps()");
   const { username, slug } = params;
   const { Post } = await mongoConnection();
   const post = await Post.findOne({ username, slug })
@@ -21,12 +23,17 @@ export async function getStaticProps({ params }) {
     .exec();
 
   return {
-    props: { post: docToObject(post), username, slug },
+    props: {
+      username,
+      slug,
+      post: docToObject(post),
+    },
     revalidate: 2 * 60 * 60 * 1000, // ms
   };
 }
 
 export async function getStaticPaths() {
+  console.info("-> [username][slug] getStaticPaths()");
   const { Post } = await mongoConnection();
   const posts = await Post.find().limit(100);
   const paths =
@@ -36,6 +43,7 @@ export async function getStaticPaths() {
         params: { username, slug },
       };
     }) || [];
+
   return {
     paths,
     fallback: "blocking", // fall back to SSR
@@ -43,13 +51,15 @@ export async function getStaticPaths() {
 }
 
 const Post = ({ post, username, slug }: IPostPage) => {
+  const { user: author, ...stalePost } = post;
   const [realtimePost, setRealtimePost] = useState(post);
 
-  useEffect(() => {
-    HTTPService.getPost(username, slug).then((_post) => {
-      console.log("Post retrieved: ");
-      console.log(_post);
-      setRealtimePost(_post as IPost);
+  useIsoEffect(() => {
+    HTTPService.makeGetReq(DBService.POSTS, { username, slug }).then((res) => {
+      if (res.status === 200 && res.data?.post?._id) {
+        const updatedPost = { ...res.data.post, user: author } as IPost;
+        setRealtimePost(updatedPost);
+      }
     });
   }, [username, slug]);
 

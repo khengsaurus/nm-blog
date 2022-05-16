@@ -12,7 +12,7 @@ import { DBService, HttpRequest, PageTitle } from "../enums";
 import { AppContext } from "../hooks";
 import { HTTPService } from "../lib/client";
 
-const NewItem = () => {
+const NEWPOST = () => {
   const { user } = useContext(AppContext);
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
@@ -88,7 +88,7 @@ const NewItem = () => {
     </main>
   );
 
-  return <HomePage title={PageTitle.NEW_ITEM} markup={markup} requireAuth />;
+  return <HomePage title={PageTitle.NEW_POST} markup={markup} requireAuth />;
 };
 
-export default NewItem;
+export default NEWPOST;

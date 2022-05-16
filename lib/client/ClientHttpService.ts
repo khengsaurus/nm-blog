@@ -1,7 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { APIAction, DBService, HttpRequest } from "../../enums";
-import { docToObject } from "../../util";
-import { mongoConnection } from "../server";
 
 class ClientHTTPService {
   private instance: AxiosInstance;
@@ -9,7 +7,12 @@ class ClientHTTPService {
   private userId: string;
 
   constructor() {
-    this.instance = axios.create();
+    this.instance = axios.create({
+      baseURL:
+        process.env.NODE_ENV === "development"
+          ? process.env.DEV_URL
+          : process.env.VERCEL_URL,
+    });
   }
 
   setBearer(token: string, userId: string) {
@@ -24,7 +27,7 @@ class ClientHTTPService {
   }
 
   makeGetReq(service: DBService, params?: Object) {
-    return this.instance.get(`api/${service}`);
+    return this.instance.get(`/api/${service}`, { params });
   }
 
   makeAuthHttpReq(
@@ -44,38 +47,29 @@ class ClientHTTPService {
 
     switch (method) {
       case HttpRequest.GET:
-        return this.instance.get(`api/${service}`, { params });
+        return this.instance.get(`/api/${service}`, {
+          params,
+        });
       case HttpRequest.POST:
         return this.instance.post(
-          `api/${service}`,
+          `/api/${service}`,
           { ...data, userId: this.userId },
           reqConfig
         );
       case HttpRequest.PUT:
         return this.instance.put(
-          `api/${service}`,
+          `/api/${service}`,
           { ...data, userId: this.userId },
           reqConfig
         );
       case HttpRequest.DELETE:
-        return this.instance.delete(`api/${service}`, {
+        return this.instance.delete(`/api/${service}`, {
           ...reqConfig,
           data: { ...data, userId: this.userId },
         });
       default:
         return null;
     }
-  }
-
-  async getPost(username: string, slug: string) {
-    return new Promise(async (resolve) => {
-      const { Post } = await mongoConnection();
-      const post = await Post.findOne({ username, slug })
-        .populate("user", "-createdAt -email -password")
-        .lean()
-        .exec();
-      resolve(docToObject(post));
-    });
   }
 }
 

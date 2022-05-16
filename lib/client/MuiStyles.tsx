@@ -148,6 +148,7 @@ function newMuiTheme(darkMode: boolean) {
         styleOverrides: {
           root: {
             margin: "6px",
+            backgroundColor: "transparent",
           },
         },
       },
