@@ -4,13 +4,13 @@ html {
   font-family: "Roboto", sans-serif;
 }
 
-@mixin flex-dir($dir) {
+@mixin flex-($dir) {
   display: flex;
   flex-direction: $dir;
 }
 
 main {
-  @include flex-dir(column);
+  @include flex-(column);
   align-items: center;
   justify-content: center;
   background-color: grey;
@@ -37,5 +37,53 @@ main {
   }
   &.transparent {
     background-color: transparent;
+  }
+}
+
+// delete
+.card {
+  @include flex-(column);
+  border: 2px solid indianred;
+  border-radius: 8px;
+  height: clamp(120px, 20vh, 180px);
+  width: clamp(240px, 28vw, 360px);
+  align-items: flex-start;
+  object-fit: contain;
+  text-align: left;
+  h3 {
+    width: calc(100% - 10px);
+    margin: 0px;
+    text-align: left;
+    padding: 5px;
+    border-bottom: 2px solid indianred;
+    overflow: hidden;
+    font-size: 18px;
+    height: 20px !important;
+    line-height: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.card-content {
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  h2 {
+    margin: 4px 0px;
+    font-size: 20px;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+  p {
+    &.author {
+      margin: 0px;
+      font-size: 16px;
+    }
+    &.body {
+      margin: 5px 0px;
+      font-size: 15px;
+    }
   }
 }

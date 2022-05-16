@@ -87,6 +87,7 @@ export enum Status {
 export enum PageTitle {
   HOME = "Home",
   LOGIN = "Login",
+  POST = "Post",
   NEW_USER = "New User",
   NEW_ITEM = "New Item",
 }

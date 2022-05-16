@@ -15,6 +15,7 @@ export const PostSchema = new Schema<IPost>({
     type: Schema.Types.ObjectId,
     ref: "User",
   },
+  username: Schema.Types.String,
   title: Schema.Types.String,
   slug: Schema.Types.String,
   body: Schema.Types.String,

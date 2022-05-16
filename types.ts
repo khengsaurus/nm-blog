@@ -29,6 +29,10 @@ export interface IAlert {
   message?: string;
 }
 
+interface IRequest {
+  userId: string;
+}
+
 interface IHasId {
   id?: string;
   _id?: string;
@@ -36,18 +40,16 @@ interface IHasId {
 
 export interface IPost extends IHasId {
   user: IUser;
-  userId: string;
+  username: string;
   title: string;
   slug: string;
   body: string;
   isPrivate: boolean;
   createdAt: string;
   updatedAt: string;
-  // comments: IComment[];
-  // likes: ILike[];
 }
 
-export interface IPostReq extends IPost {
+export interface IPostReq extends IPost, IRequest {
   update: boolean;
   count?: number;
 }
@@ -62,10 +64,9 @@ export interface IUser extends IHasId {
   username: string;
 }
 
-export interface IUserReq extends IUser {
+export interface IUserReq extends IUser, IRequest {
   login: boolean;
   action: APIAction;
-  userId: string;
 }
 
 export interface IError {

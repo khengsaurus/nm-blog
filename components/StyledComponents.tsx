@@ -22,6 +22,7 @@ export const Row = styled.div`
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  transition: 300ms all;
 `;
 
 export const RowReversed = styled(Row)`
@@ -30,6 +31,11 @@ export const RowReversed = styled(Row)`
 
 export const RowCentered = styled(Row)`
   justify-content: center;
+`;
+
+export const RowWrap = styled(Row)`
+  justify-content: center;
+  flex-wrap: wrap;
 `;
 
 export const Centered = styled(Column)`

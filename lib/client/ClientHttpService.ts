@@ -1,5 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { APIAction, DBService, HttpRequest } from "../../enums";
+import { docToObject } from "../../util";
+import { mongoConnection } from "../server";
 
 class ClientHTTPService {
   private instance: AxiosInstance;
@@ -63,6 +65,17 @@ class ClientHTTPService {
       default:
         return null;
     }
+  }
+
+  async getPost(username: string, slug: string) {
+    return new Promise(async (resolve) => {
+      const { Post } = await mongoConnection();
+      const post = await Post.findOne({ username, slug })
+        .populate("user", "-createdAt -email -password")
+        .lean()
+        .exec();
+      resolve(docToObject(post));
+    });
   }
 }
 

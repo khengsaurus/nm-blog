@@ -34,7 +34,7 @@ const NewItem = () => {
   const handleSave = useCallback(() => {
     const createdAt = new Date();
     HTTPService.makeAuthHttpReq(DBService.POSTS, HttpRequest.POST, {
-      user,
+      username: user.username,
       title,
       slug,
       body,

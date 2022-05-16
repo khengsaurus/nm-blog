@@ -1,5 +1,10 @@
 import React, { useContext } from "react";
-import { HomePage, StyledButton, StyledCenterText } from "../components";
+import {
+  HomePage,
+  RowWrap,
+  StyledButton,
+  StyledCenterText,
+} from "../components";
 import PostCard from "../components/PostCard";
 import { PageTitle } from "../enums";
 import { AppContext } from "../hooks";
@@ -34,9 +39,11 @@ const Home: React.FC = ({ posts }: IHomeProps) => {
   const markup = (
     <div>
       <StyledCenterText text={"Welcome" + ` ${user?.username || ""}`} />
-      {posts.map((post, index) => (
-        <PostCard key={index} post={post} />
-      ))}
+      <RowWrap>
+        {posts.map((post, index) => (
+          <PostCard key={index} post={post} />
+        ))}
+      </RowWrap>
       {!!user && <StyledButton label={"Logout"} onClick={logout} />}
     </div>
   );

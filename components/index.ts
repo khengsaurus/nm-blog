@@ -9,6 +9,7 @@ import {
   Row,
   RowCentered,
   RowReversed,
+  RowWrap,
 } from "./StyledComponents";
 import {
   HomeButton,
@@ -31,7 +32,8 @@ export {
   ColumnCentered,
   ColumnReversed,
   Column,
+  Row,
   RowCentered,
   RowReversed,
-  Row,
+  RowWrap,
 };

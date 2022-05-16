@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 function hashPassword(pw: string) {
   return bcrypt.hashSync(pw, Number(process.env.SALT_ROUNDS));

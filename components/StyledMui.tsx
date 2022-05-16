@@ -17,6 +17,7 @@ interface IStyledTextProps {
     | "body2";
   textAlign?: "left" | "center" | "right";
   placeSelf?: "left" | "center" | "right";
+  nowrap?: boolean;
   style?: any;
 }
 
@@ -109,19 +110,20 @@ export const StyledText = ({
   text,
   color,
   variant = "body1",
-  padding = variant.startsWith("body") ? "0px" : "5px 0px",
+  padding = variant.startsWith("h") ? "5px 0px" : "0px",
   textAlign = "left",
   placeSelf = "center",
+  nowrap = false,
   style = {},
 }: IStyledTextProps) => (
   <Typography
     style={{
-      justifySelf: "center",
-      alignSelf: "center",
       color,
       padding,
       textAlign,
       placeSelf,
+      whiteSpace: nowrap ? "nowrap" : null,
+      textOverflow: nowrap ? "ellipsis" : null,
       ...style,
     }}
     variant={variant}

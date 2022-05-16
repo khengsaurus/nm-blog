@@ -3,6 +3,7 @@ export function isDev() {
 }
 
 export function docToObject(data: any) {
+  if (data === null) return data;
   const { _id, user, ...main } = data;
   if (_id) {
     main.id = _id.toString();
