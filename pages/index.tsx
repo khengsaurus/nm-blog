@@ -1,10 +1,5 @@
 import React, { useContext } from "react";
-import {
-  HomePage,
-  RowWrap,
-  StyledButton,
-  StyledCenterText,
-} from "../components";
+import { HomePage, RowWrap, StyledButton } from "../components";
 import PostCard from "../components/PostCard";
 import { PageTitle } from "../enums";
 import { AppContext } from "../hooks";
@@ -45,15 +40,14 @@ const Home: React.FC = ({ posts, cursor }: IHomeProps) => {
   const { user, logout } = useContext(AppContext);
 
   const markup = (
-    <div>
-      <StyledCenterText text={"Welcome" + ` ${user?.username || ""}`} />
+    <main>
       <RowWrap>
         {posts.map((post, index) => (
           <PostCard key={index} post={post} />
         ))}
       </RowWrap>
       {!!user && <StyledButton label={"Logout"} onClick={logout} />}
-    </div>
+    </main>
   );
 
   return <HomePage title={PageTitle.HOME} markup={markup} />;

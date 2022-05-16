@@ -36,7 +36,7 @@ const NavBar: React.FC<INavBar> = ({ title }) => {
         {sessionActive && (
           <IconButton
             edge="end"
-            aria-label="new-post"
+            aria-label="new-item"
             onClick={() => router.push(PageRoute.NEWPOST)}
           >
             <AddIcon />

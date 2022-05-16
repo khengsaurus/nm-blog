@@ -2,11 +2,11 @@ import { ReactNode, useContext, useEffect } from "react";
 import { NavBar } from "../components";
 import { PageRoute } from "../enums";
 import { AppContext } from "../hooks";
-import { Centered } from "./StyledComponents";
 
 interface HomePageProps {
   markup: ReactNode;
   title?: string;
+  mainClass?: string;
   showNavbar?: boolean;
   requireAuth?: boolean;
 }
@@ -14,6 +14,7 @@ interface HomePageProps {
 const HomePage = ({
   markup,
   title,
+  mainClass = "",
   showNavbar = true,
   requireAuth = false,
 }: HomePageProps) => {
@@ -28,9 +29,9 @@ const HomePage = ({
   }, [requireAuth, router, sessionActive]);
 
   return (
-    <main>
+    <main className={mainClass}>
       {showNavbar && <NavBar title={title} />}
-      <Centered>{markup}</Centered>
+      {markup}
     </main>
   );
 };

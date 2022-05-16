@@ -2,6 +2,7 @@
 
 html {
   font-family: "Roboto", sans-serif;
+  background-color: grey;
 }
 
 @mixin flex-($dir) {
@@ -13,13 +14,8 @@ main {
   @include flex-(column);
   align-items: center;
   justify-content: center;
-  background-color: grey;
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: 100vw;
   font-family: "Roboto", sans-serif;
+  margin-top: 50px;
   &.left {
     padding: 60px 20px;
     height: calc(100vh - 120px);
@@ -38,31 +34,23 @@ main {
   &.transparent {
     background-color: transparent;
   }
-}
-
-// delete
-.card {
-  @include flex-(column);
-  border: 2px solid indianred;
-  border-radius: 8px;
-  height: clamp(120px, 20vh, 180px);
-  width: clamp(240px, 28vw, 360px);
-  align-items: flex-start;
-  object-fit: contain;
-  text-align: left;
-  h3 {
-    width: calc(100% - 10px);
-    margin: 0px;
-    text-align: left;
-    padding: 5px;
-    border-bottom: 2px solid indianred;
-    overflow: hidden;
-    font-size: 18px;
-    height: 20px !important;
-    line-height: 20px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .header {
+    min-height: fit-content;
+    h3 {
+      font-size: 20px;
+      margin: 10px 0px;
+    }
+    h4 {
+      font-size: 18px;
+      margin: 5px 0px;
+    }
+  }
+  .body-container {
+    p {
+      padding: 0px;
+      margin: 8px 0px;
+      overflow-y: scroll;
+    }
   }
 }
 

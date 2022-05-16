@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { HomePage } from "../../components";
+import { Column, HomePage, StyledText } from "../../components";
 import { DBService, PageTitle } from "../../enums";
 import { useIsoEffect } from "../../hooks";
 import { HTTPService } from "../../lib/client";
@@ -64,9 +64,19 @@ const Post = ({ post, username, slug }: IPostPage) => {
   }, [username, slug]);
 
   const { user, title, body } = realtimePost;
-  const markup = <div>{title}</div>;
+  const markup = (
+    <Column>
+      <div className="header">
+        <h3>{title}</h3>
+        <h4>{`By ${user?.username}`}</h4>
+      </div>
+      <div className="body-container">
+        <p>{body}</p>
+      </div>
+    </Column>
+  );
 
-  return <HomePage title={PageTitle.POST} markup={markup} />;
+  return <HomePage title={PageTitle.POST} markup={markup} mainClass="left" />;
 };
 
 export default Post;
