@@ -148,6 +148,7 @@ function newMuiTheme(darkMode: boolean) {
         styleOverrides: {
           root: {
             margin: "6px",
+            width: "clamp(220px, 30vw, 280px) !important",
             backgroundColor: "transparent",
           },
         },
@@ -155,12 +156,11 @@ function newMuiTheme(darkMode: boolean) {
       MuiCardContent: {
         styleOverrides: {
           root: {
-            maxHeight: "160px",
-            width: "clamp(280px, 30vw, 360px)",
+            height: "100px",
             padding: "4px 12px",
             backgroundColor: "#606060 !important",
             "&:last-child": {
-              padding: "8px 8px 10px",
+              padding: "4px 8px",
             },
           },
         },

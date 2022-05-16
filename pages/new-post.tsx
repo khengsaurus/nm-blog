@@ -7,7 +7,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { HomePage, Input, Row, StyledButton } from "../components";
+import { Column, HomePage, Input, Row, StyledButton } from "../components";
 import { DBService, HttpRequest, PageTitle } from "../enums";
 import { AppContext } from "../hooks";
 import { HTTPService } from "../lib/client";
@@ -45,7 +45,7 @@ const NewPost = () => {
   }, [user?.id, title, slug, body]);
 
   const markup = (
-    <main className="left">
+    <Column>
       <Input
         label={"Title"}
         value={title}
@@ -85,10 +85,17 @@ const NewPost = () => {
           onClick={handleSave}
         />
       </Row>
-    </main>
+    </Column>
   );
 
-  return <HomePage title={PageTitle.NEW_POST} markup={markup} requireAuth />;
+  return (
+    <HomePage
+      title={PageTitle.NEW_POST}
+      markup={markup}
+      requireAuth
+      mainClass="left"
+    />
+  );
 };
 
 export default NewPost;

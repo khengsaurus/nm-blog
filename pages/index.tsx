@@ -40,14 +40,14 @@ const Home: React.FC = ({ posts, cursor }: IHomeProps) => {
   const { user, logout } = useContext(AppContext);
 
   const markup = (
-    <main>
+    <>
       <RowWrap>
         {posts.map((post, index) => (
           <PostCard key={index} post={post} />
         ))}
       </RowWrap>
       {!!user && <StyledButton label={"Logout"} onClick={logout} />}
-    </main>
+    </>
   );
 
   return <HomePage title={PageTitle.HOME} markup={markup} />;

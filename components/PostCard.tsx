@@ -17,7 +17,7 @@ const PostCard = ({ post }: IPostCard) => {
     <Card onClick={() => router.push(`/${user?.username}/${slug}`)}>
       <CardMedia
         component="img"
-        height="100"
+        height="80"
         image="https://images.unsplash.com/photo-1493673272479-a20888bcee10"
         alt="plant"
       />
@@ -26,7 +26,7 @@ const PostCard = ({ post }: IPostCard) => {
           <h2>{title}</h2>
           <p className="author">{`By ${user?.username}`}</p>
           <p className="body">
-            {body?.slice(0, 150) + (body.length > 150 ? "..." : "")}
+            {body?.slice(0, 90) + (body.length > 90 ? "..." : "")}
           </p>
         </div>
       </CardContent>

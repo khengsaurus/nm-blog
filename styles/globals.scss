@@ -15,21 +15,10 @@ main {
   align-items: center;
   justify-content: center;
   font-family: "Roboto", sans-serif;
-  margin-top: 50px;
+  margin: 50px 20px;
   &.left {
-    padding: 60px 20px;
-    height: calc(100vh - 120px);
-    width: calc(100vw - 40px);
     align-items: flex-start;
     justify-content: flex-start;
-  }
-  &.no-select {
-    -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-    -khtml-user-select: none; /* Konqueror HTML */
-    -moz-user-select: none; /* Old versions of Firefox */
-    -ms-user-select: none; /* Internet Explorer/Edge */
-    user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
   }
   &.transparent {
     background-color: transparent;
@@ -60,18 +49,18 @@ main {
   text-overflow: ellipsis;
   h2 {
     margin: 4px 0px;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 800;
     white-space: nowrap;
   }
   p {
     &.author {
       margin: 0px;
-      font-size: 16px;
+      font-size: 15px;
     }
     &.body {
       margin: 5px 0px;
-      font-size: 15px;
+      font-size: 14px;
     }
   }
 }
