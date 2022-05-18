@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
-import React, { createContext, useCallback, useState } from "react";
-import { PageRoute } from "../enums";
+import React, { createContext, useCallback, useEffect, useState } from "react";
+import { PageRoute, Status } from "../enums";
 import { HTTPService } from "../lib/client";
 import { IAppContext, IUser } from "../types";
 import useLocalStorage from "./useLocalStorage";
@@ -10,8 +10,8 @@ const initialContext: IAppContext = {
   user: null,
   userToken: "",
   darkMode: false,
-  sessionActive: false,
   router: null,
+  sessionValidation: Status.IDLE,
   logout: () => {},
   handleUser: (token: string, user: IUser) => {},
   setDarkMode: (_?: boolean) => {},
@@ -26,21 +26,25 @@ const AppContextProvider = (props: any) => {
   const router = useRouter();
 
   const userTokenLogin = useCallback(async () => {
-    if (userToken) {
-      HTTPService.setBearer(userToken, "");
-      HTTPService.handleTokenLogin().then((res) => {
-        if (res.data?.user) {
-          setUser(res.data.user);
-          HTTPService.setBearer(userToken, res.data.user.id);
-          return true;
-        }
-      });
-    } else {
-      return false;
-    }
+    return new Promise((resolve) => {
+      if (userToken) {
+        HTTPService.setBearer(userToken, "");
+        HTTPService.handleTokenLogin().then((res) => {
+          if (res.data?.user) {
+            setUser(res.data.user);
+            HTTPService.setBearer(userToken, res.data.user.id);
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+        });
+      } else {
+        resolve(false);
+      }
+    });
   }, [userToken]);
 
-  const { status: sessionActive } = useFirstEffectAsync(
+  const sessionValidation = useFirstEffectAsync(
     userTokenLogin,
     !!userToken ? [userToken] : [],
     true
@@ -59,8 +63,8 @@ const AppContextProvider = (props: any) => {
     HTTPService.setBearer("", "");
     setUserToken("");
     setUser(null);
-    router.push(PageRoute.LOGIN);
-  }, [setUserToken, router]);
+    // router.push(PageRoute.LOGIN);
+  }, [setUserToken]);
 
   return (
     <AppContext.Provider
@@ -69,7 +73,7 @@ const AppContextProvider = (props: any) => {
         user,
         userToken,
         darkMode,
-        sessionActive,
+        sessionValidation,
         logout,
         handleUser,
         setDarkMode,

@@ -10,10 +10,22 @@ export const UserSchema = new Schema<IUser>({
   username: Schema.Types.String,
 });
 
+export const ImageSchema = new Schema({
+  name: Schema.Types.String,
+  img: {
+    data: Schema.Types.Buffer,
+    contentType: Schema.Types.String,
+  },
+});
+
 export const PostSchema = new Schema<IPost>({
   user: {
     type: Schema.Types.ObjectId,
     ref: "User",
+  },
+  image: {
+    type: Schema.Types.ObjectId,
+    ref: "Image",
   },
   username: Schema.Types.String,
   title: Schema.Types.String,

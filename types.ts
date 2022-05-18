@@ -17,8 +17,8 @@ export interface IAppContext {
   user: IUser;
   userToken: string;
   darkMode: boolean;
-  sessionActive: boolean;
   router: NextRouter;
+  sessionValidation: Status;
   logout: () => void;
   handleUser: (token: string, user: IUser) => void;
   setDarkMode: (_?: boolean) => void;
@@ -38,6 +38,11 @@ interface IHasId {
   _id?: string;
 }
 
+export interface IImage {
+  name: string;
+  img: any;
+}
+
 export interface IPost extends IHasId {
   user: IUser;
   username: string;
@@ -47,6 +52,7 @@ export interface IPost extends IHasId {
   isPrivate: boolean;
   createdAt: string;
   updatedAt: string;
+  image?: IImage;
 }
 
 export interface IPostReq extends IPost, IRequest {

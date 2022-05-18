@@ -1,6 +1,7 @@
 export enum DBService {
   POSTS = "posts",
   USERS = "users",
+  IMAGES = "images",
 }
 
 export enum HttpRequest {
@@ -66,6 +67,9 @@ export enum ServerInfo {
 export enum ErrorMessage {
   TRY_AGAIN = "Please try again",
   PW_NOT_MATCHING = "Passwords do not match",
+  ONE_FILE_ONLY = "Only 1 file can be uploaded",
+  FILE_UPLOAD_FAIL = "Failed to upload file",
+  FILE_DOWNLOAD_FAIL = "Failed to download file",
 }
 
 export enum APIAction {

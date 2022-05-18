@@ -26,7 +26,7 @@ const PostCard = ({ post }: IPostCard) => {
           <h2>{title}</h2>
           <p className="author">{`By ${user?.username}`}</p>
           <p className="body">
-            {body?.slice(0, 90) + (body.length > 90 ? "..." : "")}
+            {body?.slice(0, 90) + (body?.length > 90 ? "..." : "")}
           </p>
         </div>
       </CardContent>

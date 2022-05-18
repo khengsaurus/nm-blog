@@ -18,6 +18,9 @@ export default async function handler(
     case HttpRequest.GET:
       return handleGet(req, res);
     case HttpRequest.POST:
+      console.log(req);
+      console.log("-------------------------");
+      console.log(req.body);
       return handleRequest(req, res, createDoc);
     case HttpRequest.PUT:
       return handleRequest(req, res, updateDoc);

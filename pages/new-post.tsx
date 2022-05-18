@@ -1,4 +1,8 @@
+import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
+import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import React, {
   useCallback,
   useContext,
@@ -7,10 +11,19 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Column, HomePage, Input, Row, StyledButton } from "../components";
+import {
+  Column,
+  HomePage,
+  Input,
+  Row,
+  StyledButton,
+  StyledText,
+} from "../components";
 import { DBService, HttpRequest, PageTitle } from "../enums";
 import { AppContext } from "../hooks";
 import { HTTPService } from "../lib/client";
+import { checkFileSize, checkFileType, checkOneFileSelected } from "../util";
+import { RowGroupEnd } from "../components/StyledComponents";
 
 const NewPost = () => {
   const { user } = useContext(AppContext);
@@ -18,6 +31,7 @@ const NewPost = () => {
   const [slug, setSlug] = useState("");
   const [body, setBody] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
+  const [attachment, setAttachment] = useState<any>(null);
   const hasEditedSlug = useRef(false);
 
   const saveDisabled = useMemo(
@@ -31,18 +45,72 @@ const NewPost = () => {
     }
   }, [title]);
 
-  const handleSave = useCallback(() => {
-    const createdAt = new Date();
-    HTTPService.makeAuthHttpReq(DBService.POSTS, HttpRequest.POST, {
-      username: user.username,
-      title,
-      slug,
-      body,
-      createdAt,
-      updatedAt: createdAt,
-    }).then((res) => console.log(res));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, title, slug, body]);
+  const handleSave = () => {
+    const createdAt = new Date().toString();
+    // HTTPService.makeAuthHttpReq(DBService.POSTS, HttpRequest.POST, {
+    //   username: user.username,
+    //   title,
+    //   slug,
+    //   body,
+    //   createdAt,
+    //   updatedAt: createdAt,
+    // }).then((res) => console.log(res));
+    HTTPService.uploadPostWithImage(
+      {
+        username: user.username,
+        title,
+        slug,
+        body,
+        createdAt,
+        updatedAt: createdAt,
+      },
+      attachment
+    ).then((res) => console.log(res));
+  };
+
+  function renderAddImageButton() {
+    const errHandler = (msg: string) => console.info(msg);
+
+    async function handleAttachment(
+      event: React.ChangeEvent<HTMLInputElement>
+    ) {
+      const file = event.target.files[0];
+      if (user?.username && !!file) {
+        if (
+          checkOneFileSelected(event, errHandler) &&
+          checkFileSize(event, errHandler) &&
+          checkFileType(event, errHandler)
+        ) {
+          setAttachment(file);
+          // setAttachingImg(true);
+          // await HTTPService.uploadAttachment(username, todoId, attachment)
+          //   .then((res) => {
+          //     if (res?.data) {
+          //       updateStateTodo(res.todo, true);
+          //       setHasAttachment(true);
+          //     } else {
+          //       console.info("Error");
+          //     }
+          //   })
+          //   .catch((err) =>
+          //     console.info(ErrorMessage.FILE_UPLOAD_FAIL + ": " + err.message)
+          //   )
+          //   .finally(() => setAttachingImg(false));
+        }
+      }
+    }
+
+    return (
+      <IconButton
+        component="label"
+        style={{ padding: 0, width: 44.5, height: 44.5 }}
+        disableRipple
+      >
+        <AddPhotoAlternateIcon />
+        <input type="file" hidden onChange={handleAttachment} />
+      </IconButton>
+    );
+  }
 
   const markup = (
     <Column>
@@ -61,7 +129,7 @@ const NewPost = () => {
             hasEditedSlug.current = false;
           }
         }}
-        onClick={(e) => (hasEditedSlug.current = true)}
+        onClick={() => (hasEditedSlug.current = true)}
         maxWidth
       />
       <Input
@@ -73,6 +141,21 @@ const NewPost = () => {
         maxWidth
         marginTop={20}
       />
+      <Row>
+        {renderAddImageButton()}
+        {!!attachment && (
+          <RowGroupEnd>
+            <StyledText variant="subtitle2" text={attachment.name} />
+            <IconButton
+              edge="end"
+              aria-label="delete-image"
+              onClick={() => setAttachment(null)}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </RowGroupEnd>
+        )}
+      </Row>
       <Row>
         <Checkbox
           value={isPrivate}

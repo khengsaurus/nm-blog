@@ -26,6 +26,10 @@ export const Row = styled.div`
   transition: 300ms all;
 `;
 
+export const RowGroupEnd = styled(Row)`
+  justify-content: flex-end;
+`;
+
 export const RowReversed = styled(Row)`
   flex-direction: row-reverse;
 `;

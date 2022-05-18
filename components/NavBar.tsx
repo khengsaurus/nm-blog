@@ -16,11 +16,12 @@ interface INavBar {
 }
 
 const NavBar: React.FC<INavBar> = ({ title }) => {
-  const { router, sessionActive } = useContext(AppContext);
+  const { router, user } = useContext(AppContext);
+  const sessionActive = !!user;
 
   const handleProfileClick = useCallback(() => {
     sessionActive ? null : router.push(PageRoute.LOGIN);
-  }, [router, sessionActive]);
+  }, [sessionActive, router]);
 
   return (
     <AppBar position="fixed">

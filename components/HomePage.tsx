@@ -1,6 +1,6 @@
 import { ReactNode, useContext, useEffect } from "react";
 import { NavBar } from "../components";
-import { PageRoute } from "../enums";
+import { PageRoute, Status } from "../enums";
 import { AppContext } from "../hooks";
 
 interface HomePageProps {
@@ -18,15 +18,19 @@ const HomePage = ({
   showNavbar = true,
   requireAuth = false,
 }: HomePageProps) => {
-  const { router, sessionActive } = useContext(AppContext);
+  const { router, user, sessionValidation } = useContext(AppContext);
+  const sessionActive = !!user;
 
   useEffect(() => {
-    Promise.resolve().then(() => {
-      if (requireAuth && !sessionActive) {
-        router?.push(PageRoute.LOGIN);
-      }
-    });
-  }, [requireAuth, router, sessionActive]);
+    if (
+      requireAuth &&
+      (sessionValidation === Status.SUCCESS ||
+        sessionValidation === Status.ERROR) &&
+      !sessionActive
+    ) {
+      router?.push(PageRoute.LOGIN);
+    }
+  }, [requireAuth, router, sessionActive, sessionValidation]);
 
   return (
     <main className={mainClass}>

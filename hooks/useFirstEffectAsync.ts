@@ -21,7 +21,7 @@ const useFirstEffectAsync = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [callback, requireDeps, JSON.stringify(deps)]);
 
-  return { status };
+  return status;
 };
 
 export default useFirstEffectAsync;
