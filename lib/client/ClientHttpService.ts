@@ -16,6 +16,10 @@ class ClientHTTPService {
     });
   }
 
+  /**
+   * Content-Type: application/json by default
+   * Will inject bearer token & userId into body for POST requests
+   */
   makeAuthHttpReq(
     service: DBService,
     method: HttpRequest,
@@ -26,9 +30,15 @@ class ClientHTTPService {
     const reqConfig = {
       ...config,
       headers: {
+        "Content-Type": "application/json",
         ...config?.headers,
         Authorization: `Bearer ${this.bearerToken}`,
       },
+      // onUploadProgress: (event) =>
+      //   console.log(
+      //     `Current progress:`,
+      //     Math.round((event.loaded * 100) / event.total)
+      //   ),
     };
 
     switch (method) {
@@ -73,28 +83,18 @@ class ClientHTTPService {
     return this.instance.get(`/api/${service}`, { params });
   }
 
-  uploadPostWithImage = async (
-    postData: any,
-    file: any
-  ): Promise<IResponse | null> => {
+  uploadImage = async (file: any): Promise<IResponse | null> => {
     const formData = new FormData();
-    const fileName = `${file.name}`;
-    formData.append("attachment", file, fileName);
-    return this.makeAuthHttpReq(
-      DBService.POSTS,
-      HttpRequest.POST,
-      {
-        ...postData,
-        formData,
-        userId: this.userId,
+    // const fileName = `${file.name}`;
+    formData.append("file", file);
+    formData.append("userId", this.userId);
+    return this.instance.post(`/api/${DBService.IMAGES}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${this.bearerToken}`,
+        "user-id": this.userId,
       },
-      null, // TODO:
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    });
   };
 }
 

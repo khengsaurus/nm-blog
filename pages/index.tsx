@@ -30,7 +30,9 @@ export async function getServerSideProps({ res }) {
     .exec();
   const posts = postQuery.map((post) => docToObject(post));
   const cursor =
-    posts?.length > 0 ? posts[posts.length - 1].createdAt : "timestamp";
+    posts?.length > 0
+      ? posts[posts.length - 1].createdAt || "timestamp"
+      : "timestamp";
 
   return {
     props: { posts, cursor },

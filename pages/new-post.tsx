@@ -46,7 +46,10 @@ const NewPost = () => {
   }, [title]);
 
   const handleSave = () => {
-    const createdAt = new Date().toString();
+    if (!!attachment) {
+      HTTPService.uploadImage(attachment).then((res) => console.log(res));
+    }
+    // const createdAt = new Date().toString();
     // HTTPService.makeAuthHttpReq(DBService.POSTS, HttpRequest.POST, {
     //   username: user.username,
     //   title,
@@ -55,17 +58,6 @@ const NewPost = () => {
     //   createdAt,
     //   updatedAt: createdAt,
     // }).then((res) => console.log(res));
-    HTTPService.uploadPostWithImage(
-      {
-        username: user.username,
-        title,
-        slug,
-        body,
-        createdAt,
-        updatedAt: createdAt,
-      },
-      attachment
-    ).then((res) => console.log(res));
   };
 
   function renderAddImageButton() {

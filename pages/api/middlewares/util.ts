@@ -8,10 +8,10 @@ import { validateAuth } from "./auth";
 export async function handleRequest<R>(
   req: NextApiRequest,
   res: NextApiResponse,
-  callback: (p: Partial<R>) => Promise<IResponse>
+  callback: (p: NextApiRequest) => Promise<IResponse>
 ) {
   await validateAuth(req)
-    .then(async () => await callback(req.body))
+    .then(async () => await callback(req))
     .then((payload) => forwardResponse(res, payload))
     .catch((err) => handleAPIError(res, err));
 }

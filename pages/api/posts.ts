@@ -18,10 +18,12 @@ export default async function handler(
     case HttpRequest.GET:
       return handleGet(req, res);
     case HttpRequest.POST:
-      console.log(req);
-      console.log("-------------------------");
-      console.log(req.body);
-      return handleRequest(req, res, createDoc);
+      if (req.headers["content-type"] === "application/json") {
+        return handleRequest(req, res, createDoc);
+      } else {
+        console.log(req);
+        return res.status(200).send("ok");
+      }
     case HttpRequest.PUT:
       return handleRequest(req, res, updateDoc);
     case HttpRequest.DELETE:
@@ -68,11 +70,12 @@ async function getDoc(params: object): Promise<IResponse> {
   });
 }
 
-async function createDoc(reqBody: Partial<IPostReq>): Promise<IResponse> {
+async function createDoc(req: NextApiRequest): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
-    const { slug, userId } = reqBody;
     try {
       const { Post } = await mongoConnection();
+      const reqBody: Partial<IPostReq> = req.body;
+      const { slug, userId } = reqBody;
       await Post.exists({ slug, user: userId }).then((exists) => {
         if (exists) {
           resolve({ status: 200, message: ServerInfo.POST_SLUG_TAKEN });

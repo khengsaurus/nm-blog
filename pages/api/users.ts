@@ -171,11 +171,12 @@ async function handleTokenLogin(
   });
 }
 
-async function updateDoc(body: Partial<IUserReq>): Promise<IResponse> {
+async function updateDoc(req: NextApiRequest): Promise<IResponse> {
+  const reqBody: Partial<IUserReq> = req.body;
   return new Promise(async (resolve, reject) => {
     try {
       const { User } = await mongoConnection();
-      const { email, username, action, userId } = body;
+      const { email, username, action, userId } = reqBody;
       if (action === APIAction.USER_SET_USERNAME) {
         await User.exists({ username }).then(async (exists) => {
           if (exists) {
@@ -209,11 +210,12 @@ async function updateDoc(body: Partial<IUserReq>): Promise<IResponse> {
   });
 }
 
-async function deleteDoc(body: Partial<IUserReq>) {
+async function deleteDoc(req: NextApiRequest) {
+  const reqBody: Partial<IUserReq> = req.body;
   return new Promise(async (resolve, reject) => {
     try {
       const { User } = await mongoConnection();
-      User.findByIdAndDelete(body.userId, (err, _, __) => {
+      User.findByIdAndDelete(reqBody.userId, (err, _, __) => {
         if (!!err) {
           reject(new ServerError(500, err.message));
         } else {
