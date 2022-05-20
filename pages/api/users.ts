@@ -1,8 +1,6 @@
 import { isEmpty } from "lodash";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { APIAction, HttpRequest, ServerInfo } from "../../enums";
-import { hashPassword, mongoConnection, ServerError } from "../../lib/server";
-import { IResponse, IUser, IUserReq } from "../../types";
 import {
   createUserObject,
   decodeToken,
@@ -13,7 +11,9 @@ import {
   handleRequest,
   processUserData,
   verify,
-} from "./middlewares";
+} from "../../lib/middlewares";
+import { hashPassword, mongoConnection, ServerError } from "../../lib/server";
+import { IResponse, IUser, IUserReq } from "../../types";
 
 export default async function handler(
   req: NextApiRequest,

@@ -1,5 +1,5 @@
-import ClientHTTPService from "./ClientHttpService";
+import ClientHTTPService, { serverUrl } from "./ClientHttpService";
 
 const HTTPService = new ClientHTTPService();
 
-export { HTTPService };
+export { serverUrl, HTTPService };

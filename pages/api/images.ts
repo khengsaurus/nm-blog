@@ -1,6 +1,8 @@
+import { DBService } from "enums";
+import { getFileStream, uploadFile } from "lib/server/s3";
 import { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from "next-connect";
-import upload from "./middlewares/upload";
+import { upload } from "../../lib/middlewares";
 
 const route = nextConnect({
   // Handle any other HTTP method
@@ -9,25 +11,24 @@ const route = nextConnect({
   },
 });
 
-// Process a POST request
-route.post("/*", upload, (req, res) => {
-  console.log("REQ RECEIVED, HERE IS THE FILE -----");
-  console.log(req.file);
-  return new Promise(async (resolve, reject) => {
-    try {
-      await upload(req, res, function (err) {
-        if (err) {
-          res.status(500).send("error in upload");
-        } else {
-          res.status(200).send("success");
-        }
-      });
-      res.status(200).send("upload success");
-    } catch (err) {
-      console.info(err.message);
-      res.status(500).send("upload failed");
-    }
-  });
+route.get("/*", (req, res) => {
+  const key = req.query.key;
+  if (key) {
+    const readStream = getFileStream(key);
+    readStream.pipe(res);
+  }
+});
+
+route.post("/*", upload.single("image"), async (req, res) => {
+  if (!!req.file) {
+    const uploadRes = await uploadFile(req.file);
+    res.status(200).json({
+      location: uploadRes.Location,
+      key: `/${DBService.IMAGES}/${uploadRes.Key}`,
+    });
+  } else {
+    res.status(500).send("upload failed");
+  }
 });
 
 export default route;

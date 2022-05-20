@@ -4,14 +4,10 @@ module.exports = {
   reactStrictMode: true,
   env: {
     VERCEL_URL: process.env.VERCEL_URL,
-    DEV_URL: (process.env.HOST || ":") + (process.env.PORT || 3000), // -> http://localhost:3000
-    MONGODB_URI:
-      "mongodb+srv://next-mongo-user:123123123@cluster0.yzggr.mongodb.net/next-app-1?retryWrites=true&w=majority",
-    SECRET_KEY: "secret-key",
-    SALT_ROUNDS: 10,
+    DEV_URL: (process.env.DEV_HOST || ":") + (process.env.DEV_PORT || 3000), // -> http://localhost:3000
   },
   images: {
-    domains: ["images.unsplash.com"],
+    domains: ["images.unsplash.com", "localhost", "localhost:3000"],
   },
   experimental: {
     runtime: "nodejs",

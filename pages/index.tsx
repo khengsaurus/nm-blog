@@ -1,3 +1,5 @@
+import { serverUrl } from "lib/client";
+import Image from "next/image";
 import React, { useContext } from "react";
 import { HomePage, RowWrap, StyledButton } from "../components";
 import PostCard from "../components/PostCard";
@@ -48,6 +50,12 @@ const Home: React.FC = ({ posts, cursor }: IHomeProps) => {
         {posts.map((post, index) => (
           <PostCard key={index} post={post} />
         ))}
+        <Image
+          alt=""
+          height={200}
+          width={200}
+          src={`${serverUrl}/api/images?key=39af32e95bb01cf50464b17709583838`}
+        />
       </RowWrap>
       {!!user && <StyledButton label={"Logout"} onClick={logout} />}
     </>

@@ -1,14 +1,14 @@
 import { isEmpty } from "lodash";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { HttpRequest, ServerInfo } from "../../enums";
-import { mongoConnection, ServerError } from "../../lib/server";
-import { IPostReq, IResponse } from "../../types";
 import {
   forwardResponse,
   handleAPIError,
   handleBadRequest,
   handleRequest,
-} from "./middlewares";
+} from "../../lib/middlewares";
+import { mongoConnection, ServerError } from "../../lib/server";
+import { IPostReq, IResponse } from "../../types";
 
 export default async function handler(
   req: NextApiRequest,

@@ -1,8 +1,8 @@
 import { extend } from "lodash";
 import { NextApiRequest, NextApiResponse } from "next";
-import { HttpResponse } from "../../../enums";
-import { ServerError } from "../../../lib/server";
-import { IResponse, IUser } from "../../../types";
+import { HttpResponse } from "../../enums";
+import { ServerError } from "../server";
+import { IResponse, IUser } from "../../types";
 import { validateAuth } from "./auth";
 
 export async function handleRequest<R>(

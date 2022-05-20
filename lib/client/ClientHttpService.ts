@@ -2,6 +2,11 @@ import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { IResponse } from "types";
 import { APIAction, DBService, HttpRequest } from "../../enums";
 
+export const serverUrl =
+  process.env.NODE_ENV === "development"
+    ? process.env.DEV_URL
+    : process.env.VERCEL_URL;
+
 class ClientHTTPService {
   private instance: AxiosInstance;
   private bearerToken: string;
@@ -9,10 +14,7 @@ class ClientHTTPService {
 
   constructor() {
     this.instance = axios.create({
-      baseURL:
-        process.env.NODE_ENV === "development"
-          ? process.env.DEV_URL
-          : process.env.VERCEL_URL,
+      baseURL: serverUrl,
     });
   }
 
@@ -68,7 +70,14 @@ class ClientHTTPService {
     }
   }
 
+  /**
+   * Current flow is to have this called twice on app mount:
+   * -> first time to set bearer token
+   * -> handleTokenLogin to retrieve useId
+   * -> second time to set userId
+   */
   setBearer(token: string, userId: string) {
+    console.log("-> setBearer(): " + userId);
     this.bearerToken = token;
     this.userId = userId;
   }
@@ -83,16 +92,15 @@ class ClientHTTPService {
     return this.instance.get(`/api/${service}`, { params });
   }
 
-  uploadImage = async (file: any): Promise<IResponse | null> => {
+  uploadImage = async (image: any): Promise<IResponse | null> => {
     const formData = new FormData();
-    // const fileName = `${file.name}`;
-    formData.append("file", file);
-    formData.append("userId", this.userId);
+    console.log(this.userId);
+    formData.append("image", image);
+    formData.append("user-id", this.userId);
     return this.instance.post(`/api/${DBService.IMAGES}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${this.bearerToken}`,
-        "user-id": this.userId,
       },
     });
   };
