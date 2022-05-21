@@ -1,6 +1,7 @@
 import { CardMedia } from "@mui/material";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
+import { serverUrl } from "lib/client";
 import React, { useContext } from "react";
 import { AppContext } from "../hooks";
 import { IPost } from "../types";
@@ -11,15 +12,15 @@ interface IPostCard {
 
 const PostCard = ({ post }: IPostCard) => {
   const { router } = useContext(AppContext);
-  const { title, slug, body, user } = post;
+  const { title, slug, body, user, imageKey } = post;
 
   return (
     <Card onClick={() => router.push(`/${user?.username}/${slug}`)}>
       <CardMedia
         component="img"
         height="80"
-        image="https://images.unsplash.com/photo-1493673272479-a20888bcee10"
-        alt="plant"
+        image={`${serverUrl}/api/images?key=${imageKey}`}
+        alt="post-banner"
       />
       <CardContent>
         <div className="card-content">

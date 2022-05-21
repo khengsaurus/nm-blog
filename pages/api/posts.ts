@@ -18,12 +18,7 @@ export default async function handler(
     case HttpRequest.GET:
       return handleGet(req, res);
     case HttpRequest.POST:
-      if (req.headers["content-type"] === "application/json") {
-        return handleRequest(req, res, createDoc);
-      } else {
-        console.log(req);
-        return res.status(200).send("ok");
-      }
+      return handleRequest(req, res, createDoc);
     case HttpRequest.PUT:
       return handleRequest(req, res, updateDoc);
     case HttpRequest.DELETE:

@@ -38,11 +38,6 @@ interface IHasId {
   _id?: string;
 }
 
-export interface IImage {
-  name: string;
-  img: any;
-}
-
 export interface IPost extends IHasId {
   user: IUser;
   username: string;
@@ -52,7 +47,7 @@ export interface IPost extends IHasId {
   isPrivate: boolean;
   createdAt: string;
   updatedAt: string;
-  image?: IImage;
+  imageKey: string;
 }
 
 export interface IPostReq extends IPost, IRequest {

@@ -18,8 +18,10 @@ import {
   StyledText,
   TextNavButton,
 } from "./StyledMui";
+import { CircleLoader } from "./Loaders";
 
 export {
+  CircleLoader,
   HomePage,
   Input,
   HomeButton,

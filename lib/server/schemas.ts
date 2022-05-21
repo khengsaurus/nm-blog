@@ -1,39 +1,36 @@
-import { Schema } from "mongoose";
+import { Schema, SchemaTypes } from "mongoose";
 import { IPost, IUser } from "../../types";
 
 export const UserSchema = new Schema<IUser>({
-  avatar: Schema.Types.String,
-  bio: Schema.Types.String,
-  createdAt: Schema.Types.String,
-  email: Schema.Types.String,
-  password: Schema.Types.String,
-  username: Schema.Types.String,
+  avatar: SchemaTypes.String,
+  bio: SchemaTypes.String,
+  createdAt: SchemaTypes.String,
+  email: SchemaTypes.String,
+  password: SchemaTypes.String,
+  username: SchemaTypes.String,
 });
 
 export const ImageSchema = new Schema({
-  name: Schema.Types.String,
+  name: SchemaTypes.String,
   img: {
-    data: Schema.Types.Buffer,
-    contentType: Schema.Types.String,
+    data: SchemaTypes.Buffer,
+    contentType: SchemaTypes.String,
   },
 });
 
 export const PostSchema = new Schema<IPost>({
   user: {
-    type: Schema.Types.ObjectId,
+    type: SchemaTypes.ObjectId,
     ref: "User",
   },
-  image: {
-    type: Schema.Types.ObjectId,
-    ref: "Image",
-  },
-  username: Schema.Types.String,
-  title: Schema.Types.String,
-  slug: Schema.Types.String,
-  body: Schema.Types.String,
-  isPrivate: Schema.Types.Boolean,
-  createdAt: Schema.Types.String,
-  updatedAt: Schema.Types.String,
+  username: SchemaTypes.String,
+  title: SchemaTypes.String,
+  slug: SchemaTypes.String,
+  body: SchemaTypes.String,
+  isPrivate: SchemaTypes.Boolean,
+  imageKey: SchemaTypes.String,
+  createdAt: SchemaTypes.String,
+  updatedAt: SchemaTypes.String,
 });
 
 PostSchema.set("toObject", { getters: true, flattenMaps: true });

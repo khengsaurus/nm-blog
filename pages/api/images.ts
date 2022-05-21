@@ -1,4 +1,4 @@
-import { DBService } from "enums";
+import { HttpResponse } from "enums";
 import { getFileStream, uploadFile } from "lib/server/s3";
 import { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from "next-connect";
@@ -21,13 +21,19 @@ route.get("/*", (req, res) => {
 
 route.post("/*", upload.single("image"), async (req, res) => {
   if (!!req.file) {
-    const uploadRes = await uploadFile(req.file);
-    res.status(200).json({
-      location: uploadRes.Location,
-      key: `/${DBService.IMAGES}/${uploadRes.Key}`,
-    });
+    try {
+      const uploadRes = await uploadFile(req.file);
+      if (!!uploadRes.Location && !!uploadRes.Key) {
+        res.status(200).json({
+          location: uploadRes.Location,
+          key: uploadRes.Key,
+        });
+      }
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
   } else {
-    res.status(500).send("upload failed");
+    res.status(400).send(HttpResponse._400);
   }
 });
 

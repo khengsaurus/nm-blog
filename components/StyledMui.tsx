@@ -22,7 +22,7 @@ interface IStyledTextProps {
 }
 
 interface IStyledButtonProps {
-  label: string;
+  label: string | any;
   navigate?: string;
   color?: string;
   padding?: string;

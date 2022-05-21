@@ -36,11 +36,6 @@ class ClientHTTPService {
         ...config?.headers,
         Authorization: `Bearer ${this.bearerToken}`,
       },
-      // onUploadProgress: (event) =>
-      //   console.log(
-      //     `Current progress:`,
-      //     Math.round((event.loaded * 100) / event.total)
-      //   ),
     };
 
     switch (method) {
@@ -77,7 +72,6 @@ class ClientHTTPService {
    * -> second time to set userId
    */
   setBearer(token: string, userId: string) {
-    console.log("-> setBearer(): " + userId);
     this.bearerToken = token;
     this.userId = userId;
   }
@@ -94,7 +88,6 @@ class ClientHTTPService {
 
   uploadImage = async (image: any): Promise<IResponse | null> => {
     const formData = new FormData();
-    console.log(this.userId);
     formData.append("image", image);
     formData.append("user-id", this.userId);
     return this.instance.post(`/api/${DBService.IMAGES}`, formData, {

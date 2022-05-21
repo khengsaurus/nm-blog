@@ -165,6 +165,13 @@ function newMuiTheme(darkMode: boolean) {
           },
         },
       },
+      MuiCardMedia: {
+        styleOverrides: {
+          root: {
+            objectPosition: "0% 20%",
+          },
+        },
+      },
       MuiCheckbox: {
         styleOverrides: {
           root: {

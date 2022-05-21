@@ -1,8 +1,8 @@
-import Button from "@mui/material/Button";
+import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import DeleteIcon from "@mui/icons-material/Delete";
 import Checkbox from "@mui/material/Checkbox";
 import IconButton from "@mui/material/IconButton";
-import DeleteIcon from "@mui/icons-material/Delete";
-import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import { ServerError } from "lib/server";
 import React, {
   useCallback,
   useContext,
@@ -11,7 +11,9 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { IResponse } from "types";
 import {
+  CircleLoader,
   Column,
   HomePage,
   Input,
@@ -19,11 +21,17 @@ import {
   StyledButton,
   StyledText,
 } from "../components";
-import { DBService, HttpRequest, PageTitle } from "../enums";
-import { AppContext } from "../hooks";
+import { RowGroupEnd } from "../components/StyledComponents";
+import {
+  DBService,
+  ErrorMessage,
+  HttpRequest,
+  PageTitle,
+  Status,
+} from "../enums";
+import { AppContext, useAsync } from "../hooks";
 import { HTTPService } from "../lib/client";
 import { checkFileSize, checkFileType, checkOneFileSelected } from "../util";
-import { RowGroupEnd } from "../components/StyledComponents";
 
 const NewPost = () => {
   const { user } = useContext(AppContext);
@@ -34,31 +42,64 @@ const NewPost = () => {
   const [attachment, setAttachment] = useState<any>(null);
   const hasEditedSlug = useRef(false);
 
-  const saveDisabled = useMemo(
-    () => !title.trim() || !slug.trim() || !body.trim(),
-    [title, slug, body]
-  );
-
   useEffect(() => {
     if (!hasEditedSlug.current) {
       setSlug(title.toLocaleLowerCase().replaceAll(" ", "-"));
     }
   }, [title]);
 
-  const handleSave = () => {
-    if (!!attachment) {
-      HTTPService.uploadImage(attachment).then((res) => console.log(res));
-    }
-    // const createdAt = new Date().toString();
-    // HTTPService.makeAuthHttpReq(DBService.POSTS, HttpRequest.POST, {
-    //   username: user.username,
-    //   title,
-    //   slug,
-    //   body,
-    //   createdAt,
-    //   updatedAt: createdAt,
-    // }).then((res) => console.log(res));
-  };
+  const _handleSave = useCallback(() => {
+    return new Promise(async (resolve, reject) => {
+      let imageKey = "";
+      if (!!attachment) {
+        await HTTPService.uploadImage(attachment)
+          .then((res) => {
+            if (res.status === 200 && res.data?.key) {
+              imageKey = res.data.key;
+            } else {
+              throw new Error(ErrorMessage.FILE_UPLOAD_FAIL);
+            }
+          })
+          .catch((err) => {
+            reject(err);
+            return;
+          });
+      }
+      const createdAt = new Date().toString();
+      HTTPService.makeAuthHttpReq(DBService.POSTS, HttpRequest.POST, {
+        username: user.username,
+        title,
+        slug,
+        body,
+        imageKey,
+        createdAt,
+        updatedAt: createdAt,
+      })
+        .then((res) => resolve(res))
+        .catch((err) => reject(err));
+    });
+  }, [attachment, body, slug, title, user?.username]);
+
+  const _cleanup = useCallback(() => {
+    setTitle("");
+    setSlug("");
+    setBody("");
+    setAttachment(null);
+  }, []);
+
+  const { execute: handleSave, status: saveStatus } = useAsync<
+    IResponse,
+    ServerError
+  >(_handleSave, _cleanup, (r: IResponse) => r.status === 200, false);
+
+  const saveDisabled = useMemo(
+    () =>
+      !title.trim() ||
+      !slug.trim() ||
+      !body.trim() ||
+      saveStatus !== Status.IDLE,
+    [title, slug, body, saveStatus]
+  );
 
   function renderAddImageButton() {
     const errHandler = (msg: string) => console.info(msg);
@@ -66,29 +107,12 @@ const NewPost = () => {
     async function handleAttachment(
       event: React.ChangeEvent<HTMLInputElement>
     ) {
-      const file = event.target.files[0];
-      if (user?.username && !!file) {
-        if (
-          checkOneFileSelected(event, errHandler) &&
-          checkFileSize(event, errHandler) &&
-          checkFileType(event, errHandler)
-        ) {
-          setAttachment(file);
-          // setAttachingImg(true);
-          // await HTTPService.uploadAttachment(username, todoId, attachment)
-          //   .then((res) => {
-          //     if (res?.data) {
-          //       updateStateTodo(res.todo, true);
-          //       setHasAttachment(true);
-          //     } else {
-          //       console.info("Error");
-          //     }
-          //   })
-          //   .catch((err) =>
-          //     console.info(ErrorMessage.FILE_UPLOAD_FAIL + ": " + err.message)
-          //   )
-          //   .finally(() => setAttachingImg(false));
-        }
+      if (
+        checkOneFileSelected(event, errHandler) &&
+        checkFileSize(event, errHandler) &&
+        checkFileType(event, errHandler)
+      ) {
+        setAttachment(event.target.files[0]);
       }
     }
 
@@ -103,6 +127,19 @@ const NewPost = () => {
       </IconButton>
     );
   }
+
+  const saveButtonLabel = useMemo(() => {
+    switch (saveStatus) {
+      case Status.IDLE:
+        return "Save";
+      case Status.PENDING:
+        return <CircleLoader />;
+      case Status.SUCCESS:
+        return "👌🏻";
+      case Status.ERROR:
+        return "⚠️";
+    }
+  }, [saveStatus]);
 
   const markup = (
     <Column>
@@ -155,7 +192,7 @@ const NewPost = () => {
           disableRipple
         />
         <StyledButton
-          label={"Save"}
+          label={saveButtonLabel}
           disabled={saveDisabled}
           onClick={handleSave}
         />
