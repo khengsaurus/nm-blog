@@ -1,4 +1,3 @@
-// import { AnimateSharedLayout } from "framer-motion";
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import AppContextProvider from "../hooks/context";
@@ -9,7 +8,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <AppContextProvider>
       <HomeTheme>
-        {/* <AnimateSharedLayout> */}
+        {/* @ts-ignore */}
         <Head>
           <meta
             name="viewport"
@@ -17,7 +16,6 @@ function MyApp({ Component, pageProps }: AppProps) {
           />
         </Head>
         <Component {...pageProps} />
-        {/* </AnimateSharedLayout> */}
       </HomeTheme>
     </AppContextProvider>
   );

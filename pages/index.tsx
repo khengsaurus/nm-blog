@@ -25,7 +25,7 @@ export async function getServerSideProps({ res }) {
   const postQuery = await Post.find()
     .sort({ createdAt: -1 })
     .limit(LIMIT)
-    .populate("user", "-createdAt -email -password")
+    .populate("user", "-createdAt -email -password -posts")
     .lean()
     .exec();
   const posts = postQuery.map((post) => docToObject(post));

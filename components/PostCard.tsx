@@ -1,6 +1,7 @@
 import { CardMedia } from "@mui/material";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
+import { motion } from "framer-motion";
 import { serverUrl } from "lib/client";
 import React, { useContext, useMemo } from "react";
 import { AppContext } from "../hooks";
@@ -23,12 +24,19 @@ const PostCard = ({ post }: IPostCard) => {
   return (
     <Card onClick={() => router.push(`/${user?.username}/${slug}`)}>
       {hasImage && (
-        <CardMedia
-          component="img"
-          height="80"
-          image={`${serverUrl}/api/images?key=${imageKey}`}
-          alt="post-banner"
-        />
+        <CardMedia>
+          <motion.img
+            src={`${serverUrl}/api/images?key=${imageKey}`}
+            alt="post-image"
+            layoutId={imageKey}
+            style={{
+              height: "80px",
+              width: "100%",
+              objectFit: "cover",
+              objectPosition: "50% 40%",
+            }}
+          />
+        </CardMedia>
       )}
       <CardContent style={{ height: hasImage ? 105 : 185 }}>
         <div className="card-content">

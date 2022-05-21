@@ -1,5 +1,5 @@
-import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import DeleteIcon from "@mui/icons-material/Delete";
+import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import IconButton from "@mui/material/IconButton";
 import { ServerError } from "lib/server";
@@ -21,7 +21,6 @@ import {
   StyledButton,
   StyledText,
 } from "../components";
-import { RowGroupEnd } from "../components/StyledComponents";
 import {
   DBService,
   ErrorMessage,
@@ -49,6 +48,7 @@ const NewPost = () => {
   }, [title]);
 
   const _handleSave = useCallback(() => {
+    let noImageUploadError = true; // TODO: handle this
     return new Promise(async (resolve, reject) => {
       if (!!user.posts?.find((post) => post.slug === slug)) {
         reject(new Error(ErrorMessage.POST_SLUG_USED));
@@ -65,25 +65,29 @@ const NewPost = () => {
             }
           })
           .catch((err) => {
+            console.log("err");
+            noImageUploadError = false;
             reject(err);
-            return;
           });
       }
-      const createdAt = new Date().toString();
-      HTTPService.makeAuthHttpReq(DBService.POSTS, HttpRequest.POST, {
-        username: user.username,
-        title,
-        slug,
-        body,
-        imageKey,
-        createdAt,
-        updatedAt: createdAt,
-      })
-        .then((res) => {
-          console.info(res);
-          resolve(res);
+      if (noImageUploadError) {
+        console.log("continuing");
+        const createdAt = new Date().toString();
+        HTTPService.makeAuthHttpReq(DBService.POSTS, HttpRequest.POST, {
+          username: user.username,
+          title,
+          slug,
+          body,
+          imageKey,
+          createdAt,
+          updatedAt: createdAt,
         })
-        .catch((err) => reject(err));
+          .then((res) => {
+            console.info(res);
+            resolve(res);
+          })
+          .catch((err) => reject(err));
+      }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attachment, body, slug, title, JSON.stringify(user)]);
@@ -109,7 +113,7 @@ const NewPost = () => {
     [title, slug, body, saveStatus]
   );
 
-  function renderAddImageButton() {
+  function renderAttachment() {
     const errHandler = (msg: string) => console.info(msg);
 
     async function handleAttachment(
@@ -125,14 +129,54 @@ const NewPost = () => {
     }
 
     return (
-      <IconButton
-        component="label"
-        style={{ padding: 0, width: 44.5, height: 44.5 }}
-        disableRipple
-      >
-        <AddPhotoAlternateIcon />
-        <input type="file" hidden onChange={handleAttachment} />
-      </IconButton>
+      <Row>
+        <Button
+          disableRipple
+          component="label"
+          style={{
+            height: "40px",
+            width: "85px",
+            padding: "0px",
+            justifyContent: "flex-start",
+            textTransform: "capitalize",
+          }}
+        >
+          Add image
+          <input type="file" hidden onChange={handleAttachment} />
+        </Button>
+        {!!attachment && (
+          <Row style={{ justifyContent: "flex-end" }}>
+            <StyledText variant="subtitle2" text={attachment.name} />
+            <IconButton
+              edge="end"
+              aria-label="delete-image"
+              onClick={() => setAttachment(null)}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </Row>
+        )}
+      </Row>
+    );
+  }
+
+  function renderPrivate() {
+    return (
+      <Row>
+        <Row style={{ justifyContent: "flex-start" }}>
+          <StyledText text="Private" variant="body2" />
+          <Checkbox
+            value={isPrivate}
+            onChange={() => setIsPrivate(!isPrivate)}
+            disableRipple
+          />
+        </Row>
+        <StyledButton
+          label={saveButtonLabel}
+          disabled={saveDisabled}
+          onClick={handleSave}
+        />
+      </Row>
     );
   }
 
@@ -178,33 +222,8 @@ const NewPost = () => {
         maxWidth
         marginTop={20}
       />
-      <Row>
-        {renderAddImageButton()}
-        {!!attachment && (
-          <RowGroupEnd>
-            <StyledText variant="subtitle2" text={attachment.name} />
-            <IconButton
-              edge="end"
-              aria-label="delete-image"
-              onClick={() => setAttachment(null)}
-            >
-              <DeleteIcon />
-            </IconButton>
-          </RowGroupEnd>
-        )}
-      </Row>
-      <Row>
-        <Checkbox
-          value={isPrivate}
-          onChange={() => setIsPrivate(!isPrivate)}
-          disableRipple
-        />
-        <StyledButton
-          label={saveButtonLabel}
-          disabled={saveDisabled}
-          onClick={handleSave}
-        />
-      </Row>
+      {renderAttachment()}
+      {renderPrivate()}
     </Column>
   );
 

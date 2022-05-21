@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { Column, HomePage, StyledText } from "../../components";
+import React, { useState } from "react";
+import { Column, HomePage, PostBanner } from "../../components";
 import { DBService, PageTitle } from "../../enums";
 import { useIsoEffect } from "../../hooks";
-import { HTTPService } from "../../lib/client";
+import { HTTPService, serverUrl } from "../../lib/client";
 import { mongoConnection } from "../../lib/server";
 import { IPost } from "../../types";
 import { docToObject } from "../../util";
@@ -18,7 +18,7 @@ export async function getStaticProps({ params }) {
   const { username, slug } = params;
   const { Post } = await mongoConnection();
   const post = await Post.findOne({ username, slug })
-    .populate("user", "-createdAt -email -password")
+    .populate("user", "-createdAt -email -password -posts")
     .lean()
     .exec();
 
@@ -51,7 +51,7 @@ export async function getStaticPaths() {
 }
 
 const Post = ({ post, username, slug }: IPostPage) => {
-  const { user: author, ...stalePost } = post;
+  const { user: author } = post;
   const [realtimePost, setRealtimePost] = useState(post);
 
   useIsoEffect(() => {
@@ -63,9 +63,13 @@ const Post = ({ post, username, slug }: IPostPage) => {
     });
   }, [username, slug]);
 
-  const { user, title, body } = realtimePost;
+  const { user, title, body, imageKey } = realtimePost;
   const markup = (
-    <Column>
+    <Column style={{ alignItems: "flex-start" }}>
+      <PostBanner
+        src={`${serverUrl}/api/images?key=${imageKey}`}
+        id={imageKey}
+      />
       <div className="header">
         <h3>{title}</h3>
         <h4>{`By ${user?.username}`}</h4>

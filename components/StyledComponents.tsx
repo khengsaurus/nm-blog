@@ -9,14 +9,6 @@ export const Column = styled.div`
   width: 100%;
 `;
 
-export const ColumnReversed = styled(Column)`
-  flex-direction: column-reverse;
-`;
-
-export const ColumnCentered = styled(Column)`
-  justify-content: center;
-`;
-
 export const Row = styled.div`
   display: flex;
   flex-direction: row;
@@ -24,18 +16,6 @@ export const Row = styled.div`
   justify-content: space-between;
   width: 100%;
   transition: 300ms all;
-`;
-
-export const RowGroupEnd = styled(Row)`
-  justify-content: flex-end;
-`;
-
-export const RowReversed = styled(Row)`
-  flex-direction: row-reverse;
-`;
-
-export const RowCentered = styled(Row)`
-  justify-content: center;
 `;
 
 export const RowWrap = styled(Row)`

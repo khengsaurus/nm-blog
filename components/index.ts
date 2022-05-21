@@ -1,16 +1,9 @@
 import HomePage from "./HomePage";
 import Input from "./Input";
+import { CircleLoader } from "./Loaders";
 import NavBar from "./NavBar";
-import {
-  Centered,
-  Column,
-  ColumnCentered,
-  ColumnReversed,
-  Row,
-  RowCentered,
-  RowReversed,
-  RowWrap,
-} from "./StyledComponents";
+import PostBanner from "./PostBanner";
+import { Centered, Column, Row, RowWrap } from "./StyledComponents";
 import {
   HomeButton,
   StyledButton,
@@ -18,24 +11,20 @@ import {
   StyledText,
   TextNavButton,
 } from "./StyledMui";
-import { CircleLoader } from "./Loaders";
 
 export {
   CircleLoader,
+  HomeButton,
   HomePage,
   Input,
-  HomeButton,
+  PostBanner,
   StyledButton,
   StyledCenterText,
   StyledText,
   TextNavButton,
   NavBar,
   Centered,
-  ColumnCentered,
-  ColumnReversed,
   Column,
   Row,
-  RowCentered,
-  RowReversed,
   RowWrap,
 };

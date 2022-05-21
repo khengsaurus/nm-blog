@@ -168,7 +168,8 @@ function newMuiTheme(darkMode: boolean) {
       MuiCardMedia: {
         styleOverrides: {
           root: {
-            objectPosition: "0% 20%",
+            height: 80,
+            objectPosition: "50% 40%",
           },
         },
       },
