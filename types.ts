@@ -63,6 +63,7 @@ export interface IUser extends IHasId {
   email: string;
   password: string;
   username: string;
+  posts: IPost[];
 }
 
 export interface IUserReq extends IUser, IRequest {

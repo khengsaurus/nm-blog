@@ -54,7 +54,6 @@ export enum ServerInfo {
   USERNAME_TAKEN = "Username already taken",
   USER_BAD_LOGIN = "Incorrect username or password",
 
-  POST_SLUG_TAKEN = "Slug already used",
   POST_CREATED = "Post created",
   POST_DELETED = "Post deleted",
   POST_RETRIEVED = "Post retrieved",
@@ -65,6 +64,7 @@ export enum ServerInfo {
 }
 
 export enum ErrorMessage {
+  POST_SLUG_USED = "Slug already used",
   TRY_AGAIN = "Please try again",
   PW_NOT_MATCHING = "Passwords do not match",
   ONE_FILE_ONLY = "Only 1 file can be uploaded",

@@ -50,6 +50,10 @@ const NewPost = () => {
 
   const _handleSave = useCallback(() => {
     return new Promise(async (resolve, reject) => {
+      if (!!user.posts?.find((post) => post.slug === slug)) {
+        reject(new Error(ErrorMessage.POST_SLUG_USED));
+        return;
+      }
       let imageKey = "";
       if (!!attachment) {
         await HTTPService.uploadImage(attachment)
@@ -57,7 +61,7 @@ const NewPost = () => {
             if (res.status === 200 && res.data?.key) {
               imageKey = res.data.key;
             } else {
-              throw new Error(ErrorMessage.FILE_UPLOAD_FAIL);
+              reject(new Error(ErrorMessage.FILE_UPLOAD_FAIL));
             }
           })
           .catch((err) => {
@@ -75,10 +79,14 @@ const NewPost = () => {
         createdAt,
         updatedAt: createdAt,
       })
-        .then((res) => resolve(res))
+        .then((res) => {
+          console.info(res);
+          resolve(res);
+        })
         .catch((err) => reject(err));
     });
-  }, [attachment, body, slug, title, user?.username]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attachment, body, slug, title, JSON.stringify(user)]);
 
   const _cleanup = useCallback(() => {
     setTitle("");

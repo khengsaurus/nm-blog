@@ -8,6 +8,12 @@ export const UserSchema = new Schema<IUser>({
   email: SchemaTypes.String,
   password: SchemaTypes.String,
   username: SchemaTypes.String,
+  posts: [
+    {
+      type: SchemaTypes.ObjectId,
+      ref: "Post",
+    },
+  ],
 });
 
 export const ImageSchema = new Schema({

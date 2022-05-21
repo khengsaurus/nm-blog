@@ -32,7 +32,6 @@ const Login = () => {
 
   useEffect(() => {
     setConfirmPassword("");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showRegister]);
 
   const loginDisabled = useMemo(

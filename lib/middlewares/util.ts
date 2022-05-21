@@ -60,6 +60,7 @@ export function processUserData(user: any, id: string): Partial<IUser> {
     email: user.email,
     avatar: user.avatar || "",
     bio: user.bio || "",
+    posts: user.posts || [],
   };
 }
 
@@ -71,7 +72,7 @@ export function createUserObject(params: Object) {
     email: "",
     password: "",
     username: "",
-    cart: null,
+    posts: [],
   };
   return extend(baseUser, params);
 }

@@ -1,6 +1,7 @@
 import { isEmpty } from "lodash";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { HttpRequest, ServerInfo } from "../../enums";
+import { ErrorMessage, HttpRequest, ServerInfo } from "../../enums";
+import { ClientSession } from "mongoose";
 import {
   forwardResponse,
   handleAPIError,
@@ -67,31 +68,52 @@ async function getDoc(params: object): Promise<IResponse> {
 
 async function createDoc(req: NextApiRequest): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
+    let session: ClientSession = null;
     try {
-      const { Post } = await mongoConnection();
-      const reqBody: Partial<IPostReq> = req.body;
-      const { slug, userId } = reqBody;
-      await Post.exists({ slug, user: userId }).then((exists) => {
-        if (exists) {
-          resolve({ status: 200, message: ServerInfo.POST_SLUG_TAKEN });
-        } else {
-          const { userId, ...post } = reqBody;
-          const newPost = new Post({ ...post, user: userId });
-          newPost.save().then((res) => {
-            if (!!res.id) {
-              resolve({
-                status: 200,
-                message: ServerInfo.POST_CREATED,
-                data: { post: res },
-              });
-            } else {
-              reject(new ServerError());
-            }
-          });
-        }
+      const { MongoConnection } = await mongoConnection();
+      session = await MongoConnection.startSession();
+      await session.withTransaction(async () => {
+        const { Post, User } = await mongoConnection();
+        const reqBody: Partial<IPostReq> = req.body;
+        const { slug, userId } = reqBody;
+        await Post.exists({ slug, user: userId }).then((exists) => {
+          if (exists) {
+            throw new ServerError(200, ErrorMessage.POST_SLUG_USED);
+          } else {
+            const { userId, ...post } = reqBody;
+            const newPost = new Post({ ...post, user: userId });
+            newPost
+              .save()
+              .then((res) => {
+                if (res.id) {
+                  User.findByIdAndUpdate(
+                    userId,
+                    { $push: { posts: res.id } },
+                    { safe: true, upsert: true },
+                    function (err) {
+                      if (err) {
+                        throw new ServerError(500, err.message);
+                      } else {
+                        resolve({
+                          status: 200,
+                          message: ServerInfo.POST_CREATED,
+                          data: { post: res },
+                        });
+                      }
+                    }
+                  );
+                } else {
+                  throw new ServerError();
+                }
+              })
+              .catch((err) => reject(new ServerError(500, err.message)));
+          }
+        });
       });
     } catch (err) {
       reject(new ServerError(500, err.message));
+    } finally {
+      session?.endSession();
     }
   });
 }
