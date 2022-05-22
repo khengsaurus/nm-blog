@@ -24,7 +24,7 @@ export function forwardResponse(res: NextApiResponse, payload: IResponse) {
 
 export function handleBadRequest(res: NextApiResponse, err?: Error) {
   return Promise.resolve().then(() => {
-    console.info(err.message);
+    console.info(err?.message);
     res.status(400).json({ message: HttpResponse._400 });
   });
 }
@@ -54,13 +54,23 @@ export function errorHandler(
 }
 
 export function processUserData(user: any, id: string): Partial<IUser> {
+  const posts = [];
+  if (user.posts?.length > 0) {
+    try {
+      user.posts.forEach(({ slug, _id }) => {
+        posts.push(new Object({ slug, id: _id.toString() }));
+      });
+    } catch (err) {
+      console.info("Failed to parse user data: " + err.message);
+    }
+  }
   return {
     id,
     username: user.username,
     email: user.email,
     avatar: user.avatar || "",
     bio: user.bio || "",
-    posts: user.posts || [],
+    posts: posts,
   };
 }
 

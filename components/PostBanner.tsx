@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import Image from "next/image";
 import React from "react";
 
 interface IPostBanner {
@@ -9,13 +10,7 @@ interface IPostBanner {
 
 const PostBanner = ({ src, id, paddingPx = 56 }: IPostBanner) => {
   return src ? (
-    <div
-      style={{
-        position: "relative",
-        width: `calc(100vw - ${paddingPx}px)`,
-        height: "400px",
-      }}
-    >
+    <header className="banner-image">
       {/* <Image
         src={src}
         alt="post-image"
@@ -35,7 +30,7 @@ const PostBanner = ({ src, id, paddingPx = 56 }: IPostBanner) => {
           objectPosition: "50% 40%",
         }}
       />
-    </div>
+    </header>
   ) : null;
 };
 

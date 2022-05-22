@@ -38,7 +38,11 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
   if (!reqQuery.username) {
     return handleBadRequest(res);
   } else {
-    return getDoc(reqQuery)
+    return (
+      reqQuery.action === APIAction.GET_POST_SLUGS
+        ? getPostSlugs(reqQuery)
+        : getDoc(reqQuery)
+    )
       .then((payload) => forwardResponse(res, payload))
       .catch((err) => handleAPIError(res, err));
   }
@@ -46,13 +50,13 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const reqBody = req.body as Partial<IUserReq>;
-  const { email = "", password = "", login = true, action = "" } = reqBody;
+  const { username = "", password = "", action = "" } = reqBody;
   if (action === APIAction.USER_TOKEN_LOGIN) {
     return handleTokenLogin(req, res);
-  } else if (!password || (!login && !email)) {
+  } else if (!username || !password) {
     return handleBadRequest(res);
   } else {
-    return (login ? handleLogin(reqBody) : createDoc(reqBody))
+    (action === APIAction.LOGIN ? handleLogin(reqBody) : createDoc(reqBody))
       .then((payload) => forwardResponse(res, payload))
       .catch((err) => handleAPIError(res, err));
   }
@@ -149,6 +153,31 @@ async function handleLogin(reqBody: Partial<IUserReq>): Promise<IResponse> {
           });
         }
       });
+    } catch (err) {
+      reject(new ServerError(500, err.message));
+    }
+  });
+}
+
+async function getPostSlugs(reqBody: Partial<IUserReq>) {
+  return new Promise(async (resolve, reject) => {
+    const { username } = reqBody;
+    try {
+      const { User } = await mongoConnection();
+      await User.findOne({ username })
+        .populate(
+          "posts",
+          "-__v -user -username -title -body -isPrivate -createdAt -updatedAt -imageKey"
+        )
+        .then((userData) => {
+          resolve({
+            status: 200,
+            message: ServerInfo.POST_SLUGS_RETRIEVED,
+            data: {
+              user: processUserData(userData, userData._id),
+            },
+          });
+        });
     } catch (err) {
       reject(new ServerError(500, err.message));
     }

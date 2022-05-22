@@ -5,7 +5,7 @@ import { APIAction, DBService, HttpRequest } from "../../enums";
 export const serverUrl =
   process.env.NODE_ENV === "development"
     ? process.env.DEV_URL
-    : process.env.VERCEL_URL;
+    : process.env.PROD_URL;
 
 class ClientHTTPService {
   private instance: AxiosInstance;
@@ -76,13 +76,14 @@ class ClientHTTPService {
     this.userId = userId;
   }
 
-  handleTokenLogin() {
+  handleTokenLogin(token: string) {
     return this.makeAuthHttpReq(DBService.USERS, HttpRequest.POST, {
+      token,
       action: APIAction.USER_TOKEN_LOGIN,
     });
   }
 
-  makeGetReq(service: DBService, params?: Object) {
+  makeGetReq(service: DBService, params?: object) {
     return this.instance.get(`/api/${service}`, { params });
   }
 

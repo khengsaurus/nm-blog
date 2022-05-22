@@ -5,6 +5,7 @@ module.exports = {
   env: {
     VERCEL_URL: process.env.VERCEL_URL,
     DEV_URL: (process.env.DEV_HOST || ":") + (process.env.DEV_PORT || 3000), // -> http://localhost:3000
+    PROD_URL: (process.env.DEV_HOST || ":") + (process.env.DEV_PORT || 3000), // -> http://localhost:3000
   },
   images: {
     domains: ["images.unsplash.com", "localhost", "localhost:3000"],

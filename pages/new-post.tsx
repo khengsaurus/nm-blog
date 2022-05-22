@@ -20,13 +20,7 @@ import {
   StyledButton,
   StyledText,
 } from "../components";
-import {
-  DBService,
-  ErrorMessage,
-  HttpRequest,
-  PageTitle,
-  Status,
-} from "../enums";
+import { DBService, ErrorMessage, HttpRequest, Status } from "../enums";
 import { AppContext, useAsync } from "../hooks";
 import { HTTPService } from "../lib/client";
 import { checkFileSize, checkFileType, checkOneFileSelected } from "../util";
@@ -47,7 +41,7 @@ const NewPost = () => {
   }, [title]);
 
   const _handleSave = useCallback(() => {
-    let noImageUploadError = true; // TODO: handle this
+    let noImageUploadError = true;
     return new Promise(async (resolve, reject) => {
       if (!!user.posts?.find((post) => post.slug === slug)) {
         reject(new Error(ErrorMessage.POST_SLUG_USED));
@@ -64,13 +58,11 @@ const NewPost = () => {
             }
           })
           .catch((err) => {
-            console.log("err");
             noImageUploadError = false;
             reject(err);
           });
       }
       if (noImageUploadError) {
-        console.log("continuing");
         const createdAt = new Date().toString();
         HTTPService.makeAuthHttpReq(DBService.POSTS, HttpRequest.POST, {
           username: user.username,

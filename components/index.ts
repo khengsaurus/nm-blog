@@ -11,8 +11,10 @@ import {
   StyledText,
   TextNavButton,
 } from "./StyledMui";
+import AuthorLink from "./AuthorLink";
 
 export {
+  AuthorLink,
   CircleLoader,
   HomeButton,
   Layout,

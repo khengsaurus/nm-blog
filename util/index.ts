@@ -1,3 +1,4 @@
+import { IPost } from "types";
 import { ErrorMessage } from "../enums";
 
 const maxFileSizeMB = 2;
@@ -6,7 +7,7 @@ export function isDev() {
   return process.env.REACT_APP_FLAG?.startsWith("dev");
 }
 
-export function docToObject(data: any) {
+export function postDocToObj(data: any) {
   if (data === null) return data;
   const { _id, user, ...main } = data;
   if (_id) {
@@ -18,6 +19,24 @@ export function docToObject(data: any) {
     main.user = _user;
   }
   return main;
+}
+
+export function userDocToObj(data: any) {
+  if (data === null) return data;
+  const { _id, posts, ...user } = data;
+  if (_id) {
+    user.id = _id.toString();
+  }
+  if (posts?.length > 0) {
+    const processedPosts = new Array<IPost>();
+    for (let i = 0; i < posts.length; i++) {
+      const { _id, user, ...post } = posts[i];
+      post.id = _id.toString();
+      processedPosts.push(post);
+    }
+    user.posts = processedPosts;
+  }
+  return user;
 }
 
 export function checkOneFileSelected(

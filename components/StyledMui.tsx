@@ -115,22 +115,24 @@ export const StyledText = ({
   placeSelf = "center",
   nowrap = false,
   style = {},
-}: IStyledTextProps) => (
-  <Typography
-    style={{
-      color,
-      padding,
-      textAlign,
-      placeSelf,
-      whiteSpace: nowrap ? "nowrap" : null,
-      textOverflow: nowrap ? "ellipsis" : null,
-      ...style,
-    }}
-    variant={variant}
-  >
-    {text}
-  </Typography>
-);
+}: IStyledTextProps) => {
+  return (
+    <Typography
+      style={{
+        color,
+        padding,
+        textAlign,
+        placeSelf,
+        whiteSpace: nowrap ? "nowrap" : null,
+        textOverflow: nowrap ? "ellipsis" : null,
+        ...style,
+      }}
+      variant={variant}
+    >
+      {text}
+    </Typography>
+  );
+};
 
 export const StyledCenterText = ({
   text,

@@ -150,6 +150,9 @@ function newMuiTheme(darkMode: boolean) {
             margin: "6px",
             width: "clamp(220px, 30vw, 280px) !important",
             backgroundColor: "transparent",
+            "&:hover": {
+              cursor: "pointer",
+            },
           },
         },
       },
@@ -275,6 +278,22 @@ function newMuiTheme(darkMode: boolean) {
           },
         },
       },
+      MuiLink: {
+        styleOverrides: {
+          root: {
+            color: mainText,
+            primary: mainText,
+            secondary: highlightColor,
+            "&:hover": {
+              color: highlightColor,
+            },
+            "&:disabled": {
+              color: "rgb(75, 75, 75) !important",
+            },
+            margin: 0,
+          },
+        },
+      },
       MuiList: {
         styleOverrides: {
           padding: {
@@ -302,6 +321,9 @@ function newMuiTheme(darkMode: boolean) {
         styleOverrides: {
           root: {
             color: mainText,
+            "&:hover": {
+              color: highlightColor,
+            },
           },
         },
       },

@@ -58,6 +58,7 @@ export enum ServerInfo {
   POST_DELETED = "Post deleted",
   POST_RETRIEVED = "Post retrieved",
   POST_UPDATED = "Post updated",
+  POST_SLUGS_RETRIEVED = "Post slugs retrieved",
   POST_NA = "Post does not exist",
 
   REQUEST_FAILED = "Server request failed",
@@ -73,8 +74,12 @@ export enum ErrorMessage {
 }
 
 export enum APIAction {
+  LOGIN = "login",
+  REGISTER = "register",
   USER_TOKEN_LOGIN = "user-token-login",
   USER_SET_USERNAME = "user-set-username",
+  GET_POST_SLUGS = "get-post-slugs",
+  READ = "read",
 }
 
 export enum Status {

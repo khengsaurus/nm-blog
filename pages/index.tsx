@@ -1,11 +1,10 @@
 import React, { useContext } from "react";
 import { RowWrap, StyledButton } from "../components";
 import PostCard from "../components/PostCard";
-import { PageTitle } from "../enums";
 import { AppContext } from "../hooks";
 import { mongoConnection } from "../lib/server";
 import { IPost } from "../types";
-import { docToObject } from "../util";
+import { postDocToObj } from "../util";
 
 interface IHomeProps {
   posts: IPost[];
@@ -28,7 +27,7 @@ export async function getServerSideProps({ res }) {
     .populate("user", "-createdAt -email -password -posts")
     .lean()
     .exec();
-  const posts = postQuery.map((post) => docToObject(post));
+  const posts = postQuery.map((post) => postDocToObj(post));
   const cursor =
     posts?.length > 0
       ? posts[posts.length - 1].createdAt || "timestamp"

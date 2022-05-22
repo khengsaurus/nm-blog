@@ -2,6 +2,7 @@ import { Alert, Collapse } from "@mui/material";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Input, StyledButton } from "../components";
 import {
+  APIAction,
   DBService,
   ErrorMessage,
   HttpRequest,
@@ -11,7 +12,7 @@ import {
 } from "../enums";
 import { AppContext, useFirstEffect } from "../hooks";
 import { HTTPService } from "../lib/client";
-import { AlertStatus, IAlert } from "../types";
+import { AlertStatus, IAlert, IResponse } from "../types";
 
 const Login = () => {
   const { router, user, handleUser } = useContext(AppContext);
@@ -45,44 +46,44 @@ const Login = () => {
     [email, password, confirmPassword]
   );
 
-  function clearForm() {
-    setUsername("");
-    setEmail("");
-    setPassword("");
-    setConfirmPassword("");
-  }
+  const cleanup = useCallback(
+    (res: IResponse, route: PageRoute) => {
+      setAlert(null);
+      setUsername("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+      router.push(route);
+      handleUser(res.data.token, res.data.user);
+    },
+    [handleUser, router]
+  );
 
   const handleLogin = useCallback(() => {
     HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequest.POST, {
       username,
       password,
-      login: true,
+      action: APIAction.LOGIN,
     })
       .then((res) => {
-        if (res?.data?.token) {
-          handleUser(res.data.token, res.data.user);
-          setAlert(null);
-          clearForm();
-          router.push(PageRoute.HOME);
+        if (res.status === 200 && res?.data?.token) {
+          cleanup(res, PageRoute.HOME);
         } else {
           setAlert({ status: Status.ERROR, message: res?.data?.message });
         }
       })
       .catch((err) => console.error(err));
-  }, [password, setAlert, handleUser, router, username]);
+  }, [cleanup, setAlert, username, password]);
 
   const handleRegister = useCallback(() => {
     if (password === confirmPassword) {
       HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequest.POST, {
         email,
         password,
-        login: false,
+        action: APIAction.REGISTER,
       }).then((res) => {
         if (res?.data?.token) {
-          handleUser(res.data.token, res.data.user);
-          setAlert(null);
-          clearForm();
-          router.push(PageRoute.NEWUSER);
+          cleanup(res, PageRoute.NEWUSER);
         } else {
           setAlert({ status: Status.ERROR, message: res?.data?.message });
         }
@@ -90,7 +91,7 @@ const Login = () => {
     } else {
       setAlert({ status: Status.ERROR, message: ErrorMessage.PW_NOT_MATCHING });
     }
-  }, [confirmPassword, email, password, router, setAlert, handleUser]);
+  }, [confirmPassword, email, password, cleanup, setAlert]);
 
   const renderLoginButton = () => (
     <StyledButton
@@ -139,10 +140,7 @@ const Login = () => {
       </Collapse>
       <StyledButton
         label={showRegister ? "Back" : "Register"}
-        onClick={() => {
-          clearForm();
-          setShowRegister(!showRegister);
-        }}
+        onClick={() => setShowRegister(!showRegister)}
       />
       {showRegister ? renderRegisterButton() : renderLoginButton()}
       <Collapse

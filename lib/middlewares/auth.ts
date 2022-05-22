@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { NextApiRequest } from "next";
 import { ServerError, verifyPassword } from "../server";
 import { IUserReq } from "../../types";
+import { APIAction } from "enums";
 const SECRET_KEY = "secret-key";
 
 export function generateToken(email: string, username: string, id: string) {
@@ -17,8 +18,11 @@ export function generateToken(email: string, username: string, id: string) {
 }
 
 export function decodeToken<T>(req: NextApiRequest) {
-  let token: any = req.headers?.authorization || "Bearer ";
-  token = token.split("Bearer ")[1];
+  let { action, token } = req.body;
+  if (action !== APIAction.USER_TOKEN_LOGIN) {
+    token = req.headers?.authorization || "Bearer ";
+    token = token.split("Bearer ")[1];
+  }
   return jwt.verify(token, SECRET_KEY) as T;
 }
 

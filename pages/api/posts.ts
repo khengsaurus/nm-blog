@@ -1,7 +1,7 @@
 import { isEmpty } from "lodash";
+import { ClientSession } from "mongoose";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { ErrorMessage, HttpRequest, ServerInfo } from "../../enums";
-import { ClientSession } from "mongoose";
 import {
   forwardResponse,
   handleAPIError,
@@ -88,7 +88,7 @@ async function createDoc(req: NextApiRequest): Promise<IResponse> {
                 if (res.id) {
                   User.findByIdAndUpdate(
                     userId,
-                    { $push: { posts: res.id } },
+                    { $push: { posts: { $each: [res.id], $position: 0 } } },
                     { safe: true, upsert: true },
                     function (err) {
                       if (err) {
