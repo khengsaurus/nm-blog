@@ -15,7 +15,6 @@ import { IResponse } from "types";
 import {
   CircleLoader,
   Column,
-  HomePage,
   Input,
   Row,
   StyledButton,
@@ -193,47 +192,40 @@ const NewPost = () => {
     }
   }, [saveStatus]);
 
-  const markup = (
-    <Column>
-      <Input
-        label={"Title"}
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        maxWidth
-      />
-      <Input
-        label={"Slug"}
-        value={slug}
-        onChange={(e) => {
-          setSlug(e.target.value);
-          if (!e.target.value) {
-            hasEditedSlug.current = false;
-          }
-        }}
-        onClick={() => (hasEditedSlug.current = true)}
-        maxWidth
-      />
-      <Input
-        label={"Body"}
-        value={body}
-        rows={5}
-        variant="outlined"
-        onChange={(e) => setBody(e.target.value)}
-        maxWidth
-        marginTop={20}
-      />
-      {renderAttachment()}
-      {renderPrivate()}
-    </Column>
-  );
-
   return (
-    <HomePage
-      title={PageTitle.NEW_POST}
-      markup={markup}
-      requireAuth
-      mainClass="left"
-    />
+    <main className="left">
+      <Column>
+        <Input
+          label={"Title"}
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          maxWidth
+        />
+        <Input
+          label={"Slug"}
+          value={slug}
+          onChange={(e) => {
+            setSlug(e.target.value);
+            if (!e.target.value) {
+              hasEditedSlug.current = false;
+            }
+          }}
+          onClick={() => (hasEditedSlug.current = true)}
+          maxWidth
+        />
+        <Input
+          label={"Body"}
+          value={body}
+          rows={5}
+          variant="outlined"
+          onChange={(e) => setBody(e.target.value)}
+          maxWidth
+          marginTop={20}
+        />
+        {renderAttachment()}
+        {renderPrivate()}
+      </Column>
+    </main>
   );
 };
 

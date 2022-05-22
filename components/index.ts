@@ -1,5 +1,5 @@
-import HomePage from "./HomePage";
 import Input from "./Input";
+import Layout from "./Layout";
 import { CircleLoader } from "./Loaders";
 import NavBar from "./NavBar";
 import PostBanner from "./PostBanner";
@@ -15,7 +15,7 @@ import {
 export {
   CircleLoader,
   HomeButton,
-  HomePage,
+  Layout,
   Input,
   PostBanner,
   StyledButton,

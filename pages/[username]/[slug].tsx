@@ -1,6 +1,7 @@
+import { motion } from "framer-motion";
 import React, { useState } from "react";
-import { Column, HomePage, PostBanner } from "../../components";
-import { DBService, PageTitle } from "../../enums";
+import { Column, PostBanner } from "../../components";
+import { DBService } from "../../enums";
 import { useIsoEffect } from "../../hooks";
 import { HTTPService, serverUrl } from "../../lib/client";
 import { mongoConnection } from "../../lib/server";
@@ -63,24 +64,26 @@ const Post = ({ post, username, slug }: IPostPage) => {
     });
   }, [username, slug]);
 
-  const { user, title, body, imageKey } = realtimePost;
-  const markup = (
-    <Column style={{ alignItems: "flex-start" }}>
-      <PostBanner
-        src={`${serverUrl}/api/images?key=${imageKey}`}
-        id={imageKey}
-      />
-      <div className="header">
-        <h3>{title}</h3>
-        <h4>{`By ${user?.username}`}</h4>
-      </div>
-      <div className="body-container">
-        <p>{body}</p>
-      </div>
-    </Column>
+  const { user, title, body, imageKey, id } = realtimePost;
+  return (
+    <main className="left">
+      <Column style={{ alignItems: "flex-start" }}>
+        {imageKey && (
+          <PostBanner
+            src={`${serverUrl}/api/images?key=${imageKey}`}
+            id={`${id}-banner`}
+          />
+        )}
+        <div className="header">
+          <motion.h3 layoutId={`${id}-title`}>{title}</motion.h3>
+          <h4>{`By ${user?.username}`}</h4>
+        </div>
+        <div className="body-container">
+          <p>{body}</p>
+        </div>
+      </Column>
+    </main>
   );
-
-  return <HomePage title={PageTitle.POST} markup={markup} mainClass="left" />;
 };
 
 export default Post;

@@ -1,25 +1,21 @@
-import { ReactNode, useContext, useEffect } from "react";
-import { NavBar } from "../components";
+import { useMemo, ReactNode, useContext, useEffect } from "react";
+import { NavBar } from ".";
 import { PageRoute, Status } from "../enums";
 import { AppContext } from "../hooks";
 
-interface HomePageProps {
-  markup: ReactNode;
-  title?: string;
-  mainClass?: string;
-  showNavbar?: boolean;
-  requireAuth?: boolean;
+const authRoutes = [];
+
+interface ILayoutProps {
+  children: any;
 }
 
-const HomePage = ({
-  markup,
-  title,
-  mainClass = "",
-  showNavbar = true,
-  requireAuth = false,
-}: HomePageProps) => {
+const Layout = ({ children }: ILayoutProps) => {
   const { router, user, sessionValidation } = useContext(AppContext);
   const sessionActive = !!user;
+
+  const requireAuth = useMemo(() => {
+    return authRoutes.includes(router?.asPath);
+  }, [router?.asPath]);
 
   useEffect(() => {
     if (
@@ -33,11 +29,11 @@ const HomePage = ({
   }, [requireAuth, router, sessionActive, sessionValidation]);
 
   return (
-    <main className={mainClass}>
-      {showNavbar && <NavBar title={title} />}
-      {markup}
-    </main>
+    <>
+      <NavBar />
+      {children}
+    </>
   );
 };
 
-export default HomePage;
+export default Layout;

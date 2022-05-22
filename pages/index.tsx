@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { HomePage, RowWrap, StyledButton } from "../components";
+import { RowWrap, StyledButton } from "../components";
 import PostCard from "../components/PostCard";
 import { PageTitle } from "../enums";
 import { AppContext } from "../hooks";
@@ -42,18 +42,16 @@ export async function getServerSideProps({ res }) {
 const Home: React.FC = ({ posts, cursor }: IHomeProps) => {
   const { user, logout } = useContext(AppContext);
 
-  const markup = (
-    <>
+  return (
+    <main>
       <RowWrap>
         {posts.map((post, index) => (
           <PostCard key={index} post={post} />
         ))}
       </RowWrap>
       {!!user && <StyledButton label={"Logout"} onClick={logout} />}
-    </>
+    </main>
   );
-
-  return <HomePage title={PageTitle.HOME} markup={markup} />;
 };
 
 export default Home;

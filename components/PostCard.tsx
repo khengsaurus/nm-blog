@@ -13,7 +13,7 @@ interface IPostCard {
 
 const PostCard = ({ post }: IPostCard) => {
   const { router } = useContext(AppContext);
-  const { title, slug, body, user, imageKey } = post;
+  const { title, slug, body, user, imageKey, id } = post;
 
   const { hasImage, wordLimit } = useMemo(() => {
     const hasImage = !!imageKey;
@@ -28,7 +28,7 @@ const PostCard = ({ post }: IPostCard) => {
           <motion.img
             src={`${serverUrl}/api/images?key=${imageKey}`}
             alt="post-image"
-            layoutId={imageKey}
+            layoutId={`${id}-banner`}
             style={{
               height: "80px",
               width: "100%",
@@ -40,7 +40,7 @@ const PostCard = ({ post }: IPostCard) => {
       )}
       <CardContent style={{ height: hasImage ? 105 : 185 }}>
         <div className="card-content">
-          <h2>{title}</h2>
+          <motion.h2 layoutId={`${id}-title`}>{title}</motion.h2>
           <p className="author">{`By ${user?.username}`}</p>
           <p className="body">
             {body?.slice(0, wordLimit) +

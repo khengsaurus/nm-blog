@@ -11,11 +11,7 @@ import { AppContext } from "../hooks";
 // import StorefrontIcon from "@mui/icons-material/Storefront";
 // import MenuIcon from "@mui/icons-material/Menu";
 
-interface INavBar {
-  title: string;
-}
-
-const NavBar: React.FC<INavBar> = ({ title }) => {
+const NavBar: React.FC = () => {
   const { router, user } = useContext(AppContext);
   const sessionActive = !!user;
 
@@ -26,9 +22,8 @@ const NavBar: React.FC<INavBar> = ({ title }) => {
   return (
     <AppBar position="fixed">
       <Toolbar variant="dense">
-        <Typography variant="h6">{title}</Typography>
         <IconButton
-          edge="end"
+          edge="start"
           aria-label="home"
           onClick={() => router.push(PageRoute.HOME)}
         >
@@ -36,7 +31,6 @@ const NavBar: React.FC<INavBar> = ({ title }) => {
         </IconButton>
         {sessionActive && (
           <IconButton
-            edge="end"
             aria-label="new-item"
             onClick={() => router.push(PageRoute.NEWPOST)}
           >

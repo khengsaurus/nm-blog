@@ -1,17 +1,15 @@
 import { Alert, Collapse } from "@mui/material";
-import { isEmpty } from "lodash";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { HomePage, Input, StyledButton } from "../components";
+import { Input, StyledButton } from "../components";
 import {
   DBService,
   ErrorMessage,
   HttpRequest,
   PageRoute,
-  PageTitle,
   Status,
   Transition,
 } from "../enums";
-import { AppContext, useFirstEffect, useFirstEffectAsync } from "../hooks";
+import { AppContext, useFirstEffect } from "../hooks";
 import { HTTPService } from "../lib/client";
 import { AlertStatus, IAlert } from "../types";
 
@@ -114,8 +112,8 @@ const Login = () => {
     />
   );
 
-  const markup = (
-    <>
+  return (
+    <main>
       <Input
         label={showRegister ? "Email" : "Username"}
         value={showRegister ? email : username}
@@ -156,10 +154,8 @@ const Login = () => {
           {alert?.message || ErrorMessage.TRY_AGAIN}
         </Alert>
       </Collapse>
-    </>
+    </main>
   );
-
-  return <HomePage title={PageTitle.LOGIN} markup={markup} />;
 };
 
 export default Login;

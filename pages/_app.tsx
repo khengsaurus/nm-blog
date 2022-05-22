@@ -1,3 +1,4 @@
+import { Layout } from "components";
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import AppContextProvider from "../hooks/context";
@@ -15,7 +16,9 @@ function MyApp({ Component, pageProps }: AppProps) {
             content="initial-scale=1.0, width=device-width"
           />
         </Head>
-        <Component {...pageProps} />
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
       </HomeTheme>
     </AppContextProvider>
   );
