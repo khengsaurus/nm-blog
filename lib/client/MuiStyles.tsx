@@ -106,6 +106,7 @@ function newMuiTheme(darkMode: boolean) {
       MuiToolbar: {
         styleOverrides: {
           root: {
+            height: 50,
             backgroundColor: componentHighlight,
             alignItems: "center",
             justifyContent: "space-between",

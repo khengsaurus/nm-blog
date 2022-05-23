@@ -50,13 +50,16 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const reqBody = req.body as Partial<IUserReq>;
-  const { username = "", password = "", action = "" } = reqBody;
+  const { email = "", username = "", password = "", action = "" } = reqBody;
   if (action === APIAction.USER_TOKEN_LOGIN) {
     return handleTokenLogin(req, res);
-  } else if (!username || !password) {
+  } else if ((!email && !username) || !password) {
     return handleBadRequest(res);
   } else {
-    (action === APIAction.LOGIN ? handleLogin(reqBody) : createDoc(reqBody))
+    (action === APIAction.LOGIN
+      ? handleLogin(reqBody)
+      : handleRegister(reqBody)
+    )
       .then((payload) => forwardResponse(res, payload))
       .catch((err) => handleAPIError(res, err));
   }
@@ -67,7 +70,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
  * Handle login and register depending on login arg.
  * @resolve {..., token: JWT, user: user object without username}
  */
-async function createDoc(reqBody: Partial<IUserReq>): Promise<IResponse> {
+async function handleRegister(reqBody: Partial<IUserReq>): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     const { email, password } = reqBody;
     try {

@@ -36,7 +36,7 @@ const UserPage = (props: IUserPageProps) => {
   return (
     <main>
       <section className="header">
-        <h3>{user?.username}</h3>
+        <h3>{`Posts by ${user?.username}`}</h3>
       </section>
       <RowWrap>
         {user?.posts.map((post, index) => (

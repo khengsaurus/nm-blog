@@ -24,13 +24,13 @@ export function forwardResponse(res: NextApiResponse, payload: IResponse) {
 
 export function handleBadRequest(res: NextApiResponse, err?: Error) {
   return Promise.resolve().then(() => {
-    console.info(err?.message);
+    err && console.info(err?.message);
     res.status(400).json({ message: HttpResponse._400 });
   });
 }
 
 export function handleAPIError(res: NextApiResponse, err?: ServerError) {
-  console.info(err.status + " : " + err.message);
+  err && console.info(err.status + " : " + err.message);
   res.status(err.status).json({ message: err.message });
   return;
 }

@@ -15,12 +15,12 @@ body {
 }
 
 main {
-  $side-margin: 20px;
+  $side-margin: clamp(20px, 4vw, 100px);
   @include flex-(column);
   align-items: center;
   justify-content: center;
   font-family: "Roboto", sans-serif;
-  margin: 50px $side-margin;
+  margin: 70px $side-margin;
   &.left {
     align-items: flex-start;
     justify-content: flex-start;
@@ -76,8 +76,18 @@ main {
       }
     }
     &.body {
-      margin: 5px 0px;
+      margin: 2px 0px;
       font-size: 14px;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      &.short {
+        -webkit-line-clamp: 3;
+      }
+      &.long {
+        -webkit-line-clamp: 8;
+      }
     }
   }
 }

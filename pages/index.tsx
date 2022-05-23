@@ -11,7 +11,7 @@ interface IHomeProps {
   cursor: string;
 }
 
-const LIMIT = 5;
+const LIMIT = 6;
 
 export async function getServerSideProps({ res }) {
   console.info("-> Home getServerSideProps()");
@@ -43,6 +43,9 @@ const Home: React.FC = ({ posts, cursor }: IHomeProps) => {
 
   return (
     <main>
+      <section className="header">
+        <h3>Recent Posts</h3>
+      </section>
       <RowWrap>
         {posts.map((post, index) => (
           <PostCard key={index} post={post} />

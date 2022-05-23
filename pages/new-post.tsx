@@ -73,10 +73,7 @@ const NewPost = () => {
           createdAt,
           updatedAt: createdAt,
         })
-          .then((res) => {
-            console.info(res);
-            resolve(res);
-          })
+          .then((res) => resolve(res))
           .catch((err) => reject(err));
       }
     });
