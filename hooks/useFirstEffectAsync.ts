@@ -17,6 +17,8 @@ const useFirstEffectAsync = (
       callback().then((success) =>
         setStatus(success ? Status.SUCCESS : Status.ERROR)
       );
+    } else {
+      setStatus(status === Status.IDLE ? Status.ERROR : status);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [callback, requireDeps, JSON.stringify(deps)]);

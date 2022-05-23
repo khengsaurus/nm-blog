@@ -12,12 +12,11 @@ import { AppContext } from "../hooks";
 // import MenuIcon from "@mui/icons-material/Menu";
 
 const NavBar: React.FC = () => {
-  const { router, user } = useContext(AppContext);
-  const sessionActive = !!user;
+  const { router, userSessionActive } = useContext(AppContext);
 
   const handleProfileClick = useCallback(() => {
-    sessionActive ? null : router.push(PageRoute.LOGIN);
-  }, [sessionActive, router]);
+    router.push(userSessionActive ? PageRoute.PROFILE : PageRoute.LOGIN);
+  }, [userSessionActive, router]);
 
   return (
     <AppBar position="fixed">
@@ -29,7 +28,7 @@ const NavBar: React.FC = () => {
         >
           <HomeIcon />
         </IconButton>
-        {sessionActive && (
+        {userSessionActive && (
           <IconButton
             aria-label="new-item"
             onClick={() => router.push(PageRoute.NEWPOST)}

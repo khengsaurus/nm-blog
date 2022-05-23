@@ -1,6 +1,6 @@
 import { getPostSlugs } from "lib/client/backgroundTasks";
 import { useRouter } from "next/router";
-import React, { createContext, useCallback, useState } from "react";
+import React, { createContext, useCallback, useEffect, useState } from "react";
 import { PageRoute, Status } from "../enums";
 import { HTTPService } from "../lib/client";
 import { IAppContext, IUser } from "../types";
@@ -12,7 +12,7 @@ const initialContext: IAppContext = {
   userToken: "",
   darkMode: false,
   router: null,
-  sessionValidation: Status.IDLE,
+  userSessionActive: true,
   logout: () => {},
   handleUser: (token: string, user: IUser) => {},
   setDarkMode: (_?: boolean) => {},
@@ -24,6 +24,7 @@ const AppContextProvider = (props: any) => {
   const [user, setUser] = useState<IUser>();
   const [userToken, setUserToken] = useLocalStorage("userToken", "");
   const [darkMode, setDarkMode] = useState(false);
+  const [userSessionActive, setUserSessionActive] = useState(true);
   const router = useRouter();
 
   const handleUser = useCallback(
@@ -66,6 +67,18 @@ const AppContextProvider = (props: any) => {
     true
   );
 
+  useEffect(() => {
+    if (
+      !user &&
+      (sessionValidation === Status.SUCCESS ||
+        sessionValidation === Status.ERROR)
+    ) {
+      setUserSessionActive(false);
+    } else {
+      setUserSessionActive(true);
+    }
+  }, [sessionValidation, user]);
+
   const logout = useCallback(
     (login = false) => {
       HTTPService.setBearer("", "");
@@ -85,7 +98,7 @@ const AppContextProvider = (props: any) => {
         user,
         userToken,
         darkMode,
-        sessionValidation,
+        userSessionActive,
         logout,
         handleUser,
         setDarkMode,

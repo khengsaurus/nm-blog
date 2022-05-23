@@ -18,7 +18,7 @@ export interface IAppContext {
   userToken: string;
   darkMode: boolean;
   router: NextRouter;
-  sessionValidation: Status;
+  userSessionActive: boolean;
   logout: () => void;
   handleUser: (token: string, user: IUser) => void;
   setDarkMode: (_?: boolean) => void;
