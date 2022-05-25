@@ -9,7 +9,7 @@ export function isDev() {
 
 export function postDocToObj(data: any) {
   if (data === null) return data;
-  const { _id, user, ...main } = data;
+  const { _id, user, createdAt, updatedAt, ...main } = data;
   if (_id) {
     main.id = _id.toString();
   }
@@ -17,13 +17,15 @@ export function postDocToObj(data: any) {
     const { _id: userId, ..._user } = user;
     _user.id = userId.toString();
     main.user = _user;
+    main.createdAt = createdAt.toString();
+    main.updatedAt = updatedAt.toString();
   }
   return main;
 }
 
 export function userDocToObj(data: any) {
   if (data === null) return data;
-  const { _id, posts, ...user } = data;
+  const { _id, posts, createdAt, ...user } = data;
   if (_id) {
     user.id = _id.toString();
   }

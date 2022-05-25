@@ -57,10 +57,10 @@ export enum ServerInfo {
 
   POST_CREATED = "Post created",
   POST_DELETED = "Post deleted",
-  POST_RETRIEVED = "Post retrieved",
+  POST_RETRIEVED = "Post(s) retrieved",
   POST_UPDATED = "Post updated",
   POST_SLUGS_RETRIEVED = "Post slugs retrieved",
-  POST_NA = "Post does not exist",
+  POST_NA = "No post(s) found",
 
   REQUEST_FAILED = "Server request failed",
 }

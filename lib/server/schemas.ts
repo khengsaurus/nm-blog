@@ -4,7 +4,6 @@ import { IPost, IUser } from "../../types";
 export const UserSchema = new Schema<IUser>({
   avatar: SchemaTypes.String,
   bio: SchemaTypes.String,
-  createdAt: SchemaTypes.String,
   email: SchemaTypes.String,
   password: SchemaTypes.String,
   username: SchemaTypes.String,
@@ -35,8 +34,8 @@ export const PostSchema = new Schema<IPost>({
   body: SchemaTypes.String,
   isPrivate: SchemaTypes.Boolean,
   imageKey: SchemaTypes.String,
-  createdAt: SchemaTypes.String,
-  updatedAt: SchemaTypes.String,
 });
 
+UserSchema.set("timestamps", true);
+PostSchema.set("timestamps", true);
 PostSchema.set("toObject", { getters: true, flattenMaps: true });

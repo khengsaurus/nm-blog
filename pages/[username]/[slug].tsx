@@ -5,7 +5,7 @@ import { useIsoEffect } from "../../hooks";
 import { HTTPService, serverUrl } from "../../lib/client";
 import { mongoConnection } from "../../lib/server";
 import { IPost } from "../../types";
-import { postDocToObj } from "../../util";
+import { postDocToObj } from "../../utils";
 
 interface IPostPage {
   post: IPost;
@@ -19,8 +19,7 @@ export async function getStaticProps({ params }) {
   const { Post } = await mongoConnection();
   const post = await Post.findOne({ username, slug })
     .populate("user", "-createdAt -email -password -posts")
-    .lean()
-    .exec();
+    .lean();
 
   return {
     props: {

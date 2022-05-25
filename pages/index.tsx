@@ -4,7 +4,7 @@ import PostCard from "../components/PostCard";
 import { AppContext } from "../hooks";
 import { mongoConnection } from "../lib/server";
 import { IPost } from "../types";
-import { postDocToObj } from "../util";
+import { postDocToObj } from "../utils";
 
 interface IHomeProps {
   posts: IPost[];
@@ -24,9 +24,8 @@ export async function getServerSideProps({ res }) {
   const postQuery = await Post.find()
     .sort({ createdAt: -1 })
     .limit(LIMIT)
-    .populate("user", "-createdAt -email -password -posts")
-    .lean()
-    .exec();
+    .populate("user", "-createdAt -updatedAt -email -password -posts")
+    .lean();
   const posts = postQuery.map((post) => postDocToObj(post));
   const cursor =
     posts?.length > 0

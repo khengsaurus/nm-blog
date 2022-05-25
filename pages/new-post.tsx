@@ -23,7 +23,7 @@ import {
 import { DBService, ErrorMessage, HttpRequest, Status } from "../enums";
 import { AppContext, useAsync } from "../hooks";
 import { HTTPService } from "../lib/client";
-import { checkFileSize, checkFileType, checkOneFileSelected } from "../util";
+import { checkFileSize, checkFileType, checkOneFileSelected } from "../utils";
 
 const NewPost = () => {
   const { user } = useContext(AppContext);
@@ -63,15 +63,12 @@ const NewPost = () => {
           });
       }
       if (noImageUploadError) {
-        const createdAt = new Date().toString();
         HTTPService.makeAuthHttpReq(DBService.POSTS, HttpRequest.POST, {
           username: user.username,
           title,
           slug,
           body,
           imageKey,
-          createdAt,
-          updatedAt: createdAt,
         })
           .then((res) => resolve(res))
           .catch((err) => reject(err));

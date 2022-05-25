@@ -78,7 +78,6 @@ export function createUserObject(params: Object) {
   const baseUser = {
     avatar: "",
     bio: "",
-    createdAt: "",
     email: "",
     password: "",
     username: "",

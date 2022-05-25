@@ -3,7 +3,7 @@ import PostCard from "components/PostCard";
 import { mongoConnection } from "lib/server";
 import React from "react";
 import { IUser } from "types";
-import { userDocToObj } from "../../util";
+import { userDocToObj } from "../../utils";
 
 interface IUserPageProps {
   user: IUser;
@@ -22,8 +22,7 @@ export async function getServerSideProps({ params, res }) {
   const userQuery = await User.findOne({ username })
     .select(["-password"])
     .populate({ path: "posts", select: "-user", options: { limit: 5 } })
-    .lean()
-    .exec();
+    .lean();
   const user = userDocToObj(userQuery);
 
   return {

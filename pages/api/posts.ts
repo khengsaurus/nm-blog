@@ -1,6 +1,7 @@
 import { isEmpty } from "lodash";
 import { ClientSession } from "mongoose";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { postDocToObj } from "../../utils";
 import { ErrorMessage, HttpRequest, ServerInfo } from "../../enums";
 import {
   forwardResponse,
@@ -31,37 +32,61 @@ export default async function handler(
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse) {
   const reqQuery = req.query as Partial<IPostReq>;
-  const { username, slug, count = 1 } = reqQuery;
-  if (count > 1) {
-    // fetch a few
-  } else {
-    if (!username || !slug) {
-      handleBadRequest(res);
-    } else {
-      await getDoc(reqQuery)
-        .then((payload) => forwardResponse(res, payload))
-        .catch((err) => handleAPIError(res, err));
-    }
-  }
+  await (reqQuery?.limit > 1 ? getPostsByUsername(reqQuery) : getPost(reqQuery))
+    .then((payload) => forwardResponse(res, payload))
+    .catch((err) => handleAPIError(res, err));
 }
 
-async function getDoc(params: object): Promise<IResponse> {
+async function getPostsByUsername(
+  params: Partial<IPostReq>
+): Promise<IResponse> {
+  const { username, cursor, limit = 2 } = params;
   return new Promise(async (resolve, reject) => {
-    try {
-      const { Post } = await mongoConnection();
-      await Post.findOne(params).then((post) => {
-        if (isEmpty(post)) {
+    if (!username) reject(new ServerError(404));
+    const { Post } = await mongoConnection();
+    await Post.find({ username, createdAt: { $lte: cursor || new Date() } })
+      .select(["-user"])
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .lean()
+      .then((posts) => {
+        if (isEmpty(posts)) {
           reject(new ServerError(400, ServerInfo.POST_NA));
         } else {
           resolve({
             status: 200,
             message: ServerInfo.POST_RETRIEVED,
-            data: { post },
+            data: { posts },
           });
         }
       });
-    } catch (err) {
-      reject(new ServerError(500, err.message));
+  });
+}
+
+async function getPost(params: Partial<IPostReq>): Promise<IResponse> {
+  return new Promise(async (resolve, reject) => {
+    const { username, slug } = params;
+    if (!username || !slug) reject(new ServerError(400));
+    else {
+      try {
+        const { Post } = await mongoConnection();
+        await Post.findOne(params)
+          .select(["-user"])
+          .lean()
+          .then((post) => {
+            if (isEmpty(post)) {
+              reject(new ServerError(400, ServerInfo.POST_NA));
+            } else {
+              resolve({
+                status: 200,
+                message: ServerInfo.POST_RETRIEVED,
+                data: { post },
+              });
+            }
+          });
+      } catch (err) {
+        reject(new ServerError(500, err.message));
+      }
     }
   });
 }

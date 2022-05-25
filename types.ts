@@ -38,28 +38,32 @@ interface IHasId {
   _id?: string;
 }
 
-export interface IPost extends IHasId {
+interface IHasTimestamps {
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface IPost extends IHasId, IHasTimestamps {
   user: IUser;
   username: string;
   title: string;
   slug: string;
   body: string;
   isPrivate: boolean;
-  createdAt: string;
-  updatedAt: string;
   imageKey: string;
 }
 
 export interface IPostReq extends IPost, IRequest {
   update: boolean;
-  count?: number;
+  limit?: number;
+  sort?: 1 | -1;
+  cursor?: string;
 }
 
-export interface IUser extends IHasId {
+export interface IUser extends IHasId, Partial<IHasTimestamps> {
   id: string;
   avatar: string;
   bio: string;
-  createdAt: string;
   email: string;
   password: string;
   username: string;
