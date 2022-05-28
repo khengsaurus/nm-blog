@@ -19,7 +19,11 @@ const AuthorLink = ({ author, title = false }: IAuthorLinkProps) => {
 
   return (
     <Link onClick={handleClick} underline="hover">
-      {title ? <h4>{`By ${author?.username}`}</h4> : `By ${author?.username}`}
+      {title ? (
+        <h3>{`By ${author?.username}`}</h3>
+      ) : (
+        <p className="author">{`By ${author?.username}`}</p>
+      )}
     </Link>
   );
 };

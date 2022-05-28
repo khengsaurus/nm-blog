@@ -1,4 +1,10 @@
-import { Centered, CircleLoader, PostFeed, StyledButton } from "components";
+import {
+  Centered,
+  CircleLoader,
+  PostFeed,
+  StyledButton,
+  StyledText,
+} from "components";
 import PostCard from "components/PostCard";
 import { AppContext } from "hooks";
 import usePaginatePosts from "hooks/usePaginatePosts";
@@ -21,10 +27,11 @@ const ProfilePage = () => {
           {user?.avatar && (
             <Image src={`api/images?key=${user.avatar}`} alt="avatar" />
           )}
-          <h2>{user?.username}</h2>
-          <h3>Bio:</h3>
-          <section className="post-body">{user?.bio || "(None)"}</section>
-          <h3>Posts:</h3>
+          <StyledText text={user?.username} variant="h2" />
+          <StyledText text="Bio:" variant="h5" />
+          <StyledText text={user?.bio || "(None)"} variant="body1" />
+          <br />
+          <StyledText text="Posts:" variant="h5" />
           <PostFeed>
             {posts.map((post, index) => (
               <PostCard

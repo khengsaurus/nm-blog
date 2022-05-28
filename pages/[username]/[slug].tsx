@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { AuthorLink, PostBanner } from "../../components";
+import { AuthorLink, PostBanner, StyledText } from "../../components";
 import { DBService } from "../../enums";
 import { useIsoEffect } from "../../hooks";
 import { HTTPService, serverUrl } from "../../lib/client";
@@ -74,11 +74,11 @@ const Post = ({ post, username, slug }: IPostPage) => {
       )}
       <section className="header">
         {/* <motion.h3 layoutId={`${id}-title`}>{title}</motion.h3> */}
-        <h3>{title}</h3>
+        <StyledText text={title} variant="h2" />
         <AuthorLink author={user} title />
       </section>
       <section className="post-body">
-        <p>{body}</p>
+        <StyledText text={body} variant="body1" />
       </section>
     </main>
   );

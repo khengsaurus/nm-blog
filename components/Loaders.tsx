@@ -14,7 +14,7 @@ export const CircleLoader = ({
   height = 22,
   width = 22,
   strokeWidth = 6,
-  color = "rgb(50,50,50)",
+  color = "rgb(230, 230, 230)",
 }: ILoader) => {
   return (
     <Oval

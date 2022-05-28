@@ -1,6 +1,6 @@
 import { Alert, Collapse } from "@mui/material";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { Input, StyledButton } from "../components";
+import { CenteredMain, Input, StyledButton } from "../components";
 import {
   APIAction,
   DBService,
@@ -48,13 +48,9 @@ const Login = () => {
 
   const cleanup = useCallback(
     (res: IResponse, route: PageRoute) => {
-      setAlert(null);
-      setUsername("");
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
       router.push(route);
-      handleUser(res.data.token, res.data.user);
+      setAlert(null);
+      Promise.resolve().then(() => handleUser(res.data.token, res.data.user));
     },
     [handleUser, router]
   );
@@ -114,7 +110,7 @@ const Login = () => {
   );
 
   return (
-    <main>
+    <CenteredMain>
       <Input
         label={showRegister ? "Email" : "Username"}
         value={showRegister ? email : username}
@@ -138,6 +134,7 @@ const Login = () => {
           password
         />
       </Collapse>
+      <br />
       <StyledButton
         label={showRegister ? "Back" : "Register"}
         onClick={() => setShowRegister(!showRegister)}
@@ -152,7 +149,7 @@ const Login = () => {
           {alert?.message || ErrorMessage.TRY_AGAIN}
         </Alert>
       </Collapse>
-    </main>
+    </CenteredMain>
   );
 };
 

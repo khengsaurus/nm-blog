@@ -3,7 +3,13 @@ import Layout from "./Layout";
 import { CircleLoader } from "./Loaders";
 import NavBar from "./NavBar";
 import PostBanner from "./PostBanner";
-import { Centered, Column, PostFeed, Row } from "./StyledComponents";
+import {
+  Centered,
+  CenteredMain,
+  Column,
+  PostFeed,
+  Row,
+} from "./StyledComponents";
 import {
   HomeButton,
   StyledButton,
@@ -26,6 +32,7 @@ export {
   TextNavButton,
   NavBar,
   Centered,
+  CenteredMain,
   Column,
   PostFeed,
   Row,

@@ -30,3 +30,8 @@ export const Centered = styled(Column)`
   align-self: center;
   text-align: center;
 `;
+
+export const CenteredMain = styled(Centered)`
+  height: 100vh;
+  width: 100vw;
+`;

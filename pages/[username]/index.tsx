@@ -1,4 +1,4 @@
-import { PostFeed, StyledButton } from "components";
+import { PostFeed, StyledButton, StyledCenterText } from "components";
 import PostCard from "components/PostCard";
 import { usePaginatePosts } from "hooks";
 import { mongoConnection } from "lib/server";
@@ -6,7 +6,7 @@ import React from "react";
 import { IUser } from "types";
 import { postDocToObj, userDocToObj } from "../../utils";
 
-const PAGINATE_LIMIT = 2;
+const PAGINATE_LIMIT = 4;
 
 interface IUserPageProps {
   visitingUser: IUser;
@@ -50,7 +50,10 @@ const UserPage = (props: IUserPageProps) => {
   return (
     <main>
       <section className="header">
-        <h3>{`Posts by ${visitingUser?.username}`}</h3>
+        <StyledCenterText
+          text={`Posts by ${visitingUser?.username}`}
+          variant="h3"
+        />
       </section>
       <PostFeed>
         {posts.map((post, index) => (
@@ -58,6 +61,7 @@ const UserPage = (props: IUserPageProps) => {
             key={index}
             post={post}
             hasAuthorLink={false}
+            hasDate={true}
             postTag="username"
           />
         ))}

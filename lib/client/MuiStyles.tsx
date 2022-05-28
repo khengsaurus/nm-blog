@@ -1,4 +1,3 @@
-import { amber, blue, grey } from "@mui/material/colors";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useContext, useMemo } from "react";
 import { TransitionSpeed } from "../../enums";
@@ -13,11 +12,16 @@ export const HomeTheme = (props: any) => {
   return <ThemeProvider theme={_theme} {...props} />;
 };
 
+const grey = "rgb(66, 80, 107)";
+const blue = "rgb(62, 97, 155)";
+const red = "rgb(239, 75, 76)";
+const white = "rgb(230, 230, 230)";
+
 function newMuiTheme(darkMode: boolean) {
-  const backgroundColor = darkMode ? grey[900] : grey[500];
-  const componentHighlight = darkMode ? amber[900] : amber[900];
-  const mainText = darkMode ? grey[100] : grey[900];
-  const highlightColor = darkMode ? amber[700] : blue[800];
+  const backgroundColor = darkMode ? grey : grey;
+  const componentHighlight = darkMode ? blue : blue;
+  const mainText = darkMode ? white : white;
+  const highlightColor = darkMode ? red : red;
   const accordionWidth = {
     minWidth: "200px",
     width: "80vw",
@@ -160,11 +164,14 @@ function newMuiTheme(darkMode: boolean) {
       MuiCardContent: {
         styleOverrides: {
           root: {
-            height: "100px",
+            border: `2px solid ${grey}`,
             padding: "4px 12px",
-            backgroundColor: "#606060 !important",
+            backgroundColor: grey,
             "&:last-child": {
               padding: "4px 8px",
+            },
+            "&:hover": {
+              borderColor: highlightColor,
             },
           },
         },
@@ -269,12 +276,18 @@ function newMuiTheme(darkMode: boolean) {
       MuiOutlinedInput: {
         styleOverrides: {
           root: {
+            borderColor: white,
+            ".MuiOutlinedInput-notchedOutline": {
+              borderColor: white,
+              borderWidth: "1px",
+            },
             "&:hover .MuiOutlinedInput-notchedOutline": {
               borderColor: highlightColor,
               borderWidth: "2px",
             },
             "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
               borderColor: highlightColor,
+              borderWidth: "2px",
             },
           },
         },
@@ -287,6 +300,7 @@ function newMuiTheme(darkMode: boolean) {
             secondary: highlightColor,
             "&:hover": {
               color: highlightColor,
+              cursor: "pointer",
             },
             "&:disabled": {
               color: "rgb(75, 75, 75) !important",
@@ -322,9 +336,6 @@ function newMuiTheme(darkMode: boolean) {
         styleOverrides: {
           root: {
             color: mainText,
-            "&:hover": {
-              color: highlightColor,
-            },
           },
         },
       },

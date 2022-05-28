@@ -1,7 +1,7 @@
 import { DBService } from "enums";
 import { HTTPService } from "lib/client";
 import React, { useCallback, useContext } from "react";
-import { PostFeed, StyledButton } from "../components";
+import { PostFeed, StyledButton, StyledCenterText } from "../components";
 import PostCard from "../components/PostCard";
 import { AppContext, usePaginatePosts } from "../hooks";
 import { mongoConnection } from "../lib/server";
@@ -13,7 +13,7 @@ interface IHomeProps {
   cursor: string;
 }
 
-const PAGINATE_LIMIT = 2;
+const PAGINATE_LIMIT = 4;
 
 export async function getServerSideProps({ res }) {
   console.info("-> Home getServerSideProps()");
@@ -42,13 +42,14 @@ const Home: React.FC = ({ initPosts }: IHomeProps) => {
   return (
     <main>
       <section className="header">
-        <h3>Recent Posts</h3>
+        <StyledCenterText text={"Recent Posts"} variant="h3" />
       </section>
       <PostFeed>
         {posts.map((post, index) => (
           <PostCard key={index} post={post} />
         ))}
       </PostFeed>
+      <br />
       <StyledButton label={"Load more"} onClick={loadMore} />
       {!!user && <StyledButton label={"Logout"} onClick={logout} />}
     </main>
