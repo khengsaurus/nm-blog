@@ -12,8 +12,8 @@ export function postDocToObj(data: any) {
   const { _id, user, createdAt, updatedAt, ...post } = data;
   if (_id) {
     post.id = _id.toString();
-    post.createdAt = createdAt.toString();
-    post.updatedAt = updatedAt.toString();
+    post.createdAt = createdAt?.toString();
+    post.updatedAt = updatedAt?.toString();
   }
   if (user) {
     const { _id, updatedAt, createdAt, ..._user } = user;

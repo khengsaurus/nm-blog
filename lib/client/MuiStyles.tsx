@@ -149,7 +149,7 @@ function newMuiTheme(darkMode: boolean) {
         styleOverrides: {
           root: {
             margin: "6px",
-            width: "clamp(220px, 30vw, 280px) !important",
+            width: "280px",
             backgroundColor: "transparent",
             "&:hover": {
               cursor: "pointer",

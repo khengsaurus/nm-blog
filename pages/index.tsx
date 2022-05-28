@@ -1,17 +1,19 @@
-import React, { useContext } from "react";
+import { DBService } from "enums";
+import { HTTPService } from "lib/client";
+import React, { useCallback, useContext } from "react";
 import { PostFeed, StyledButton } from "../components";
 import PostCard from "../components/PostCard";
-import { AppContext } from "../hooks";
+import { AppContext, usePaginatePosts } from "../hooks";
 import { mongoConnection } from "../lib/server";
 import { IPost } from "../types";
 import { postDocToObj } from "../utils";
 
 interface IHomeProps {
-  posts: IPost[];
+  initPosts: IPost[];
   cursor: string;
 }
 
-const LIMIT = 6;
+const PAGINATE_LIMIT = 2;
 
 export async function getServerSideProps({ res }) {
   console.info("-> Home getServerSideProps()");
@@ -23,22 +25,19 @@ export async function getServerSideProps({ res }) {
   const { Post } = await mongoConnection();
   const postQuery = await Post.find()
     .sort({ createdAt: -1 })
-    .limit(LIMIT)
+    .limit(PAGINATE_LIMIT)
     .populate("user", "-createdAt -updatedAt -email -password -posts")
     .lean();
-  const posts = postQuery.map((post) => postDocToObj(post));
-  const cursor =
-    posts?.length > 0
-      ? posts[posts.length - 1].createdAt || "timestamp"
-      : "timestamp";
+  const initPosts = postQuery.map((post) => postDocToObj(post));
 
   return {
-    props: { posts, cursor },
+    props: { initPosts },
   };
 }
 
-const Home: React.FC = ({ posts, cursor }: IHomeProps) => {
+const Home: React.FC = ({ initPosts }: IHomeProps) => {
   const { user, logout } = useContext(AppContext);
+  const { posts, loadMore } = usePaginatePosts(true, initPosts);
 
   return (
     <main>
@@ -50,6 +49,7 @@ const Home: React.FC = ({ posts, cursor }: IHomeProps) => {
           <PostCard key={index} post={post} />
         ))}
       </PostFeed>
+      <StyledButton label={"Load more"} onClick={loadMore} />
       {!!user && <StyledButton label={"Logout"} onClick={logout} />}
     </main>
   );

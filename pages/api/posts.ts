@@ -1,7 +1,6 @@
 import { isEmpty } from "lodash";
 import { ClientSession } from "mongoose";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { postDocToObj } from "../../utils";
 import { ErrorMessage, HttpRequest, ServerInfo } from "../../enums";
 import {
   forwardResponse,
@@ -32,23 +31,19 @@ export default async function handler(
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse) {
   const reqQuery = req.query as Partial<IPostReq>;
-  await (reqQuery?.limit > 1 ? getPostsByUsername(reqQuery) : getPost(reqQuery))
+  await (reqQuery?.limit > 1 ? getPosts(reqQuery) : getPost(reqQuery))
     .then((payload) => forwardResponse(res, payload))
     .catch((err) => handleAPIError(res, err));
 }
 
-async function getPostsByUsername(
-  params: Partial<IPostReq>
-): Promise<IResponse> {
+async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
   const { username, createdAt, limit = 2 } = params;
   return new Promise(async (resolve, reject) => {
-    if (!username) reject(new ServerError(404));
     const { Post } = await mongoConnection();
-    await Post.find({
-      username,
-      createdAt: { $lt: createdAt || new Date() },
-    })
-      .select(["-user"])
+    const query: any = { createdAt: { $lt: createdAt || new Date() } };
+    if (username) query.username = username;
+    await Post.find(query)
+      .populate("user", "-createdAt -updatedAt -email -password -posts")
       .sort({ createdAt: -1 })
       .limit(limit)
       .lean()

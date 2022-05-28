@@ -21,7 +21,7 @@ export const Row = styled.div`
 export const PostFeed = styled(Row)`
   justify-content: center;
   flex-wrap: wrap;
-  width: clamp(200px, 85vw, 1200px);
+  width: clamp(360px, 85vw, 1200px);
 `;
 
 export const Centered = styled(Column)`

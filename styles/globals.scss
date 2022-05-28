@@ -21,8 +21,6 @@ main {
   justify-content: center;
   font-family: "Roboto", sans-serif;
   margin: 70px $side-margin;
-  // height: calc(100vh - 140px);
-  // width: calc(100vw - 2 * $side-margin);
   &.left {
     align-items: flex-start;
     justify-content: flex-start;

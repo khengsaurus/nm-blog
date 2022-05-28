@@ -1,44 +1,18 @@
 import { Centered, CircleLoader, PostFeed, StyledButton } from "components";
-import { AppContext } from "hooks";
-import { mongoConnection } from "lib/server";
-import { IPost } from "../types";
-import Image from "next/image";
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { HTTPService } from "lib/client";
-import { DBService } from "enums";
 import PostCard from "components/PostCard";
-
-const LIMIT = 2;
+import { AppContext } from "hooks";
+import usePaginatePosts from "hooks/usePaginatePosts";
+import Image from "next/image";
+import React, { useContext } from "react";
 
 const ProfilePage = () => {
   const { user } = useContext(AppContext);
-  const [posts, setPosts] = useState<IPost[]>([]);
 
-  const getPosts = async () => {
-    const createdAt =
-      posts.length === 0 ? new Date() : posts[posts.length - 1].createdAt;
-    HTTPService.makeGetReq(DBService.POSTS, {
-      username: user?.username,
-      limit: LIMIT,
-      createdAt,
-    }).then((res) => {
-      if (res.status === 200 && res.data?.posts?.length > 0) {
-        const _posts = [...posts, ...res.data.posts];
-        setPosts(_posts);
-      }
-    });
-  };
-
-  useEffect(() => {
-    user?.username && getPosts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.username]);
+  const { posts, loadMore } = usePaginatePosts(
+    !!user?.username,
+    [],
+    user?.username
+  );
 
   return (
     <main className="left">
@@ -62,7 +36,7 @@ const ProfilePage = () => {
             ))}
           </PostFeed>
           {posts.length < user?.posts.length && (
-            <StyledButton label={"Load more"} onClick={getPosts} />
+            <StyledButton label={"Load more"} onClick={loadMore} />
           )}
         </>
       ) : (

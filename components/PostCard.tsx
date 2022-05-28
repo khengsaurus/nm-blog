@@ -36,7 +36,6 @@ const PostCard = ({ post, postTag = "", hasAuthorLink = true }: IPostCard) => {
       )}
       <CardContent style={{ height: imageKey ? 105 : 185 }}>
         <div className="card-content">
-          {/* <motion.h2 layoutId={`${id}-title`}>{title}</motion.h2> */}
           <h2>{title}</h2>
           {hasAuthorLink && <AuthorLink author={user} />}
           <p className={`body ${imageKey ? "short" : "long"}`}>{body}</p>
