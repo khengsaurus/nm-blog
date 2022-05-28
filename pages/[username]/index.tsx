@@ -1,4 +1,4 @@
-import { RowWrap } from "components";
+import { PostFeed } from "components";
 import PostCard from "components/PostCard";
 import { mongoConnection } from "lib/server";
 import React from "react";
@@ -21,13 +21,11 @@ export async function getServerSideProps({ params, res }) {
 
   const userQuery = await User.findOne({ username })
     .select(["-password"])
-    .populate({ path: "posts", select: "-user", options: { limit: 5 } })
+    .populate({ path: "posts", select: "-user", options: { limit: 2 } })
     .lean();
   const user = userDocToObj(userQuery);
 
-  return {
-    props: { user },
-  };
+  return { props: { user } };
 }
 
 const UserPage = (props: IUserPageProps) => {
@@ -37,11 +35,16 @@ const UserPage = (props: IUserPageProps) => {
       <section className="header">
         <h3>{`Posts by ${user?.username}`}</h3>
       </section>
-      <RowWrap>
+      <PostFeed>
         {user?.posts.map((post, index) => (
-          <PostCard key={index} post={post} hasAuthorLink={false} />
+          <PostCard
+            key={index}
+            post={post}
+            hasAuthorLink={false}
+            postTag="username"
+          />
         ))}
-      </RowWrap>
+      </PostFeed>
     </main>
   );
 };

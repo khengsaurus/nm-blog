@@ -1,5 +1,4 @@
-import { postDocToObj } from "../utils";
-import { Centered, CircleLoader, RowWrap, StyledButton } from "components";
+import { Centered, CircleLoader, PostFeed, StyledButton } from "components";
 import { AppContext } from "hooks";
 import { mongoConnection } from "lib/server";
 import { IPost } from "../types";
@@ -15,7 +14,7 @@ import { HTTPService } from "lib/client";
 import { DBService } from "enums";
 import PostCard from "components/PostCard";
 
-const LIMIT = 3;
+const LIMIT = 2;
 
 const ProfilePage = () => {
   const { user } = useContext(AppContext);
@@ -23,7 +22,7 @@ const ProfilePage = () => {
 
   const getPosts = async () => {
     const createdAt =
-      posts.length === 0 ? null : posts[posts.length - 1].createdAt;
+      posts.length === 0 ? new Date() : posts[posts.length - 1].createdAt;
     HTTPService.makeGetReq(DBService.POSTS, {
       username: user?.username,
       limit: LIMIT,
@@ -52,11 +51,16 @@ const ProfilePage = () => {
           <h3>Bio:</h3>
           <section className="post-body">{user?.bio || "(None)"}</section>
           <h3>Posts:</h3>
-          <RowWrap>
+          <PostFeed>
             {posts.map((post, index) => (
-              <PostCard key={index} post={post} hasAuthorLink={false} />
+              <PostCard
+                key={index}
+                post={post}
+                hasAuthorLink={false}
+                postTag="profile"
+              />
             ))}
-          </RowWrap>
+          </PostFeed>
           {posts.length < user?.posts.length && (
             <StyledButton label={"Load more"} onClick={getPosts} />
           )}

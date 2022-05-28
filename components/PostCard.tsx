@@ -10,11 +10,12 @@ import AuthorLink from "./AuthorLink";
 interface IPostCard {
   post: IPost;
   hasAuthorLink?: boolean;
+  postTag?: string;
 }
 
-const PostCard = ({ post, hasAuthorLink = true }: IPostCard) => {
+const PostCard = ({ post, postTag = "", hasAuthorLink = true }: IPostCard) => {
   const { router } = useContext(AppContext);
-  const { title, slug, body, user, imageKey, id } = post;
+  const { title, slug, body, user, imageKey } = post;
 
   return (
     <Card onClick={() => router.push(`/${user?.username}/${slug}`)}>
@@ -23,7 +24,7 @@ const PostCard = ({ post, hasAuthorLink = true }: IPostCard) => {
           <motion.img
             src={`api/images?key=${imageKey}`}
             alt="post-image"
-            layoutId={`${id}-banner`}
+            layoutId={`banner-${imageKey}${postTag}`}
             style={{
               height: "80px",
               width: "100%",

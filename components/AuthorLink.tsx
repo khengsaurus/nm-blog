@@ -5,9 +5,10 @@ import { IUser } from "types";
 
 interface IAuthorLinkProps {
   author?: IUser;
+  title?: boolean;
 }
 
-const AuthorLink = ({ author }: IAuthorLinkProps) => {
+const AuthorLink = ({ author, title = false }: IAuthorLinkProps) => {
   const router = useRouter();
 
   function handleClick(e: any) {
@@ -17,8 +18,8 @@ const AuthorLink = ({ author }: IAuthorLinkProps) => {
   }
 
   return (
-    <Link variant="body1" onClick={handleClick} underline="hover">
-      {`By ${author?.username}`}
+    <Link onClick={handleClick} underline="hover">
+      {title ? <h4>{`By ${author?.username}`}</h4> : `By ${author?.username}`}
     </Link>
   );
 };

@@ -18,9 +18,10 @@ export const Row = styled.div`
   transition: 300ms all;
 `;
 
-export const RowWrap = styled(Row)`
+export const PostFeed = styled(Row)`
   justify-content: center;
   flex-wrap: wrap;
+  width: clamp(200px, 85vw, 1200px);
 `;
 
 export const Centered = styled(Column)`

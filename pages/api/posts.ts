@@ -40,11 +40,14 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
 async function getPostsByUsername(
   params: Partial<IPostReq>
 ): Promise<IResponse> {
-  const { username, cursor, limit = 2 } = params;
+  const { username, createdAt, limit = 2 } = params;
   return new Promise(async (resolve, reject) => {
     if (!username) reject(new ServerError(404));
     const { Post } = await mongoConnection();
-    await Post.find({ username, createdAt: { $lte: cursor || new Date() } })
+    await Post.find({
+      username,
+      createdAt: { $lt: createdAt || new Date() },
+    })
       .select(["-user"])
       .sort({ createdAt: -1 })
       .limit(limit)

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { PostBanner } from "../../components";
+import { AuthorLink, PostBanner } from "../../components";
 import { DBService } from "../../enums";
 import { useIsoEffect } from "../../hooks";
 import { HTTPService, serverUrl } from "../../lib/client";
@@ -69,13 +69,13 @@ const Post = ({ post, username, slug }: IPostPage) => {
       {imageKey && (
         <PostBanner
           src={`${serverUrl}/api/images?key=${imageKey}`}
-          id={`${id}-banner`}
+          id={`${imageKey}`}
         />
       )}
       <section className="header">
         {/* <motion.h3 layoutId={`${id}-title`}>{title}</motion.h3> */}
         <h3>{title}</h3>
-        <h4>{`By ${user?.username}`}</h4>
+        <AuthorLink author={user} title />
       </section>
       <section className="post-body">
         <p>{body}</p>

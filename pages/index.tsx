@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { RowWrap, StyledButton } from "../components";
+import { PostFeed, StyledButton } from "../components";
 import PostCard from "../components/PostCard";
 import { AppContext } from "../hooks";
 import { mongoConnection } from "../lib/server";
@@ -45,11 +45,11 @@ const Home: React.FC = ({ posts, cursor }: IHomeProps) => {
       <section className="header">
         <h3>Recent Posts</h3>
       </section>
-      <RowWrap>
+      <PostFeed>
         {posts.map((post, index) => (
           <PostCard key={index} post={post} />
         ))}
-      </RowWrap>
+      </PostFeed>
       {!!user && <StyledButton label={"Logout"} onClick={logout} />}
     </main>
   );

@@ -9,35 +9,31 @@ export function isDev() {
 
 export function postDocToObj(data: any) {
   if (data === null) return data;
-  const { _id, user, createdAt, updatedAt, ...main } = data;
+  const { _id, user, createdAt, updatedAt, ...post } = data;
   if (_id) {
-    main.id = _id.toString();
+    post.id = _id.toString();
+    post.createdAt = createdAt.toString();
+    post.updatedAt = updatedAt.toString();
   }
   if (user) {
-    const { _id: userId, ..._user } = user;
-    _user.id = userId.toString();
-    main.user = _user;
-    main.createdAt = createdAt.toString();
-    main.updatedAt = updatedAt.toString();
+    const { _id, updatedAt, createdAt, ..._user } = user;
+    _user.id = _id.toString();
+    post.user = _user;
   }
-  return main;
+  return post;
 }
 
 export function userDocToObj(data: any) {
   if (data === null) return data;
-  const { _id, posts, createdAt, ...user } = data;
+  const { _id, posts, createdAt, updatedAt, ...user } = data;
   if (_id) {
     user.id = _id.toString();
   }
-  if (posts?.length > 0) {
-    const processedPosts = new Array<IPost>();
-    for (let i = 0; i < posts.length; i++) {
-      const { _id, user, ...post } = posts[i];
-      post.id = _id.toString();
-      processedPosts.push(post);
-    }
-    user.posts = processedPosts;
+  const processedPosts: IPost[] = [];
+  for (let i = 0; i < posts.length; i++) {
+    processedPosts.push(postDocToObj(posts[i]));
   }
+  user.posts = processedPosts;
   return user;
 }
 

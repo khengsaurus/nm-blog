@@ -8,7 +8,7 @@ interface IPostBanner {
   paddingPx?: number;
 }
 
-const PostBanner = ({ src, id, paddingPx = 56 }: IPostBanner) => {
+const PostBanner = ({ src, id }: IPostBanner) => {
   return src ? (
     <header className="banner-image">
       {/* <Image
@@ -22,7 +22,7 @@ const PostBanner = ({ src, id, paddingPx = 56 }: IPostBanner) => {
       <motion.img
         src={src}
         alt="post-image"
-        layoutId={id}
+        layoutId={`banner-${id}`}
         style={{
           height: "100%",
           width: "100%",
