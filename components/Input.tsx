@@ -1,4 +1,8 @@
-import { InputBaseComponentProps, TextField } from "@mui/material";
+import {
+  InputBaseComponentProps,
+  InputLabelProps,
+  TextField,
+} from "@mui/material";
 import React, { ChangeEventHandler, CSSProperties } from "react";
 
 interface IInput {
@@ -13,6 +17,7 @@ interface IInput {
   password?: boolean;
   style?: CSSProperties;
   inputProps?: InputBaseComponentProps;
+  inputLabelProps?: InputLabelProps;
   onChange: ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement>;
   onClick?: (e: React.MouseEvent) => void;
 }
@@ -25,6 +30,8 @@ const Input = (props: IInput) => {
     maxWidth = false,
     width = "160px",
     marginTop = 0,
+    inputProps = {},
+    inputLabelProps = {},
     ...rest
   } = props;
 
@@ -34,6 +41,8 @@ const Input = (props: IInput) => {
       multiline={props?.rows > 1}
       type={password ? "password" : "text"}
       variant={variant}
+      inputProps={inputProps}
+      InputLabelProps={inputLabelProps}
       style={{
         margin: `${marginTop || 5}px 0`,
         width: maxWidth ? "100%" : width,

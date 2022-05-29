@@ -23,7 +23,7 @@ export async function getServerSideProps({ res }) {
   );
 
   const { Post } = await mongoConnection();
-  const postQuery = await Post.find()
+  const postQuery = await Post.find({ isPrivate: false })
     .sort({ createdAt: -1 })
     .limit(PAGINATE_LIMIT)
     .populate("user", "-createdAt -updatedAt -email -password -posts")
@@ -37,12 +37,12 @@ export async function getServerSideProps({ res }) {
 
 const Home: React.FC = ({ initPosts }: IHomeProps) => {
   const { user, logout } = useContext(AppContext);
-  const { posts, loadMore } = usePaginatePosts(true, initPosts);
+  const { posts, loadMore } = usePaginatePosts(true, true, initPosts);
 
   return (
     <main>
       <section className="header">
-        <StyledCenterText text={"Recent Posts"} variant="h3" />
+        <StyledCenterText text={"Public Posts"} variant="h3" />
       </section>
       <PostFeed>
         {posts.map((post, index) => (

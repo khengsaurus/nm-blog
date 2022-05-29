@@ -26,7 +26,7 @@ export async function getServerSideProps({ params, res }) {
     .select(["-password -posts"])
     .lean();
   const user = userDocToObj(userQuery);
-  await Post.find({ username })
+  await Post.find({ username, isPrivate: false })
     .sort({ createdAt: -1 })
     .limit(PAGINATE_LIMIT)
     .populate("user", "-createdAt -updatedAt -email -password -posts")
@@ -43,6 +43,7 @@ const UserPage = (props: IUserPageProps) => {
   const { visitingUser } = props;
   const { posts, loadMore } = usePaginatePosts(
     !!visitingUser?.username,
+    true,
     visitingUser?.posts,
     visitingUser?.username
   );

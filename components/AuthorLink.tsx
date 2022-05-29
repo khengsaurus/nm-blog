@@ -1,6 +1,7 @@
 import { Link } from "@mui/material";
-import { useRouter } from "next/router";
-import React from "react";
+import { PageRoute } from "enums";
+import { AppContext } from "hooks";
+import React, { useContext } from "react";
 import { IUser } from "types";
 
 interface IAuthorLinkProps {
@@ -9,12 +10,16 @@ interface IAuthorLinkProps {
 }
 
 const AuthorLink = ({ author, title = false }: IAuthorLinkProps) => {
-  const router = useRouter();
+  const { user, router } = useContext(AppContext);
 
   function handleClick(e: any) {
     e.preventDefault();
     e.stopPropagation();
-    router.push(`/${author.username}`);
+    router.push(
+      author.username === user?.username
+        ? PageRoute.PROFILE
+        : `/${author.username}`
+    );
   }
 
   return (

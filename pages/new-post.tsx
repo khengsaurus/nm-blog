@@ -69,6 +69,7 @@ const NewPost = () => {
           slug,
           body,
           imageKey,
+          isPrivate,
         })
           .then((res) => resolve(res))
           .catch((err) => reject(err));
@@ -185,6 +186,7 @@ const NewPost = () => {
           label={"Title"}
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          inputProps={{ maxLength: 50 }}
           maxWidth
         />
         <Input
@@ -207,6 +209,10 @@ const NewPost = () => {
           onChange={(e) => setBody(e.target.value)}
           maxWidth
           marginTop={20}
+          inputLabelProps={{
+            // shrink: true,
+            children: <div style={{ width: 30, height: 10 }}>Hello</div>,
+          }}
         />
         {renderAttachment()}
         {renderPrivate()}

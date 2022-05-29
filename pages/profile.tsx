@@ -16,6 +16,7 @@ const ProfilePage = () => {
 
   const { posts, loadMore } = usePaginatePosts(
     !!user?.username,
+    false,
     [],
     user?.username
   );

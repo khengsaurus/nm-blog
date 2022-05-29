@@ -1,9 +1,9 @@
-import moment from "moment";
 import { CardMedia } from "@mui/material";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import { AuthorLink, Row, StyledText } from "components";
+import { AuthorLink, Row } from "components";
 import { motion } from "framer-motion";
+import moment from "moment";
 import React, { useContext } from "react";
 import { AppContext } from "../hooks";
 import { IPost } from "../types";
@@ -23,7 +23,7 @@ const PostCard = ({
 }: IPostCard) => {
   const { router } = useContext(AppContext);
   const { title, slug, body, user, imageKey, updatedAt } = post;
-  const date = moment(updatedAt).format("DD/MM/YY");
+  const date = moment(new Date(updatedAt)).format("DD/MM/YY");
 
   return (
     <Card onClick={() => router.push(`/${user?.username}/${slug}`)}>

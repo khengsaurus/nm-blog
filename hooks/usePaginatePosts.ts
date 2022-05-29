@@ -6,6 +6,7 @@ import { IPost } from "types";
 
 const usePaginatePosts = (
   ready: boolean,
+  publicPosts: boolean,
   initPosts?: IPost[],
   username?: string,
   limit = 2
@@ -17,6 +18,7 @@ const usePaginatePosts = (
       posts.length === 0 ? new Date() : posts[posts.length - 1].createdAt;
     const query: any = { createdAt, limit };
     if (username) query.username = username;
+    if (publicPosts) query.isPrivate = false;
     HTTPService.makeGetReq(DBService.POSTS, query).then((res) => {
       if (res.status === 200 && res.data?.posts?.length > 0) {
         const _posts = [...posts, ...res.data.posts];
