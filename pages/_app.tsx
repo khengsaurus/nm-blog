@@ -9,7 +9,6 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <AppContextProvider>
       <HomeTheme>
-        {/* @ts-ignore */}
         <Head>
           <meta
             name="viewport"

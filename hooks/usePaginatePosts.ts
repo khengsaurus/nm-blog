@@ -1,4 +1,4 @@
-import { DBService } from "enums";
+import { DBService, ServerInfo } from "enums";
 import { HTTPService } from "lib/client";
 import { isEmpty } from "lodash";
 import { useCallback, useEffect, useState } from "react";
@@ -12,6 +12,7 @@ const usePaginatePosts = (
   limit = 2
 ) => {
   const [posts, setPosts] = useState(initPosts || []);
+  const [limitReached, setLimitReached] = useState(false);
 
   const loadMore = useCallback(async () => {
     const createdAt =
@@ -20,9 +21,17 @@ const usePaginatePosts = (
     if (username) query.username = username;
     if (publicPosts) query.isPrivate = false;
     HTTPService.makeGetReq(DBService.POSTS, query).then((res) => {
-      if (res.status === 200 && res.data?.posts?.length > 0) {
-        const _posts = [...posts, ...res.data.posts];
-        setPosts(_posts);
+      if (res.status === 200) {
+        if (res.data?.posts?.length > 0) {
+          const _posts = [...posts, ...res.data.posts];
+          setPosts(_posts);
+        }
+        if (
+          res.data?.posts?.length < limit ||
+          res.data?.message === ServerInfo.POST_NA
+        ) {
+          setLimitReached(true);
+        }
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -33,7 +42,7 @@ const usePaginatePosts = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready]);
 
-  return { posts, loadMore };
+  return { posts, limitReached, loadMore };
 };
 
 export default usePaginatePosts;

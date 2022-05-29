@@ -1,22 +1,15 @@
 import AddIcon from "@mui/icons-material/Add";
 import HomeIcon from "@mui/icons-material/Home";
-import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import AppBar from "@mui/material/AppBar";
 import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import React, { useCallback, useContext } from "react";
+import { ProfileNav } from "components";
+import React, { useContext } from "react";
 import { PageRoute } from "../enums";
 import { AppContext } from "../hooks";
-// import StorefrontIcon from "@mui/icons-material/Storefront";
-// import MenuIcon from "@mui/icons-material/Menu";
 
 const NavBar: React.FC = () => {
   const { router, userSessionActive } = useContext(AppContext);
-
-  const handleProfileClick = useCallback(() => {
-    router.push(userSessionActive ? PageRoute.PROFILE : PageRoute.LOGIN);
-  }, [userSessionActive, router]);
 
   return (
     <AppBar position="fixed">
@@ -36,13 +29,7 @@ const NavBar: React.FC = () => {
             <AddIcon />
           </IconButton>
         )}
-        <IconButton
-          edge="end"
-          aria-label="profile"
-          onClick={handleProfileClick}
-        >
-          <PersonOutlineIcon />
-        </IconButton>
+        <ProfileNav />
       </Toolbar>
     </AppBar>
   );

@@ -48,16 +48,15 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
       .limit(limit)
       .lean()
       .then((posts) => {
-        if (isEmpty(posts)) {
-          reject(new ServerError(400, ServerInfo.POST_NA));
-        } else {
-          resolve({
-            status: 200,
-            message: ServerInfo.POST_RETRIEVED,
-            data: { posts },
-          });
-        }
-      });
+        resolve({
+          status: 200,
+          message: isEmpty(posts)
+            ? ServerInfo.POST_NA
+            : ServerInfo.POST_RETRIEVED,
+          data: { posts },
+        });
+      })
+      .catch((err) => reject(new ServerError(500, err?.message)));
   });
 }
 
@@ -83,7 +82,7 @@ async function getPost(params: Partial<IPostReq>): Promise<IResponse> {
             }
           });
       } catch (err) {
-        reject(new ServerError(500, err.message));
+        reject(new ServerError(500, err?.message));
       }
     }
   });
@@ -115,7 +114,7 @@ async function createDoc(req: NextApiRequest): Promise<IResponse> {
                     { safe: true, upsert: true },
                     function (err) {
                       if (err) {
-                        throw new ServerError(500, err.message);
+                        throw new ServerError(500, err?.message);
                       } else {
                         resolve({
                           status: 200,
@@ -129,12 +128,12 @@ async function createDoc(req: NextApiRequest): Promise<IResponse> {
                   throw new ServerError();
                 }
               })
-              .catch((err) => reject(new ServerError(500, err.message)));
+              .catch((err) => reject(new ServerError(500, err?.message)));
           }
         });
       });
     } catch (err) {
-      reject(new ServerError(500, err.message));
+      reject(new ServerError(500, err?.message));
     } finally {
       session?.endSession();
     }
@@ -152,7 +151,7 @@ async function updateDoc(req: Partial<IPostReq>): Promise<IResponse> {
         { $set: req },
         (err, _res) => {
           if (err) {
-            reject(new ServerError(500, err.message));
+            reject(new ServerError(500, err?.message));
           } else {
             resolve({
               status: 200,
@@ -163,7 +162,7 @@ async function updateDoc(req: Partial<IPostReq>): Promise<IResponse> {
         }
       );
     } catch (err) {
-      reject(new ServerError(500, err.message));
+      reject(new ServerError(500, err?.message));
     }
   });
 }
@@ -181,7 +180,7 @@ async function deleteDoc(req: Partial<IPostReq>): Promise<IResponse> {
         }
       });
     } catch (err) {
-      reject(new ServerError(500, err.message));
+      reject(new ServerError(500, err?.message));
     }
   });
 }

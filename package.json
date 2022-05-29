@@ -29,6 +29,7 @@
     "react-dom": "^18.1.0",
     "react-loader-spinner": "^6.0.0-0",
     "react-scripts": "^5.0.0",
+    "react-transition-group": "^4.4.2",
     "sass": "^1.49.7",
     "sass-loader": "^12.4.0",
     "styled-components": "^5.3.5"

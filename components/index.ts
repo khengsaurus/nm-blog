@@ -18,6 +18,7 @@ import {
   TextNavButton,
 } from "./StyledMui";
 import AuthorLink from "./AuthorLink";
+import ProfileNav from "./ProfileNav";
 
 export {
   AuthorLink,
@@ -30,6 +31,7 @@ export {
   StyledCenterText,
   StyledText,
   TextNavButton,
+  ProfileNav,
   NavBar,
   Centered,
   CenteredMain,

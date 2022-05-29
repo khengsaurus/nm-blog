@@ -1,9 +1,7 @@
-import { DBService } from "enums";
-import { HTTPService } from "lib/client";
-import React, { useCallback, useContext } from "react";
+import React from "react";
 import { PostFeed, StyledButton, StyledCenterText } from "../components";
 import PostCard from "../components/PostCard";
-import { AppContext, usePaginatePosts } from "../hooks";
+import { usePaginatePosts } from "../hooks";
 import { mongoConnection } from "../lib/server";
 import { IPost } from "../types";
 import { postDocToObj } from "../utils";
@@ -36,8 +34,11 @@ export async function getServerSideProps({ res }) {
 }
 
 const Home: React.FC = ({ initPosts }: IHomeProps) => {
-  const { user, logout } = useContext(AppContext);
-  const { posts, loadMore } = usePaginatePosts(true, true, initPosts);
+  const { posts, limitReached, loadMore } = usePaginatePosts(
+    true,
+    true,
+    initPosts
+  );
 
   return (
     <main>
@@ -50,8 +51,7 @@ const Home: React.FC = ({ initPosts }: IHomeProps) => {
         ))}
       </PostFeed>
       <br />
-      <StyledButton label={"Load more"} onClick={loadMore} />
-      {!!user && <StyledButton label={"Logout"} onClick={logout} />}
+      {!limitReached && <StyledButton label={"Load more"} onClick={loadMore} />}
     </main>
   );
 };
