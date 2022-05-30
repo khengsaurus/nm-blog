@@ -16,7 +16,8 @@ export enum PageRoute {
   LOGIN = "/login",
   NEWPOST = "/new-post",
   NEWUSER = "/new-user",
-  PROFILE = "/profile",
+  MY_PROFILE = "/my-profile",
+  MY_POSTS = "/my-posts",
 }
 
 export enum TransitionSpeed {

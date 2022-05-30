@@ -8,10 +8,9 @@ import {
 import PostCard from "components/PostCard";
 import { AppContext } from "hooks";
 import usePaginatePosts from "hooks/usePaginatePosts";
-import Image from "next/image";
 import React, { useContext } from "react";
 
-const ProfilePage = () => {
+const MyPosts = () => {
   const { user } = useContext(AppContext);
 
   const { posts, loadMore } = usePaginatePosts(
@@ -25,15 +24,8 @@ const ProfilePage = () => {
     <main className="left">
       {user ? (
         <>
-          {user?.avatar && (
-            <Image src={`api/images?key=${user.avatar}`} alt="avatar" />
-          )}
-          <StyledText text={user?.username} variant="h2" />
-          <StyledText text="Bio:" variant="h5" />
-          <StyledText text={user?.bio || "(None)"} variant="body1" />
-          <br />
-          <StyledText text="Posts:" variant="h5" />
-          <PostFeed>
+          <StyledText text="My Posts:" variant="h4" />
+          <PostFeed style={{ justifyContent: "flex-start" }}>
             {posts.map((post, index) => (
               <PostCard
                 key={index}
@@ -56,4 +48,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default MyPosts;

@@ -32,6 +32,7 @@ interface IStyledButtonProps {
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
   style?: any;
+  sx?: any;
   onClick?: () => void;
 }
 
@@ -46,6 +47,7 @@ export const StyledButton = ({
   autoFocus = false,
   disabled = false,
   style = {},
+  sx = {},
   onClick,
 }: IStyledButtonProps) => {
   const router = useRouter();
@@ -53,6 +55,7 @@ export const StyledButton = ({
   return (
     <Button
       style={{ color, padding, ...style }}
+      sx={sx}
       size={size}
       variant={variant}
       autoFocus={autoFocus}

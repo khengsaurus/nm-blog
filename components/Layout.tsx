@@ -3,7 +3,7 @@ import { NavBar } from ".";
 import { PageRoute } from "../enums";
 import { AppContext } from "../hooks";
 
-const authRoutes: string[] = [PageRoute.PROFILE];
+const authRoutes: string[] = [PageRoute.MY_PROFILE];
 
 interface ILayoutProps {
   children: any;

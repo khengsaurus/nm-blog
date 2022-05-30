@@ -17,7 +17,7 @@ const AuthorLink = ({ author, title = false }: IAuthorLinkProps) => {
     e.stopPropagation();
     router.push(
       author.username === user?.username
-        ? PageRoute.PROFILE
+        ? PageRoute.MY_PROFILE
         : `/${author.username}`
     );
   }
