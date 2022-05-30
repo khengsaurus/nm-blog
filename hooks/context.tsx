@@ -1,18 +1,28 @@
 import { getPostSlugs } from "lib/client/backgroundTasks";
 import { useRouter } from "next/router";
-import React, { createContext, useCallback, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { PageRoute, Status } from "../enums";
 import { HTTPService } from "../lib/client";
 import { IAppContext, IUser } from "../types";
 import useFirstEffectAsync from "./useFirstEffectAsync";
 import useLocalStorage from "./useLocalStorage";
+import useWindowListener from "./useWindowListener";
 
 const initialContext: IAppContext = {
   user: null,
   userToken: "",
   darkMode: false,
-  router: null,
   userSessionActive: true,
+  history: [],
+  router: null,
+  routerPush: () => {},
+  routerBack: () => {},
   logout: () => {},
   handleUser: (token: string, user: IUser) => {},
   setDarkMode: (_?: boolean) => {},
@@ -25,7 +35,36 @@ const AppContextProvider = (props: any) => {
   const [userToken, setUserToken] = useLocalStorage("userToken", "");
   const [darkMode, setDarkMode] = useState(false);
   const [userSessionActive, setUserSessionActive] = useState(true);
+  const historyRef = useRef([]);
   const router = useRouter();
+
+  /* -------------------- Start Router stuff -------------------- */
+  const routerPush = useCallback(
+    (route: string) => {
+      if (route === PageRoute.HOME) {
+        historyRef.current = new Array();
+      } else {
+        historyRef.current.push(router.asPath);
+      }
+      router.push(route);
+    },
+    [router]
+  );
+
+  const historyPop = useCallback(() => {
+    if (historyRef.current?.length > 0) {
+      historyRef.current.pop();
+    }
+  }, []);
+
+  const routerBack = useCallback(() => {
+    historyPop();
+    router.back();
+  }, [router, historyPop]);
+
+  useWindowListener("popstate", historyPop);
+
+  /* -------------------- End router stuff -------------------- */
 
   const handleUser = useCallback(
     (token: string, user: IUser) => {
@@ -94,11 +133,14 @@ const AppContextProvider = (props: any) => {
   return (
     <AppContext.Provider
       value={{
-        router,
         user,
         userToken,
         darkMode,
         userSessionActive,
+        history: historyRef.current,
+        router,
+        routerPush,
+        routerBack,
         logout,
         handleUser,
         setDarkMode,

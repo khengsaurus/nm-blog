@@ -21,12 +21,12 @@ const PostCard = ({
   hasAuthorLink = true,
   hasDate = true,
 }: IPostCard) => {
-  const { router } = useContext(AppContext);
+  const { routerPush } = useContext(AppContext);
   const { title, slug, body, user, imageKey, updatedAt } = post;
   const date = moment(new Date(updatedAt)).format("DD/MM/YY");
 
   return (
-    <Card onClick={() => router.push(`/${user?.username}/${slug}`)}>
+    <Card onClick={() => routerPush(`/${user?.username}/${slug}`)}>
       {imageKey && (
         <CardMedia>
           <motion.img
@@ -50,7 +50,7 @@ const PostCard = ({
       >
         <div className="card-content">
           <h6>{title}</h6>
-          <Row style={{ justifyContent: "flex-start", alignItems: "flex-end" }}>
+          <Row style={{ justifyContent: "flex-start" }}>
             {hasAuthorLink && <AuthorLink author={user} />}
             {hasDate && <p className="date">{date}</p>}
           </Row>

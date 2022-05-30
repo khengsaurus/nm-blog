@@ -8,14 +8,14 @@ import {
   HttpRequest,
   PageRoute,
   Status,
-  Transition,
+  Transition
 } from "../enums";
 import { AppContext, useFirstEffect } from "../hooks";
 import { HTTPService } from "../lib/client";
 import { AlertStatus, IAlert, IResponse } from "../types";
 
 const Login = () => {
-  const { router, user, handleUser } = useContext(AppContext);
+  const { user, handleUser, routerPush } = useContext(AppContext);
   const [alert, setAlert] = useState<IAlert>(null);
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -25,9 +25,9 @@ const Login = () => {
 
   useFirstEffect(() => {
     if (!!user) {
-      router.push(PageRoute.HOME);
+      routerPush(PageRoute.HOME);
     }
-  }, [router, user]);
+  }, [routerPush, user]);
 
   useEffect(() => {
     setConfirmPassword("");
@@ -48,11 +48,11 @@ const Login = () => {
 
   const cleanup = useCallback(
     (res: IResponse, route: PageRoute) => {
-      router.push(route);
+      routerPush(route);
       setAlert(null);
       Promise.resolve().then(() => handleUser(res.data.token, res.data.user));
     },
-    [handleUser, router]
+    [handleUser, routerPush]
   );
 
   const handleLogin = useCallback(() => {

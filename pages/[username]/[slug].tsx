@@ -1,3 +1,5 @@
+import EditIcon from "@mui/icons-material/Edit";
+import { IconButton } from "@mui/material";
 import React, { useState } from "react";
 import { AuthorLink, PostBanner, StyledText } from "../../components";
 import { DBService } from "../../enums";
@@ -62,25 +64,31 @@ const Post = ({ post, username, slug }: IPostPage) => {
     });
   }, [username, slug]);
 
-  const { user, title, body, imageKey, id } = realtimePost;
+  const { user, title, body, imageKey } = realtimePost;
 
   return (
-    <main className="left">
-      {imageKey && (
-        <PostBanner
-          src={`${serverUrl}/api/images?key=${imageKey}`}
-          id={`${imageKey}`}
-        />
-      )}
-      <section className="header">
-        {/* <motion.h3 layoutId={`${id}-title`}>{title}</motion.h3> */}
-        <StyledText text={title} variant="h2" />
-        <AuthorLink author={user} title />
-      </section>
-      <section className="post-body">
-        <StyledText text={body} variant="body1" />
-      </section>
-    </main>
+    <>
+      <main className="left">
+        {imageKey && (
+          <PostBanner
+            src={`${serverUrl}/api/images?key=${imageKey}`}
+            id={`${imageKey}`}
+          />
+        )}
+        <section className="header">
+          <StyledText text={title} variant="h2" />
+          <AuthorLink author={user} title />
+        </section>
+        <section className="post-body">
+          <StyledText text={body} variant="body1" />
+        </section>
+      </main>
+      <div className="post-edit-button">
+        <IconButton size="large" disableRipple>
+          <EditIcon style={{ width: 40, height: 40 }} />
+        </IconButton>
+      </div>
+    </>
   );
 };
 

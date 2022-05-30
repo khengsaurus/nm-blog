@@ -8,10 +8,16 @@
 $main-side-margin: clamp(20px, 4vw, 100px);
 $main-width: calc(100vw - (2 * $main-side-margin));
 $speed: 350ms;
+$main-bg: rgb(45, 60, 90);
+$grey-dark: #242526;
+$grey-main: #484a4d;
+$grey-light: #525357;
+$border-radius-round: 8px;
+$big-button-dim: clamp(60px, 10vw, 85px);
 
 html {
   font-family: "Roboto", sans-serif;
-  background-color: rgb(45, 60, 90);
+  background-color: $main-bg;
 }
 
 body {
@@ -123,10 +129,8 @@ p {
 }
 
 .profile-nav {
-  $bg: #242526;
   $nav-size: 60px;
-  $border: 1px solid #474a4d;
-  $border-radius: 8px;
+  $border: 1px solid $grey-main;
   $padding: 6px;
   ul {
     list-style: none;
@@ -152,7 +156,7 @@ p {
     $button-size: calc($nav-size * 0.5);
     width: $button-size;
     height: $button-size;
-    background-color: #484a4d;
+    background-color: $grey-main;
     border-radius: 50%;
     padding: 5px;
     display: flex;
@@ -164,9 +168,9 @@ p {
     position: absolute;
     top: 45px;
     right: $padding;
-    background-color: $bg;
+    background-color: $grey-dark;
     border: $border;
-    border-radius: $border-radius;
+    border-radius: $border-radius-round;
     padding: 4px;
     overflow: hidden;
     transition: height $speed;
@@ -178,27 +182,42 @@ p {
         @include flex-(row);
         height: 45px;
         align-items: center;
-        border-radius: $border-radius;
+        border-radius: $border-radius-round;
         transition: background $speed;
         padding: $padding;
+        .right {
+          margin-left: auto;
+          background-color: transparent;
+        }
         span {
           &.icon-button {
             margin-right: 10px;
-            &:hover {
-              filter: none;
-            }
           }
+          &.back {
+            padding-right: 2px;
+            background-color: transparent;
+          }
+        }
+        &:hover {
+          background-color: $grey-light;
         }
       }
     }
   }
+}
 
-  .menu-item:hover {
-    background-color: #525357;
-  }
-
-  .icon-right {
-    margin-left: auto;
+.post-edit-button {
+  @include flex-(column);
+  justify-content: center;
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  height: $big-button-dim;
+  width: $big-button-dim;
+  border-radius: 50%;
+  background-color: $grey-dark;
+  &:hover {
+    background-color: $grey-light;
   }
 }
 

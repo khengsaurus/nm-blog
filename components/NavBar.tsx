@@ -9,7 +9,7 @@ import { PageRoute } from "../enums";
 import { AppContext } from "../hooks";
 
 const NavBar: React.FC = () => {
-  const { router, userSessionActive } = useContext(AppContext);
+  const { userSessionActive, routerPush } = useContext(AppContext);
 
   return (
     <AppBar position="fixed">
@@ -17,14 +17,14 @@ const NavBar: React.FC = () => {
         <IconButton
           edge="start"
           aria-label="home"
-          onClick={() => router.push(PageRoute.HOME)}
+          onClick={() => routerPush(PageRoute.HOME)}
         >
           <HomeIcon />
         </IconButton>
         {userSessionActive && (
           <IconButton
             aria-label="new-item"
-            onClick={() => router.push(PageRoute.NEWPOST)}
+            onClick={() => routerPush(PageRoute.NEWPOST)}
           >
             <AddIcon />
           </IconButton>

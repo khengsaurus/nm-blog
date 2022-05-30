@@ -1,5 +1,7 @@
 import { Button, Typography } from "@mui/material";
-import { useRouter } from "next/router";
+import { PageRoute } from "enums";
+import { AppContext } from "hooks";
+import { useContext } from "react";
 
 interface IStyledTextProps {
   text: string;
@@ -50,7 +52,7 @@ export const StyledButton = ({
   sx = {},
   onClick,
 }: IStyledButtonProps) => {
-  const router = useRouter();
+  const { routerPush } = useContext(AppContext);
 
   return (
     <Button
@@ -60,7 +62,7 @@ export const StyledButton = ({
       variant={variant}
       autoFocus={autoFocus}
       onClick={() =>
-        navigate ? router.push(navigate) : onClick ? onClick() : null
+        navigate ? routerPush(navigate) : onClick ? onClick() : null
       }
       type={type}
       disabled={disabled}
@@ -98,12 +100,12 @@ export const HomeButton = ({
   label = "Home",
   style = {},
 }: ITextNavButtonProps) => {
-  const router = useRouter();
+  const { routerPush } = useContext(AppContext);
 
   return (
     <TextNavButton
       label={label}
-      onClick={() => router.push("/")}
+      onClick={() => routerPush(PageRoute.HOME)}
       style={style}
     />
   );

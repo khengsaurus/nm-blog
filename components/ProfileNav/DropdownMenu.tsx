@@ -1,5 +1,4 @@
 import BoltIcon from "@mui/icons-material/Bolt";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import DynamicFeedIcon from "@mui/icons-material/DynamicFeed";
 import KeyIcon from "@mui/icons-material/Key";
@@ -43,17 +42,17 @@ function renderButton(label: string, fontSize = 16) {
 const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
   (props: IDropdownMenu, ref?: MutableRefObject<any>) => {
     const { handleClose } = props;
-    const { router, user, logout } = useContext(AppContext);
+    const { routerPush, user, logout } = useContext(AppContext);
     const [activeMenu, setActiveMenu] = useState("main");
     const [menuHeight, setMenuHeight] = useState(null);
     const dropdownRef = useRef(null);
 
     const handleNav = useCallback(
       (route: PageRoute) => {
-        router.push(route);
+        routerPush(route);
         handleClose();
       },
-      [handleClose, router]
+      [handleClose, routerPush]
     );
 
     useEffect(() => {
@@ -97,10 +96,7 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
     function renderProfileMenu() {
       return (
         <div className="menu">
-          <DropdownItem
-            callback={() => setActiveMenu("main")}
-            leftIcon={<ChevronLeftIcon />}
-          >
+          <DropdownItem callback={() => setActiveMenu("main")} hasBack>
             {renderButton("Profile", 18)}
           </DropdownItem>
           <DropdownItem
@@ -122,10 +118,7 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
     function renderThemeMenu() {
       return (
         <div className="menu">
-          <DropdownItem
-            callback={() => setActiveMenu("main")}
-            leftIcon={<ChevronLeftIcon />}
-          >
+          <DropdownItem callback={() => setActiveMenu("main")} hasBack>
             {renderButton("Themes", 18)}
           </DropdownItem>
           <DropdownItem leftIcon={<BoltIcon />}>

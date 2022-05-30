@@ -1,6 +1,6 @@
 import { Alert, Collapse } from "@mui/material";
 import { useCallback, useContext, useEffect, useState } from "react";
-import { Input, Row, StyledButton } from "../components";
+import { CenteredMain, Input, Row, StyledButton } from "../components";
 import {
   APIAction,
   DBService,
@@ -14,33 +14,34 @@ import { HTTPService } from "../lib/client";
 import { AlertStatus, IAlert, IUser } from "../types";
 
 const NewUser = () => {
-  const { router, user, handleUser, logout } = useContext(AppContext);
+  const { user, handleUser, logout, routerPush } = useContext(AppContext);
   const [username, setUsername] = useState("");
   const [alert, setAlert] = useState<IAlert>(null);
   const [toDeleteIfUnload, setToDeleteIfUnload] = useState(true);
 
   useEffect(() => {
     if (!user) {
-      router.push(PageRoute.LOGIN);
+      routerPush(PageRoute.LOGIN);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router, JSON.stringify(user)]);
+  }, [JSON.stringify(user), routerPush]);
 
   const cancelRegister = useCallback(() => {
     setAlert(null);
+    setToDeleteIfUnload(false);
     HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequest.DELETE, {
       user,
     })
       .then((res) => {
         if (res.status === 200) {
           logout();
-          router.push(PageRoute.LOGIN);
+          routerPush(PageRoute.LOGIN);
         } else {
           console.info(res);
         }
       })
       .catch((err) => console.error(err));
-  }, [logout, router, user]);
+  }, [user, logout, routerPush]);
 
   // If user ends session before setting username, delete records of email from DB to preserve email availability
   useEffect(() => {
@@ -53,7 +54,8 @@ const NewUser = () => {
     return () => {
       window.onbeforeunload = null;
     };
-  }, [cancelRegister, toDeleteIfUnload]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function registerUsername(
     email: string,
@@ -67,12 +69,13 @@ const NewUser = () => {
       action: APIAction.USER_SET_USERNAME,
     }).then((res) => {
       if (res.data?.token) {
+        setToDeleteIfUnload(false);
         handleUser(res.data.token, res.data.user);
         setAlert({
           status: Status.SUCCESS,
           message: "Successfully registered",
         });
-        setTimeout(() => router.push(PageRoute.HOME), 2000);
+        setTimeout(() => routerPush(PageRoute.HOME), 2000);
       } else {
         setAlert({ status: Status.ERROR, message: res.data?.message });
       }
@@ -81,7 +84,7 @@ const NewUser = () => {
   }
 
   return (
-    <main>
+    <CenteredMain>
       <Input
         label={"Username"}
         value={username}
@@ -106,7 +109,7 @@ const NewUser = () => {
       <Collapse in={!!alert} timeout={Transition.FAST} unmountOnExit>
         <Alert severity={alert?.status as AlertStatus}>{alert?.message}</Alert>
       </Collapse>
-    </main>
+    </CenteredMain>
   );
 };
 

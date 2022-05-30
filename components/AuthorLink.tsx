@@ -1,8 +1,10 @@
 import { Link } from "@mui/material";
+import { Row } from "components";
 import { PageRoute } from "enums";
 import { AppContext } from "hooks";
-import React, { useContext } from "react";
+import { useContext, useMemo } from "react";
 import { IUser } from "types";
+import { StyledText } from "./StyledMui";
 
 interface IAuthorLinkProps {
   author?: IUser;
@@ -10,25 +12,42 @@ interface IAuthorLinkProps {
 }
 
 const AuthorLink = ({ author, title = false }: IAuthorLinkProps) => {
-  const { user, router } = useContext(AppContext);
+  const { history, user, routerPush } = useContext(AppContext);
+  const label = `By ${author?.username}`;
 
   function handleClick(e: any) {
     e.preventDefault();
     e.stopPropagation();
-    router.push(
+    routerPush(
       author.username === user?.username
-        ? PageRoute.MY_PROFILE
+        ? PageRoute.MY_POSTS
         : `/${author.username}`
     );
   }
 
-  return (
+  const renderText = useMemo(() => {
+    return (
+      history.length > 0 &&
+      history[history.length - 1] === `/${author?.username}`
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [author?.username, JSON.stringify(history)]);
+
+  return renderText ? (
+    title ? (
+      <StyledText text={label} variant="h3" />
+    ) : (
+      <StyledText text={label} variant="body1" style={{ marginRight: 10 }} />
+    )
+  ) : title ? (
+    <Row>
+      <Link onClick={handleClick} underline="hover">
+        <h3>{label}</h3>
+      </Link>
+    </Row>
+  ) : (
     <Link onClick={handleClick} underline="hover">
-      {title ? (
-        <h3>{`By ${author?.username}`}</h3>
-      ) : (
-        <p className="author">{`By ${author?.username}`}</p>
-      )}
+      <p className="author">{label}</p>
     </Link>
   );
 };

@@ -6,6 +6,7 @@ import useFirstEffectAsync from "./useFirstEffectAsync";
 import useIsoEffect from "./useIsoEffect";
 import useLocalStorage from "./useLocalStorage";
 import usePaginatePosts from "./usePaginatePosts";
+import useWindowListener from "./useWindowListener";
 
 export {
   AppContext,
@@ -16,4 +17,5 @@ export {
   useIsoEffect,
   useLocalStorage,
   usePaginatePosts,
+  useWindowListener,
 };
