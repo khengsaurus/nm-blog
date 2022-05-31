@@ -15,7 +15,6 @@ const NavBar: React.FC = () => {
     <AppBar position="fixed">
       <Toolbar variant="dense">
         <IconButton
-          edge="start"
           aria-label="home"
           onClick={() => routerPush(PageRoute.HOME)}
         >

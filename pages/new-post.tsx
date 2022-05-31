@@ -16,12 +16,19 @@ import {
   CircleLoader,
   Column,
   Input,
+  MarkdownEditor,
+  MarkdownViewer,
   Row,
   StyledButton,
   StyledText,
 } from "../components";
 import { DBService, ErrorMessage, HttpRequest, Status } from "../enums";
-import { AppContext, useAsync } from "../hooks";
+import {
+  AppContext,
+  useAsync,
+  useDocumentListener,
+  useWindowListener,
+} from "../hooks";
 import { HTTPService } from "../lib/client";
 import { checkFileSize, checkFileType, checkOneFileSelected } from "../utils";
 
@@ -32,6 +39,8 @@ const NewPost = () => {
   const [body, setBody] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
   const [attachment, setAttachment] = useState<any>(null);
+  const [hasMarkdown, setHasMarkdown] = useState(false);
+  const editorRef = useRef(null);
   const hasEditedSlug = useRef(false);
 
   useEffect(() => {
@@ -99,6 +108,25 @@ const NewPost = () => {
     [title, slug, body, saveStatus]
   );
 
+  function renderEditAndPreview() {
+    return (
+      <Row>
+        <MarkdownEditor
+          value={body}
+          setValue={setBody}
+          fullWidth={!hasMarkdown}
+          ref={editorRef}
+        />
+        {hasMarkdown && (
+          <MarkdownViewer
+            text={body}
+            minHeight={editorRef?.current?.clientHeight}
+          />
+        )}
+      </Row>
+    );
+  }
+
   function renderAttachment() {
     const errHandler = (msg: string) => console.info(msg);
 
@@ -121,10 +149,11 @@ const NewPost = () => {
           component="label"
           style={{
             height: "40px",
-            width: "85px",
+            width: "120px",
             padding: "0px",
             justifyContent: "flex-start",
             textTransform: "capitalize",
+            marginLeft: 10,
           }}
         >
           Add image
@@ -132,7 +161,7 @@ const NewPost = () => {
         </Button>
         {!!attachment && (
           <Row style={{ justifyContent: "flex-end" }}>
-            <StyledText variant="subtitle2" text={attachment.name} />
+            <StyledText variant="body1" text={attachment.name} />
             <IconButton
               edge="end"
               aria-label="delete-image"
@@ -146,23 +175,32 @@ const NewPost = () => {
     );
   }
 
-  function renderPrivate() {
+  function renderButtons() {
     return (
-      <Row>
+      <>
         <Row style={{ justifyContent: "flex-start" }}>
-          <StyledText text="Private" variant="body2" />
           <Checkbox
             value={isPrivate}
             onChange={() => setIsPrivate(!isPrivate)}
             disableRipple
           />
+          <StyledText text="Private post" variant="body1" />
         </Row>
-        <StyledButton
-          label={saveButtonLabel}
-          disabled={saveDisabled}
-          onClick={handleSave}
-        />
-      </Row>
+        <div className="justify-start-last-end">
+          <Checkbox
+            value={hasMarkdown}
+            onChange={() => setHasMarkdown(!hasMarkdown)}
+            disableRipple
+          />
+          <StyledText text="Has markdown" variant="body1" />
+          <StyledButton
+            label={saveButtonLabel}
+            disabled={saveDisabled}
+            onClick={handleSave}
+            style={{ marginRight: -10 }}
+          />
+        </div>
+      </>
     );
   }
 
@@ -201,21 +239,10 @@ const NewPost = () => {
           onClick={() => (hasEditedSlug.current = true)}
           maxWidth
         />
-        <Input
-          label={"Body"}
-          value={body}
-          rows={5}
-          variant="outlined"
-          onChange={(e) => setBody(e.target.value)}
-          maxWidth
-          marginTop={20}
-          inputLabelProps={{
-            // shrink: true,
-            children: <div style={{ width: 30, height: 10 }}>Hello</div>,
-          }}
-        />
+        <br />
+        {renderEditAndPreview()}
         {renderAttachment()}
-        {renderPrivate()}
+        {renderButtons()}
       </Column>
     </main>
   );

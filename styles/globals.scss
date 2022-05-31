@@ -5,14 +5,18 @@
   flex-direction: $dir;
 }
 
+@mixin round-border {
+  border-radius: 4px;
+}
+
 $main-side-margin: clamp(20px, 4vw, 100px);
 $main-width: calc(100vw - (2 * $main-side-margin));
 $speed: 350ms;
 $main-bg: rgb(45, 60, 90);
+$white-main: rgb(195, 195, 195);
 $grey-dark: #242526;
 $grey-main: #484a4d;
 $grey-light: #525357;
-$border-radius-round: 8px;
 $big-button-dim: clamp(60px, 10vw, 85px);
 
 html {
@@ -165,12 +169,12 @@ p {
     transition: filter 300ms;
   }
   .dropdown {
+    @include round-border;
     position: absolute;
     top: 45px;
     right: $padding;
     background-color: $grey-dark;
     border: $border;
-    border-radius: $border-radius-round;
     padding: 4px;
     overflow: hidden;
     transition: height $speed;
@@ -180,9 +184,9 @@ p {
     a {
       &.menu-item {
         @include flex-(row);
+        @include round-border;
         height: 45px;
         align-items: center;
-        border-radius: $border-radius-round;
         transition: background $speed;
         padding: $padding;
         .right {
@@ -206,6 +210,16 @@ p {
   }
 }
 
+.markdown-viewer {
+  @include round-border;
+  position: relative;
+  background-color: $white-main;
+  height: 493px;
+  width: calc(50% - 6px);
+  padding-left: 5px;
+  overflow-y: scroll;
+}
+
 .post-edit-button {
   @include flex-(column);
   justify-content: center;
@@ -218,6 +232,17 @@ p {
   background-color: $grey-dark;
   &:hover {
     background-color: $grey-light;
+  }
+}
+
+.justify-start-last-end {
+  @include flex-(row);
+  align-items: center;
+  width: 100%;
+  justify-content: flex-start;
+  :last-child {
+    justify-self: flex-end;
+    margin-left: auto;
   }
 }
 

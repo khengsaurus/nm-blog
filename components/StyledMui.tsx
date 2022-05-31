@@ -56,7 +56,7 @@ export const StyledButton = ({
 
   return (
     <Button
-      style={{ color, padding, ...style }}
+      style={{ color, padding, textTransform: "capitalize", ...style }}
       sx={sx}
       size={size}
       variant={variant}

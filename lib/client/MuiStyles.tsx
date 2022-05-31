@@ -123,6 +123,7 @@ function newMuiTheme(darkMode: boolean) {
             color: mainText,
             primary: mainText,
             secondary: highlightColor,
+            fontSize: 16,
             "&:hover": {
               color: highlightColor,
             },
@@ -143,6 +144,7 @@ function newMuiTheme(darkMode: boolean) {
             primary: mainText,
             secondary: highlightColor,
             backgroundColor: "transparent !important",
+            fontSize: 16,
             "&:disabled": {
               color: "rgb(75, 75, 75) !important",
             },
@@ -240,7 +242,13 @@ function newMuiTheme(darkMode: boolean) {
       },
       MuiFormControlLabel: {
         styleOverrides: {
-          root: { margin: "0px" },
+          root: {
+            margin: "0px",
+            "&:hover": {
+              color: `${highlightColor} !important`,
+              cursor: "normal !important",
+            },
+          },
           labelPlacementStart: { marginLeft: "0px" },
         },
       },
@@ -252,7 +260,6 @@ function newMuiTheme(darkMode: boolean) {
             backgroundColor: "transparent !important",
             "&:hover": {
               color: highlightColor,
-              transition: "150ms !important",
             },
           },
         },
@@ -336,6 +343,9 @@ function newMuiTheme(darkMode: boolean) {
         styleOverrides: {
           root: {
             color: mainText,
+          },
+          body1: {
+            fontSize: 16,
           },
         },
       },
