@@ -20,12 +20,17 @@ const allowedAttributes = Object.assign(
 interface IMarkdownViewerProps {
   text: string;
   minHeight?: string | number;
+  hasMarkdown?: boolean;
 }
 
-const MarkdownViewer = ({ text, minHeight }: IMarkdownViewerProps) => {
+const MarkdownViewer = ({
+  text,
+  minHeight,
+  hasMarkdown,
+}: IMarkdownViewerProps) => {
   return (
     <div
-      className="markdown-viewer"
+      className={`markdown-viewer ${hasMarkdown ? "show" : ""}`}
       style={{ minHeight }}
       dangerouslySetInnerHTML={{
         __html: sanitizeHtml(marked(text), {

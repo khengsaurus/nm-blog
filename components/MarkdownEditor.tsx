@@ -23,7 +23,7 @@ const MarkdownEditor = forwardRef<MutableRefObject<any>, IMarkdownEditorProps>(
         variant="outlined"
         style={{
           width: `calc(${fullWidth ? "100%" : "50%"} - 6px)`,
-          transition: "300ms",
+          transition: "500ms",
         }}
         ref={ref}
       />

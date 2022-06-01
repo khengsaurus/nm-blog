@@ -79,6 +79,7 @@ const NewPost = () => {
           body,
           imageKey,
           isPrivate,
+          hasMarkdown,
         })
           .then((res) => resolve(res))
           .catch((err) => reject(err));
@@ -117,12 +118,11 @@ const NewPost = () => {
           fullWidth={!hasMarkdown}
           ref={editorRef}
         />
-        {hasMarkdown && (
-          <MarkdownViewer
-            text={body}
-            minHeight={editorRef?.current?.clientHeight}
-          />
-        )}
+        <MarkdownViewer
+          text={body}
+          minHeight={editorRef?.current?.clientHeight}
+          hasMarkdown={hasMarkdown}
+        />
       </Row>
     );
   }

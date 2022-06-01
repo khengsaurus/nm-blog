@@ -214,10 +214,14 @@ p {
   @include round-border;
   position: relative;
   background-color: $white-main;
-  height: 493px;
-  width: calc(50% - 6px);
-  padding-left: 5px;
   overflow-y: scroll;
+  transition: 500ms;
+  width: 0px;
+  padding-left: 0px;
+  &.show {
+    width: calc(50% - 6px);
+    padding-left: 5px;
+  }
 }
 
 .post-edit-button {

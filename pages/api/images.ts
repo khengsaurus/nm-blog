@@ -1,11 +1,11 @@
 import { HttpResponse } from "enums";
+import fs from "fs";
 import { getFileStream, uploadFile } from "lib/server/s3";
 import { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from "next-connect";
 import { upload } from "../../lib/middlewares";
 
 const route = nextConnect({
-  // Handle any other HTTP method
   onNoMatch(req: NextApiRequest, res: NextApiResponse) {
     res.status(405).json({ error: `Method '${req.method}' Not Allowed` });
   },
@@ -31,6 +31,10 @@ route.post("/*", upload.single("image"), async (req, res) => {
       }
     } catch (err) {
       res.status(500).send(err.message);
+    } finally {
+      fs.unlink(req.file.path, () =>
+        console.info("File unlinked: " + req.file.path)
+      );
     }
   } else {
     res.status(400).send(HttpResponse._400);

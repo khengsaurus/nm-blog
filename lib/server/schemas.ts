@@ -33,6 +33,7 @@ export const PostSchema = new Schema<IPost>({
   slug: SchemaTypes.String,
   body: SchemaTypes.String,
   isPrivate: SchemaTypes.Boolean,
+  hasMarkdown: SchemaTypes.Boolean,
   imageKey: SchemaTypes.String,
 });
 

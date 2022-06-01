@@ -53,6 +53,7 @@ export interface IPost extends IHasId, IHasTimestamps {
   slug: string;
   body: string;
   isPrivate: boolean;
+  hasMarkdown: boolean;
   imageKey: string;
 }
 
