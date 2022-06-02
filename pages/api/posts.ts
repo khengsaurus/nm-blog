@@ -45,7 +45,6 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
     if ((params.isPrivate as unknown as string) === "false") {
       query.isPrivate = false;
     }
-    console.log(query);
     await Post.find(query)
       .populate("user", "-createdAt -updatedAt -email -password -posts")
       .sort({ createdAt: -1 })

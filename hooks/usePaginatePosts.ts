@@ -1,3 +1,4 @@
+import { PAGINATE_LIMIT } from "consts";
 import { DBService, ServerInfo } from "enums";
 import { HTTPService } from "lib/client";
 import { isEmpty } from "lodash";
@@ -9,7 +10,7 @@ const usePaginatePosts = (
   publicPosts: boolean,
   initPosts?: IPost[],
   username?: string,
-  limit = 2
+  limit = PAGINATE_LIMIT
 ) => {
   const [posts, setPosts] = useState(initPosts || []);
   const [limitReached, setLimitReached] = useState(false);

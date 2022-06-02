@@ -1,3 +1,4 @@
+import { PAGINATE_LIMIT } from "consts";
 import React from "react";
 import { PostFeed, StyledButton, StyledCenterText } from "../components";
 import PostCard from "../components/PostCard";
@@ -10,8 +11,6 @@ interface IHomeProps {
   initPosts: IPost[];
   cursor: string;
 }
-
-const PAGINATE_LIMIT = 4;
 
 export async function getServerSideProps({ res }) {
   console.info("-> Home getServerSideProps()");

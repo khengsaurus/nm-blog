@@ -1,5 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:ital@0;1&display=swap");
 
+@mixin orientate-contents-($dir) {
+  align-items: $dir;
+  justify-content: $dir;
+}
+
 @mixin flex-($dir) {
   display: flex;
   flex-direction: $dir;
@@ -17,7 +22,8 @@ $white-main: rgb(195, 195, 195);
 $grey-dark: #242526;
 $grey-main: #484a4d;
 $grey-light: #525357;
-$big-button-dim: clamp(60px, 10vw, 85px);
+$big-button-dim: 80px;
+$medium-button-dim: 50px;
 
 html {
   font-family: "Roboto", sans-serif;
@@ -30,13 +36,11 @@ body {
 
 main {
   @include flex-(column);
-  align-items: center;
-  justify-content: center;
+  @include orientate-contents-(center);
   font-family: "Roboto", sans-serif;
   margin: 70px $main-side-margin;
   &.left {
-    align-items: flex-start;
-    justify-content: flex-start;
+    @include orientate-contents-(flex-start);
   }
   &.transparent {
     background-color: transparent;
@@ -119,7 +123,7 @@ p {
       margin: 5px 0px;
       font-size: 14px;
       display: -webkit-box;
-      -webkit-box-orient: vertical;
+      -webkit-box-orientate: vertical;
       overflow: hidden;
       text-overflow: ellipsis;
       &.short {
@@ -151,12 +155,12 @@ p {
     justify-content: flex-end;
   }
   .nav-item {
+    @include orientate-contents-(center);
     width: calc($nav-size * 0.8);
     display: flex;
-    align-items: center;
-    justify-content: center;
   }
   .icon-button {
+    @include orientate-contents-(center);
     $button-size: calc($nav-size * 0.5);
     width: $button-size;
     height: $button-size;
@@ -164,8 +168,6 @@ p {
     border-radius: 50%;
     padding: 5px;
     display: flex;
-    align-items: center;
-    justify-content: center;
     transition: filter 300ms;
   }
   .dropdown {
@@ -224,18 +226,44 @@ p {
   }
 }
 
-.post-edit-button {
+.post-edit-container {
+  @mixin delete-button {
+    @include flex-(column);
+    @include orientate-contents-(center);
+    height: $medium-button-dim;
+    width: $medium-button-dim;
+    border-top-left-radius: 50%;
+    border-bottom-left-radius: 50%;
+    background-color: $grey-dark;
+    position: fixed;
+    bottom: calc($medium-button-dim / 2);
+    transition: $speed;
+    z-index: 0;
+  }
   @include flex-(column);
-  justify-content: center;
+  @include orientate-contents-(center);
   position: fixed;
   bottom: 10px;
   right: 10px;
-  height: $big-button-dim;
-  width: $big-button-dim;
-  border-radius: 50%;
-  background-color: $grey-dark;
+  transition: $speed;
+  .post-edit-button {
+    @include flex-(column);
+    @include orientate-contents-(center);
+    height: $big-button-dim;
+    width: $big-button-dim;
+    border-radius: 50%;
+    background-color: $grey-dark;
+    z-index: 1;
+  }
+  .post-delete-button {
+    @include delete-button;
+    right: calc($medium-button-dim/2);
+  }
   &:hover {
-    background-color: $grey-light;
+    .post-delete-button {
+      @include delete-button;
+      right: 80px;
+    }
   }
 }
 

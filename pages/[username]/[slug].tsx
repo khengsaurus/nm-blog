@@ -1,9 +1,10 @@
+import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { IconButton } from "@mui/material";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { AuthorLink, PostBanner, StyledText } from "../../components";
 import { DBService } from "../../enums";
-import { useIsoEffect } from "../../hooks";
+import { AppContext, useIsoEffect } from "../../hooks";
 import { HTTPService, serverUrl } from "../../lib/client";
 import { mongoConnection } from "../../lib/server";
 import { IPost } from "../../types";
@@ -53,6 +54,7 @@ export async function getStaticPaths() {
 
 const Post = ({ post, username, slug }: IPostPage) => {
   const { user: author } = post;
+  const { user } = useContext(AppContext);
   const [realtimePost, setRealtimePost] = useState(post);
 
   useIsoEffect(() => {
@@ -64,7 +66,7 @@ const Post = ({ post, username, slug }: IPostPage) => {
     });
   }, [username, slug]);
 
-  const { user, title, body, imageKey } = realtimePost;
+  const { title, body, imageKey } = realtimePost;
 
   return (
     <>
@@ -83,11 +85,20 @@ const Post = ({ post, username, slug }: IPostPage) => {
           <StyledText text={body} variant="body1" />
         </section>
       </main>
-      <div className="post-edit-button">
-        <IconButton size="large" disableRipple>
-          <EditIcon style={{ width: 40, height: 40 }} />
-        </IconButton>
-      </div>
+      {user?.id === author?.id && (
+        <div className="post-edit-container">
+          <div className="post-edit-button">
+            <IconButton disableRipple>
+              <EditIcon style={{ width: 40, height: 40 }} color="primary" />
+            </IconButton>
+          </div>
+          <div className="post-delete-button">
+            <IconButton disableRipple>
+              <DeleteIcon style={{ width: 25, height: 25 }} color="primary" />
+            </IconButton>
+          </div>
+        </div>
+      )}
     </>
   );
 };

@@ -386,6 +386,16 @@ function newMuiTheme(darkMode: boolean) {
           },
         },
       },
+      MuiSvgIcon: {
+        styleOverrides: {
+          root: {
+            color: mainText,
+            "&:hover": {
+              color: highlightColor,
+            },
+          },
+        },
+      },
       MuiTab: {
         styleOverrides: {
           root: {

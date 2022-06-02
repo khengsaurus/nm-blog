@@ -1,12 +1,11 @@
 import { PostFeed, StyledButton, StyledCenterText } from "components";
 import PostCard from "components/PostCard";
+import { PAGINATE_LIMIT } from "consts";
 import { usePaginatePosts } from "hooks";
 import { mongoConnection } from "lib/server";
 import React from "react";
 import { IUser } from "types";
 import { postDocToObj, userDocToObj } from "../../utils";
-
-const PAGINATE_LIMIT = 4;
 
 interface IUserPageProps {
   visitingUser: IUser;
