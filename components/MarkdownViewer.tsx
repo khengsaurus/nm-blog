@@ -19,19 +19,19 @@ const allowedAttributes = Object.assign(
 
 interface IMarkdownViewerProps {
   text: string;
-  minHeight?: string | number;
+  height?: string | number;
   hasMarkdown?: boolean;
 }
 
 const MarkdownViewer = ({
   text,
-  minHeight,
+  height,
   hasMarkdown,
 }: IMarkdownViewerProps) => {
   return (
     <div
       className={`markdown-viewer ${hasMarkdown ? "show" : ""}`}
-      style={{ minHeight }}
+      style={{ height }}
       dangerouslySetInnerHTML={{
         __html: sanitizeHtml(marked(text), {
           allowedTags,

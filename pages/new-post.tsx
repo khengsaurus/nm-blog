@@ -111,7 +111,7 @@ const NewPost = () => {
 
   function renderEditAndPreview() {
     return (
-      <Row>
+      <Row style={{ alignItems: "flex-start" }}>
         <MarkdownEditor
           value={body}
           setValue={setBody}
@@ -119,9 +119,9 @@ const NewPost = () => {
           ref={editorRef}
         />
         <MarkdownViewer
-          text={body}
-          minHeight={editorRef?.current?.clientHeight}
+          text={hasMarkdown ? body : ""}
           hasMarkdown={hasMarkdown}
+          height={editorRef?.current?.clientHeight}
         />
       </Row>
     );

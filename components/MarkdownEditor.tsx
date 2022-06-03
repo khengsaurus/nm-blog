@@ -12,6 +12,7 @@ interface IMarkdownEditorProps {
 const MarkdownEditor = forwardRef<MutableRefObject<any>, IMarkdownEditorProps>(
   (props: IMarkdownEditorProps, ref?: MutableRefObject<any>) => {
     const { value, setValue, fullWidth, rows = 20, label = "Body" } = props;
+
     return (
       <TextField
         value={value}
@@ -23,7 +24,7 @@ const MarkdownEditor = forwardRef<MutableRefObject<any>, IMarkdownEditorProps>(
         variant="outlined"
         style={{
           width: `calc(${fullWidth ? "100%" : "50%"} - 6px)`,
-          transition: "500ms",
+          transition: "400ms",
         }}
         ref={ref}
       />
