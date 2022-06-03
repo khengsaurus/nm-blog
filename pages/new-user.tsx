@@ -46,9 +46,7 @@ const NewUser = () => {
   // If user ends session before setting username, delete records of email from DB to preserve email availability
   useEffect(() => {
     window.onbeforeunload = () => {
-      if (toDeleteIfUnload) {
-        cancelRegister();
-      }
+      if (toDeleteIfUnload) cancelRegister();
     };
 
     return () => {
@@ -57,13 +55,8 @@ const NewUser = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function registerUsername(
-    email: string,
-    username: string,
-    user: IUser,
-    callback?: () => void
-  ) {
-    HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequest.PUT, {
+  function registerUsername(email: string, username: string) {
+    HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequest.PATCH, {
       email,
       username,
       action: APIAction.USER_SET_USERNAME,
@@ -79,7 +72,6 @@ const NewUser = () => {
       } else {
         setAlert({ status: Status.ERROR, message: res.data?.message });
       }
-      !!callback && callback();
     });
   }
 
@@ -101,7 +93,7 @@ const NewUser = () => {
               autoFocus
               type="submit"
               disabled={username.trim() === ""}
-              onClick={() => registerUsername(user?.email, username, user)}
+              onClick={() => registerUsername(user?.email, username)}
             />
           </>
         )}

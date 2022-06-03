@@ -24,8 +24,8 @@ export default async function handler(
       return handleGet(req, res);
     case HttpRequest.POST:
       return handlePost(req, res);
-    case HttpRequest.PUT:
-      return handleRequest(req, res, updateDoc);
+    case HttpRequest.PATCH:
+      return handleRequest(req, res, patchDoc);
     case HttpRequest.DELETE:
       return handleRequest(req, res, deleteDoc);
     default:
@@ -203,7 +203,7 @@ async function handleTokenLogin(
   });
 }
 
-async function updateDoc(req: NextApiRequest): Promise<IResponse> {
+async function patchDoc(req: NextApiRequest): Promise<IResponse> {
   const reqBody: Partial<IUserReq> = req.body;
   return new Promise(async (resolve, reject) => {
     try {

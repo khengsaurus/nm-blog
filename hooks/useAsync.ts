@@ -23,10 +23,10 @@ function useAsync<T, E extends Error>(
     setValue(defaultValue || null);
     setError(null);
     return asyncFunction()
-      .then((response: T) => {
-        if (isSuccess(response)) {
+      .then((res: T) => {
+        if (isSuccess(res)) {
           setStatus(Status.SUCCESS);
-          setValue(response);
+          setValue(res);
           !!cleanup && cleanup();
         } else {
           setStatus(Status.ERROR);

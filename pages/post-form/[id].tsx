@@ -33,7 +33,6 @@ export async function getServerSideProps({ params }) {
 const EditPost = ({ id }: IPostPage) => {
   const { user } = useContext(AppContext);
   const existingPost = useRealtimePost({ id, user });
-  const isNewPost = id === "new";
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [body, setBody] = useState("");
@@ -42,6 +41,7 @@ const EditPost = ({ id }: IPostPage) => {
   const [_imageName, setImageName] = useState("");
   const [hasMarkdown, setHasMarkdown] = useState(false);
   const hasEditedSlug = useRef(false);
+  const isNewPost = id === "new";
 
   useEffect(() => {
     if (!hasEditedSlug.current) {
@@ -63,9 +63,9 @@ const EditPost = ({ id }: IPostPage) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isNewPost, existingPost]);
 
-  const _handleSaveNew = useCallback(() => {
+  const _handlePost = useCallback(() => {
     return new Promise(async (resolve, reject) => {
-      if (!!user.posts?.find((post) => post.slug === slug)) {
+      if (!!user?.posts?.find((post) => post.slug === slug)) {
         reject(new Error(ErrorMessage.POST_SLUG_USED));
         return;
       }
@@ -86,9 +86,9 @@ const EditPost = ({ id }: IPostPage) => {
           slug,
           body,
           imageKey,
+          imageName: newImage?.name || "",
           isPrivate,
           hasMarkdown,
-          imageName: newImage?.name || "",
         })
           .then((res) => resolve(res))
           .catch((err) => reject(err));
@@ -97,27 +97,55 @@ const EditPost = ({ id }: IPostPage) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newImage, body, slug, title, JSON.stringify(user)]);
 
-  const imageAltered = useMemo(() => {
-    return !!newImage || _imageName !== existingPost?.imageName;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [!!newImage, _imageName, existingPost?.imageName]);
-
-  const _handleSave = useCallback(() => {
-    if (imageAltered) {
-      deleteImage(existingPost?.imageKey);
-    }
-    /**
-     * Image changes:
-     * Delete old image
-     * Update new image
-     */
-    /**
-     * Post changes:
-     * Patch doc
-     */
-    return Promise.resolve(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [imageAltered]);
+  async function _handlePatch() {
+    return new Promise(async (resolve, reject) => {
+      if (!!user?.posts?.find((post) => post.id !== id && post.slug === slug)) {
+        reject(new Error(ErrorMessage.POST_SLUG_USED));
+        return;
+      }
+      let imageError = false,
+        imageKey = existingPost?.imageKey || "",
+        imageName = existingPost?.imageName || "";
+      if (!!newImage || _imageName !== imageName) {
+        await deleteImage(imageKey)
+          .then(() => {
+            imageKey = "";
+            imageName = "";
+          })
+          .catch((err) => {
+            imageError = true;
+            reject(err);
+            return;
+          });
+      }
+      if (!!newImage) {
+        await uploadImage(newImage)
+          .then((_imageKey) => {
+            imageKey = _imageKey;
+            imageName = newImage.name;
+          })
+          .catch((err) => {
+            imageError = true;
+            reject(err);
+            return;
+          });
+      }
+      if (!imageError) {
+        await HTTPService.makeAuthHttpReq(DBService.POSTS, HttpRequest.PATCH, {
+          id,
+          title,
+          slug,
+          body,
+          imageKey,
+          imageName,
+          isPrivate,
+          hasMarkdown,
+        })
+          .then((res) => resolve(res))
+          .catch((err) => reject(err));
+      }
+    });
+  }
 
   const _cleanup = useCallback(() => {
     setTitle("");
@@ -130,7 +158,7 @@ const EditPost = ({ id }: IPostPage) => {
     IResponse,
     ServerError
   >(
-    isNewPost ? _handleSaveNew : _handleSave,
+    isNewPost ? _handlePost : _handlePatch,
     isNewPost ? _cleanup : null,
     (r: IResponse) => r.status === 200,
     false

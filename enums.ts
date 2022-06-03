@@ -9,6 +9,7 @@ export enum HttpRequest {
   GET = "GET",
   POST = "POST",
   PUT = "PUT",
+  PATCH = "PATCH",
 }
 
 export enum PageRoute {

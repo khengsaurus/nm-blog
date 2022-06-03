@@ -48,8 +48,8 @@ class ClientHTTPService {
           { ...bodyOrParams, userId: this.userId },
           reqConfig
         );
-      case HttpRequest.PUT:
-        return this.instance.put(
+      case HttpRequest.PATCH:
+        return this.instance.patch(
           `/api/${service}`,
           { ...bodyOrParams, userId: this.userId },
           reqConfig

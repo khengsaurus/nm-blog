@@ -20,8 +20,8 @@ export default async function handler(
       return handleGet(req, res);
     case HttpRequest.POST:
       return handleRequest(req, res, createDoc);
-    case HttpRequest.PUT:
-      return handleRequest(req, res, updateDoc);
+    case HttpRequest.PATCH:
+      return handleRequest(req, res, patchDoc);
     case HttpRequest.DELETE:
       return handleRequest(req, res, deleteDoc);
     default:
@@ -143,27 +143,25 @@ async function createDoc(req: NextApiRequest): Promise<IResponse> {
   });
 }
 
-async function updateDoc(req: Partial<IPostReq>): Promise<IResponse> {
+async function patchDoc(req: NextApiRequest): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     try {
+      const { userId, id, ..._set } = req.body as Partial<IPostReq>;
       const { Post } = await mongoConnection();
-      const { userId, id, slug } = req;
-      // TODO: slug !== post[id].slug -> changing slug, check if slug is avail
-      await Post.updateOne(
-        { user: userId, _id: id },
-        { $set: req },
-        (err, _res) => {
-          if (err) {
-            reject(new ServerError(500, err?.message));
-          } else {
-            resolve({
-              status: 200,
-              message: ServerInfo.POST_UPDATED,
-              data: { ..._res },
-            });
-          }
-        }
-      );
+      const post = await Post.findById(id);
+      for (const key of Object.keys(_set)) {
+        post[key] = _set[key];
+      }
+      await post
+        .save()
+        .then((postData) => {
+          resolve({
+            status: 200,
+            message: ServerInfo.POST_UPDATED,
+            data: postData,
+          });
+        })
+        .catch((err) => reject(new ServerError(500, err.message)));
     } catch (err) {
       reject(new ServerError(500, err?.message));
     }
