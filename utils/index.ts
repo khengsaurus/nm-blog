@@ -42,7 +42,7 @@ export function checkOneFileSelected(
   let files = event.target.files;
   if (files.length !== 1) {
     event.target.value = null;
-    errorHandler(ErrorMessage.ONE_FILE_ONLY);
+    errorHandler(ErrorMessage.ONE_IMAGE_ONLY);
     return false;
   }
   return true;

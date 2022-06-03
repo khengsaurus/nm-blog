@@ -63,6 +63,7 @@ export enum ServerInfo {
   POST_SLUGS_RETRIEVED = "Post slugs retrieved",
   POST_NA = "No post(s) found",
 
+  FILE_DELETED = "File deleted",
   REQUEST_FAILED = "Server request failed",
 }
 
@@ -70,9 +71,10 @@ export enum ErrorMessage {
   POST_SLUG_USED = "Slug already used",
   TRY_AGAIN = "Please try again",
   PW_NOT_MATCHING = "Passwords do not match",
-  ONE_FILE_ONLY = "Only 1 file can be uploaded",
-  FILE_UPLOAD_FAIL = "Failed to upload file",
-  FILE_DOWNLOAD_FAIL = "Failed to download file",
+  ONE_IMAGE_ONLY = "Only 1 image can be uploaded",
+  IMAGE_DELETE_FAIL = "Failed to delete image",
+  IMAGE_UPLOAD_FAIL = "Failed to upload image",
+  IMAGE_DOWNLOAD_FAIL = "Failed to download image",
 }
 
 export enum APIAction {

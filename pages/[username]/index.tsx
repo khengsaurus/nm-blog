@@ -32,7 +32,7 @@ export async function getServerSideProps({ params, res }) {
     .lean()
     .then((posts) => {
       const _posts = posts.map((post) => postDocToObj(post));
-      user.posts = _posts;
+      if (user) user.posts = _posts;
     });
 
   return { props: { visitingUser: user } };

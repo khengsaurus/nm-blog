@@ -32,7 +32,7 @@ export function decodeToken<T>(req: NextApiRequest) {
  */
 export async function validateAuth(req: NextApiRequest): Promise<boolean> {
   return new Promise((resolve, reject) => {
-    const { userId = "" } = req.body;
+    const userId = req.body?.userId || req.query?.userId;
     let token: any = req.headers?.authorization || "Bearer ";
     token = token.split("Bearer ")[1];
     if (!token) {

@@ -1,7 +1,7 @@
-import { HttpResponse } from "enums";
 import fs from "fs";
-import { upload } from "lib/middlewares";
-import { getFileStream, uploadFile } from "lib/server/s3";
+import { handleRequest, upload } from "lib/middlewares";
+import { ServerError } from "lib/server";
+import { deleteFile, getFileStream, uploadFile } from "lib/server/s3";
 import { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from "next-connect";
 
@@ -19,26 +19,12 @@ route.get("/*", (req, res) => {
   }
 });
 
-route.post("/*", upload.single("image"), async (req, res) => {
-  if (!!req.file) {
-    try {
-      const uploadRes = await uploadFile(req.file);
-      if (!!uploadRes.Location && !!uploadRes.Key) {
-        res.status(200).json({
-          location: uploadRes.Location,
-          key: uploadRes.Key,
-        });
-      }
-    } catch (err) {
-      res.status(500).send(err.message);
-    } finally {
-      fs.unlink(req.file.path, () =>
-        console.info("File unlinked: " + req.file.path)
-      );
-    }
-  } else {
-    res.status(400).send(HttpResponse._400);
-  }
+route.post("/*", upload.single("image"), async (req, res) =>
+  handleRequest(req, res, uploadImage)
+);
+
+route.delete("/*", async (req, res) => {
+  handleRequest(req, res, deleteImage);
 });
 
 export default route;
@@ -48,3 +34,40 @@ export const config = {
     bodyParser: false, // Disallow body parsing, consume as stream
   },
 };
+
+async function uploadImage(req) {
+  return new Promise(async (resolve, reject) => {
+    if (!!req.file) {
+      try {
+        const uploadRes = await uploadFile(req.file);
+        if (!!uploadRes.Location && !!uploadRes.Key) {
+          resolve({
+            status: 200,
+            data: {
+              location: uploadRes.Location,
+              key: uploadRes.Key,
+            },
+          });
+        }
+      } catch (err) {
+        reject(new ServerError(500, err.message));
+      } finally {
+        fs.unlink(req.file.path, () =>
+          console.info("File unlinked: " + req.file.path)
+        );
+      }
+    } else {
+      reject(new ServerError(400));
+    }
+  });
+}
+
+async function deleteImage(req) {
+  return new Promise(async (resolve, reject) => {
+    const { imageKey } = req.query;
+    if (!imageKey) reject(new ServerError(400));
+    await deleteFile(imageKey)
+      .then((res) => resolve(res))
+      .catch((err) => reject(err));
+  });
+}

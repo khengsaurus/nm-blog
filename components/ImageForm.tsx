@@ -2,24 +2,22 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import { Row, StyledText } from "components";
-import { useEffect, useState } from "react";
 import { checkFileSize, checkFileType, checkOneFileSelected } from "utils";
 
-interface IAttachmentForm {
-  attachment: any;
-  setAttachment: (attachment: any) => void;
+interface IImageForm {
+  newImage: any;
+  setNewImage: (image: any) => void;
   imageName?: string;
+  setImageName?: (imageName: string) => void;
 }
 
-const AttachmentForm = ({
-  attachment,
-  setAttachment,
+const ImageForm = ({
+  newImage,
+  setNewImage,
   imageName,
-}: IAttachmentForm) => {
-  const [_imageName, setImageName] = useState("");
+  setImageName,
+}: IImageForm) => {
   const errHandler = (msg: string) => console.info(msg);
-
-  useEffect(() => setImageName(imageName), [imageName]); // useState(imageName) being funny
 
   async function handleAttachment(event: React.ChangeEvent<HTMLInputElement>) {
     if (
@@ -28,7 +26,7 @@ const AttachmentForm = ({
       checkFileType(event, errHandler)
     ) {
       const file = event.target.files[0];
-      setAttachment(file);
+      setNewImage(file);
       setImageName(file.name);
     }
   }
@@ -50,15 +48,15 @@ const AttachmentForm = ({
         Add image
         <input type="file" hidden onChange={handleAttachment} />
       </Button>
-      {(!!attachment || _imageName) && (
+      {(!!newImage || imageName) && (
         <Row style={{ justifyContent: "flex-end" }}>
-          <StyledText variant="body1" text={attachment?.name || imageName} />
+          <StyledText variant="body1" text={newImage?.name || imageName} />
           <IconButton
             edge="end"
             aria-label="delete-image"
             onClick={() => {
               setImageName("");
-              setAttachment(null);
+              setNewImage(null);
             }}
           >
             <DeleteIcon />
@@ -69,4 +67,4 @@ const AttachmentForm = ({
   );
 };
 
-export default AttachmentForm;
+export default ImageForm;

@@ -23,7 +23,7 @@ const NavBar: React.FC = () => {
         {userSessionActive && (
           <IconButton
             aria-label="new-item"
-            onClick={() => routerPush(PageRoute.POST_FORM)}
+            onClick={() => routerPush(PageRoute.POST_FORM + "/new")}
           >
             <AddIcon />
           </IconButton>

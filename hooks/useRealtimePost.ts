@@ -10,18 +10,22 @@ const useRealtimePost = (post: Partial<IPost>) => {
   const [realtimePost, setRealtimePost] = useState(post);
 
   useIsoEffect(() => {
-    HTTPService.makeGetReq(DBService.POSTS, { id, slug, username }).then(
-      (res) => {
-        if (res.status === 200 && res.data?.post?._id) {
-          const updatedPost = {
-            ...postDocToObj(res.data.post),
-            user,
-          } as IPost;
-          setRealtimePost(updatedPost);
+    if (id == "new") {
+      setRealtimePost(null);
+    } else {
+      HTTPService.makeGetReq(DBService.POSTS, { id, slug, username }).then(
+        (res) => {
+          if (res.status === 200 && res.data?.post?._id) {
+            const updatedPost = {
+              ...postDocToObj(res.data.post),
+              user,
+            } as IPost;
+            setRealtimePost(updatedPost);
+          }
         }
-      }
-    );
-  }, [username, slug]);
+      );
+    }
+  }, [id, slug, username]);
 
   return realtimePost;
 };

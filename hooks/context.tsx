@@ -1,6 +1,5 @@
 import { PageRoute, Status } from "enums";
-import { HTTPService } from "lib/client";
-import { getPostSlugs } from "lib/client/backgroundTasks";
+import { getPostSlugs, HTTPService } from "lib/client";
 import { useRouter } from "next/router";
 import { createContext, useCallback, useEffect, useRef, useState } from "react";
 import { IAppContext, IUser } from "types";

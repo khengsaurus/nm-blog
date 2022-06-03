@@ -25,8 +25,7 @@ class ClientHTTPService {
   makeAuthHttpReq(
     service: DBService,
     method: HttpRequest,
-    body?: object,
-    getParams?: object,
+    bodyOrParams?: object,
     config?: AxiosRequestConfig<any>
   ) {
     const reqConfig = {
@@ -41,24 +40,24 @@ class ClientHTTPService {
     switch (method) {
       case HttpRequest.GET:
         return this.instance.get(`/api/${service}`, {
-          params: getParams,
+          params: bodyOrParams,
         });
       case HttpRequest.POST:
         return this.instance.post(
           `/api/${service}`,
-          { ...body, userId: this.userId },
+          { ...bodyOrParams, userId: this.userId },
           reqConfig
         );
       case HttpRequest.PUT:
         return this.instance.put(
           `/api/${service}`,
-          { ...body, userId: this.userId },
+          { ...bodyOrParams, userId: this.userId },
           reqConfig
         );
       case HttpRequest.DELETE:
         return this.instance.delete(`/api/${service}`, {
           ...reqConfig,
-          data: { ...body, userId: this.userId },
+          params: { ...bodyOrParams, userId: this.userId },
         });
       default:
         return null;
@@ -68,7 +67,7 @@ class ClientHTTPService {
   /**
    * Current flow is to have this called twice on app mount:
    * -> first time to set bearer token
-   * -> handleTokenLogin to retrieve useId
+   * -> handleTokenLogin to retrieve userId
    * -> second time to set userId
    */
   setBearer(token: string, userId: string) {
@@ -90,12 +89,18 @@ class ClientHTTPService {
   uploadImage = async (image: any): Promise<IResponse | null> => {
     const formData = new FormData();
     formData.append("image", image);
-    formData.append("user-id", this.userId);
+    formData.append("userId", this.userId);
     return this.instance.post(`/api/${DBService.IMAGES}`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${this.bearerToken}`,
       },
+    });
+  };
+
+  deleteImage = async (imageKey: string): Promise<IResponse> => {
+    return this.makeAuthHttpReq(DBService.IMAGES, HttpRequest.DELETE, {
+      imageKey,
     });
   };
 }

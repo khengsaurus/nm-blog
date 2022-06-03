@@ -1,13 +1,15 @@
 import {
-  AttachmentForm,
   CircleLoader,
   Column,
-  EditPreviewMarkdown,
   EditPostButtons,
+  EditPreviewMarkdown,
+  ImageForm,
   Input,
 } from "components";
-import { Status } from "enums";
+import { DBService, ErrorMessage, HttpRequest, Status } from "enums";
 import { AppContext, useAsync, useRealtimePost } from "hooks";
+import { HTTPService, uploadImage } from "lib/client";
+import { deleteImage } from "lib/client/tasks";
 import { ServerError } from "lib/server";
 import {
   useCallback,
@@ -30,25 +32,80 @@ export async function getServerSideProps({ params }) {
 
 const EditPost = ({ id }: IPostPage) => {
   const { user } = useContext(AppContext);
-  const post = useRealtimePost({ id, user });
+  const existingPost = useRealtimePost({ id, user });
+  const isNewPost = id === "new";
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [body, setBody] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
-  const [attachment, setAttachment] = useState<any>(null);
+  const [newImage, setNewImage] = useState<any>(null);
+  const [_imageName, setImageName] = useState("");
   const [hasMarkdown, setHasMarkdown] = useState(false);
   const hasEditedSlug = useRef(false);
 
   useEffect(() => {
-    const { title, slug, body, isPrivate, hasMarkdown } = post;
-    setTitle(title);
-    setSlug(slug);
-    setBody(body);
-    setIsPrivate(isPrivate);
-    setHasMarkdown(hasMarkdown);
-  }, [post]);
+    if (!hasEditedSlug.current) {
+      setSlug(title?.toLocaleLowerCase().replaceAll(" ", "-"));
+    }
+  }, [title]);
+
+  useEffect(() => {
+    if (!isNewPost) {
+      const { title, slug, body, imageName, isPrivate, hasMarkdown } =
+        existingPost || {};
+      setTitle(title);
+      setSlug(slug);
+      setBody(body);
+      setImageName(imageName);
+      setIsPrivate(isPrivate);
+      setHasMarkdown(hasMarkdown);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isNewPost, existingPost]);
+
+  const _handleSaveNew = useCallback(() => {
+    return new Promise(async (resolve, reject) => {
+      if (!!user.posts?.find((post) => post.slug === slug)) {
+        reject(new Error(ErrorMessage.POST_SLUG_USED));
+        return;
+      }
+      const hasAttachment = !!newImage;
+      let imageKey = "";
+      if (hasAttachment) {
+        await uploadImage(newImage)
+          .then((_imageKey) => {
+            imageKey = _imageKey;
+          })
+          .catch((err) => reject(err));
+      }
+      // no newImage or newImage saved
+      if (!hasAttachment || !!imageKey) {
+        HTTPService.makeAuthHttpReq(DBService.POSTS, HttpRequest.POST, {
+          username: user.username,
+          title,
+          slug,
+          body,
+          imageKey,
+          isPrivate,
+          hasMarkdown,
+          imageName: newImage?.name || "",
+        })
+          .then((res) => resolve(res))
+          .catch((err) => reject(err));
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [newImage, body, slug, title, JSON.stringify(user)]);
+
+  const imageAltered = useMemo(() => {
+    return !!newImage || _imageName !== existingPost?.imageName;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [!!newImage, _imageName, existingPost?.imageName]);
 
   const _handleSave = useCallback(() => {
+    if (imageAltered) {
+      deleteImage(existingPost?.imageKey);
+    }
     /**
      * Image changes:
      * Delete old image
@@ -58,14 +115,26 @@ const EditPost = ({ id }: IPostPage) => {
      * Post changes:
      * Patch doc
      */
-    return null;
+    return Promise.resolve(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [attachment, body, slug, title, JSON.stringify(user)]);
+  }, [imageAltered]);
+
+  const _cleanup = useCallback(() => {
+    setTitle("");
+    setSlug("");
+    setBody("");
+    setNewImage(null);
+  }, []);
 
   const { execute: handleSave, status: saveStatus } = useAsync<
     IResponse,
     ServerError
-  >(_handleSave, null, (r: IResponse) => r.status === 200, false);
+  >(
+    isNewPost ? _handleSaveNew : _handleSave,
+    isNewPost ? _cleanup : null,
+    (r: IResponse) => r.status === 200,
+    false
+  );
 
   const saveDisabled = useMemo(
     () =>
@@ -117,10 +186,11 @@ const EditPost = ({ id }: IPostPage) => {
           hasMarkdown={hasMarkdown}
           setBody={setBody}
         />
-        <AttachmentForm
-          attachment={attachment}
-          setAttachment={setAttachment}
-          imageName={post?.imageName}
+        <ImageForm
+          newImage={newImage}
+          setNewImage={setNewImage}
+          imageName={_imageName}
+          setImageName={setImageName}
         />
         <EditPostButtons
           isPrivate={isPrivate}

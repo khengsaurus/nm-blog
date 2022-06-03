@@ -10,6 +10,15 @@ module.exports = {
   images: {
     domains: ["images.unsplash.com", "localhost", "localhost:3000"],
   },
+  async redirects() {
+    return [
+      {
+        source: "/post-form",
+        destination: "/post-form/new",
+        permanent: true,
+      },
+    ];
+  },
   experimental: {
     runtime: "nodejs",
     serverComponents: true,

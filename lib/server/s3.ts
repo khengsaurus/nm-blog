@@ -1,4 +1,5 @@
 import S3 from "aws-sdk/clients/s3";
+import { ServerInfo } from "enums";
 import fs from "fs";
 
 const bucketName = process.env.AWS_BUCKET;
@@ -24,4 +25,18 @@ export function uploadFile(file) {
     Key: file.filename,
   };
   return s3.upload(uploadParams).promise();
+}
+
+export function deleteFile(imageKey: string) {
+  return new Promise((resolve, reject) => {
+    s3.deleteObject({ Bucket: bucketName, Key: imageKey }, function (err, _) {
+      if (err) reject(err);
+      else {
+        resolve({
+          status: 200,
+          message: ServerInfo.FILE_DELETED,
+        });
+      }
+    });
+  });
 }
