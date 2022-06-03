@@ -1,7 +1,7 @@
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { TransitionSpeed } from "enums";
+import { AppContext } from "hooks";
 import { useContext, useMemo } from "react";
-import { TransitionSpeed } from "../../enums";
-import { AppContext } from "../../hooks";
 
 export const HomeTheme = (props: any) => {
   const { darkMode } = useContext(AppContext);

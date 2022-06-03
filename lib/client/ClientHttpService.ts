@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import { APIAction, DBService, HttpRequest } from "enums";
 import { IResponse } from "types";
-import { APIAction, DBService, HttpRequest } from "../../enums";
 
 export const serverUrl =
   process.env.NODE_ENV === "development"

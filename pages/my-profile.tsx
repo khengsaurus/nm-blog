@@ -1,7 +1,7 @@
 import { Centered, CircleLoader, StyledText } from "components";
 import { AppContext } from "hooks";
 import Image from "next/image";
-import React, { useContext } from "react";
+import { useContext } from "react";
 
 const MyProfile = () => {
   const { user } = useContext(AppContext);

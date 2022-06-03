@@ -8,7 +8,7 @@ import {
 import PostCard from "components/PostCard";
 import { AppContext } from "hooks";
 import usePaginatePosts from "hooks/usePaginatePosts";
-import React, { useContext } from "react";
+import { useContext } from "react";
 
 const MyPosts = () => {
   const { user } = useContext(AppContext);
@@ -36,7 +36,7 @@ const MyPosts = () => {
             ))}
           </PostFeed>
           {posts.length < user?.posts.length && (
-            <StyledButton label={"Load more"} onClick={loadMore} />
+            <StyledButton label="Load more" onClick={loadMore} />
           )}
         </>
       ) : (

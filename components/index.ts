@@ -21,10 +21,16 @@ import {
   StyledText,
   TextNavButton,
 } from "./StyledMui";
+import AttachmentForm from "./AttachmentForm";
+import EditPreviewMarkdown from "./EditPreviewMarkdown";
+import EditPostButtons from "./EditPostButtons";
 
 export {
+  AttachmentForm,
   AuthorLink,
   CircleLoader,
+  EditPreviewMarkdown,
+  EditPostButtons,
   HomeButton,
   Input,
   Layout,

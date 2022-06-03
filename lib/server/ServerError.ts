@@ -1,4 +1,4 @@
-import { HttpResponse } from "../../enums";
+import { HttpResponse } from "enums";
 
 class ServerError extends Error {
   status: number;

@@ -1,5 +1,5 @@
 import { IPost } from "types";
-import { ErrorMessage } from "../enums";
+import { ErrorMessage } from "enums";
 
 const maxFileSizeMB = 2;
 
@@ -10,12 +10,10 @@ export function isDev() {
 export function postDocToObj(data: any) {
   if (data === null) return data;
   const { _id, user, createdAt, updatedAt, ...post } = data;
-  if (_id) {
-    post.id = _id.toString();
-    post.createdAt = createdAt?.toString();
-    post.updatedAt = updatedAt?.toString();
-  }
-  if (user) {
+  post.id = _id?.toString();
+  post.createdAt = createdAt?.toString();
+  post.updatedAt = updatedAt?.toString();
+  if (user?._id) {
     const { _id, updatedAt, createdAt, ..._user } = user;
     _user.id = _id.toString();
     post.user = _user;

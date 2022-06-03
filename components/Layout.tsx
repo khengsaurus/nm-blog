@@ -1,12 +1,12 @@
 import { useMemo, ReactNode, useContext, useEffect } from "react";
 import { NavBar } from ".";
-import { PageRoute } from "../enums";
-import { AppContext } from "../hooks";
+import { PageRoute } from "enums";
+import { AppContext } from "hooks";
 
 const authRoutes: string[] = [
   PageRoute.MY_POSTS,
   PageRoute.MY_PROFILE,
-  PageRoute.NEWPOST,
+  PageRoute.POST_FORM,
 ];
 
 interface ILayoutProps {

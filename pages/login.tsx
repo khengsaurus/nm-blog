@@ -1,6 +1,5 @@
 import { Alert, Collapse } from "@mui/material";
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { CenteredMain, Input, StyledButton } from "../components";
+import { CenteredMain, Input, StyledButton } from "components";
 import {
   APIAction,
   DBService,
@@ -8,11 +7,12 @@ import {
   HttpRequest,
   PageRoute,
   Status,
-  Transition
-} from "../enums";
-import { AppContext, useFirstEffect } from "../hooks";
-import { HTTPService } from "../lib/client";
-import { AlertStatus, IAlert, IResponse } from "../types";
+  Transition,
+} from "enums";
+import { AppContext, useFirstEffect } from "hooks";
+import { HTTPService } from "lib/client";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { AlertStatus, IAlert, IResponse } from "types";
 
 const Login = () => {
   const { user, handleUser, routerPush } = useContext(AppContext);
@@ -79,7 +79,7 @@ const Login = () => {
         action: APIAction.REGISTER,
       }).then((res) => {
         if (res?.data?.token) {
-          cleanup(res, PageRoute.NEWUSER);
+          cleanup(res, PageRoute.NEW_USER);
         } else {
           setAlert({ status: Status.ERROR, message: res?.data?.message });
         }
@@ -91,7 +91,7 @@ const Login = () => {
 
   const renderLoginButton = () => (
     <StyledButton
-      label={"Login"}
+      label="Login"
       type="submit"
       autoFocus
       disabled={loginDisabled}
@@ -101,7 +101,7 @@ const Login = () => {
 
   const renderRegisterButton = () => (
     <StyledButton
-      label={"Register"}
+      label="Register"
       type="submit"
       autoFocus
       disabled={registerDisabled}
@@ -121,14 +121,14 @@ const Login = () => {
         }
       />
       <Input
-        label={"Password"}
+        label="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         password
       />
       <Collapse in={showRegister} timeout={300} unmountOnExit>
         <Input
-          label={"Confirm Password"}
+          label="Confirm Password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           password

@@ -3,10 +3,10 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import { AuthorLink, Row } from "components";
 import { motion } from "framer-motion";
+import { AppContext } from "hooks";
 import moment from "moment";
-import React, { useContext } from "react";
-import { AppContext } from "../hooks";
-import { IPost } from "../types";
+import { useContext } from "react";
+import { IPost } from "types";
 
 interface IPostCard {
   post: IPost;

@@ -1,15 +1,15 @@
-import { isEmpty } from "lodash";
-import { ClientSession } from "mongoose";
-import type { NextApiRequest, NextApiResponse } from "next";
-import { ErrorMessage, HttpRequest, ServerInfo } from "../../enums";
+import { ErrorMessage, HttpRequest, ServerInfo } from "enums";
 import {
   forwardResponse,
   handleAPIError,
   handleBadRequest,
   handleRequest,
-} from "../../lib/middlewares";
-import { mongoConnection, ServerError } from "../../lib/server";
-import { IPostReq, IResponse } from "../../types";
+} from "lib/middlewares";
+import { mongoConnection, ServerError } from "lib/server";
+import { isEmpty } from "lodash";
+import { ClientSession } from "mongoose";
+import type { NextApiRequest, NextApiResponse } from "next";
+import { IPostReq, IResponse } from "types";
 
 export default async function handler(
   req: NextApiRequest,
@@ -65,12 +65,12 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
 
 async function getPost(params: Partial<IPostReq>): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
-    const { username, slug } = params;
-    if (!username || !slug) reject(new ServerError(400));
+    const { id, username, slug } = params;
+    if (!id && (!username || !slug)) reject(new ServerError(400));
     else {
       try {
         const { Post } = await mongoConnection();
-        await Post.findOne(params)
+        await (id ? Post.findById(id) : Post.findOne({ username, slug }))
           .select(["-user"])
           .lean()
           .then((post) => {

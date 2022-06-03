@@ -1,9 +1,9 @@
 import { HttpResponse } from "enums";
 import fs from "fs";
+import { upload } from "lib/middlewares";
 import { getFileStream, uploadFile } from "lib/server/s3";
 import { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from "next-connect";
-import { upload } from "../../lib/middlewares";
 
 const route = nextConnect({
   onNoMatch(req: NextApiRequest, res: NextApiResponse) {

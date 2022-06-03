@@ -1,5 +1,5 @@
 import { Schema, SchemaTypes } from "mongoose";
-import { IPost, IUser } from "../../types";
+import { IPost, IUser } from "types";
 
 export const UserSchema = new Schema<IUser>({
   avatar: SchemaTypes.String,
@@ -35,6 +35,7 @@ export const PostSchema = new Schema<IPost>({
   isPrivate: SchemaTypes.Boolean,
   hasMarkdown: SchemaTypes.Boolean,
   imageKey: SchemaTypes.String,
+  imageName: SchemaTypes.String,
 });
 
 UserSchema.set("timestamps", true);

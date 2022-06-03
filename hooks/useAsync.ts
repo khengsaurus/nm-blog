@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Status } from "../enums";
+import { Status } from "enums";
 import { isEmpty } from "lodash.isempty";
 
 function defaultValidation<T>(res: T) {

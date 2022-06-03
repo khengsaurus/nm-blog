@@ -1,15 +1,9 @@
+import { PageRoute, Status } from "enums";
+import { HTTPService } from "lib/client";
 import { getPostSlugs } from "lib/client/backgroundTasks";
 import { useRouter } from "next/router";
-import React, {
-  createContext,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { PageRoute, Status } from "../enums";
-import { HTTPService } from "../lib/client";
-import { IAppContext, IUser } from "../types";
+import { createContext, useCallback, useEffect, useRef, useState } from "react";
+import { IAppContext, IUser } from "types";
 import useFirstEffectAsync from "./useFirstEffectAsync";
 import useLocalStorage from "./useLocalStorage";
 import useWindowListener from "./useWindowListener";
@@ -21,11 +15,11 @@ const initialContext: IAppContext = {
   userSessionActive: true,
   history: [],
   router: null,
-  routerPush: () => {},
-  routerBack: () => {},
-  logout: () => {},
-  handleUser: (token: string, user: IUser) => {},
-  setDarkMode: (_?: boolean) => {},
+  routerPush: null,
+  routerBack: null,
+  logout: null,
+  handleUser: null,
+  setDarkMode: null,
 };
 
 export const AppContext = createContext<IAppContext>(initialContext);

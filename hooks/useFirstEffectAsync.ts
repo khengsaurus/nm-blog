@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Status } from "../enums";
+import { Status } from "enums";
 import useIsoEffect from "./useIsoEffect";
 
 const useFirstEffectAsync = (

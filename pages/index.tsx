@@ -1,11 +1,11 @@
 import { PAGINATE_LIMIT } from "consts";
 import React from "react";
-import { PostFeed, StyledButton, StyledCenterText } from "../components";
-import PostCard from "../components/PostCard";
-import { usePaginatePosts } from "../hooks";
-import { mongoConnection } from "../lib/server";
-import { IPost } from "../types";
-import { postDocToObj } from "../utils";
+import { PostFeed, StyledButton, StyledCenterText } from "components";
+import PostCard from "components/PostCard";
+import { usePaginatePosts } from "hooks";
+import { mongoConnection } from "lib/server";
+import { IPost } from "types";
+import { postDocToObj } from "utils";
 
 interface IHomeProps {
   initPosts: IPost[];
@@ -42,7 +42,7 @@ const Home: React.FC = ({ initPosts }: IHomeProps) => {
   return (
     <main>
       <section className="header">
-        <StyledCenterText text={"Public Posts"} variant="h3" />
+        <StyledCenterText text="Public Posts" variant="h3" />
       </section>
       <PostFeed>
         {posts.map((post, index) => (
@@ -50,7 +50,7 @@ const Home: React.FC = ({ initPosts }: IHomeProps) => {
         ))}
       </PostFeed>
       <br />
-      {!limitReached && <StyledButton label={"Load more"} onClick={loadMore} />}
+      {!limitReached && <StyledButton label="Load more" onClick={loadMore} />}
     </main>
   );
 };

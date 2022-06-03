@@ -4,9 +4,9 @@ import AppBar from "@mui/material/AppBar";
 import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
 import { ProfileNav } from "components";
-import React, { useContext } from "react";
-import { PageRoute } from "../enums";
-import { AppContext } from "../hooks";
+import { PageRoute } from "enums";
+import { AppContext } from "hooks";
+import { useContext } from "react";
 
 const NavBar: React.FC = () => {
   const { userSessionActive, routerPush } = useContext(AppContext);
@@ -23,7 +23,7 @@ const NavBar: React.FC = () => {
         {userSessionActive && (
           <IconButton
             aria-label="new-item"
-            onClick={() => routerPush(PageRoute.NEWPOST)}
+            onClick={() => routerPush(PageRoute.POST_FORM)}
           >
             <AddIcon />
           </IconButton>

@@ -5,7 +5,7 @@ import { usePaginatePosts } from "hooks";
 import { mongoConnection } from "lib/server";
 import React from "react";
 import { IUser } from "types";
-import { postDocToObj, userDocToObj } from "../../utils";
+import { postDocToObj, userDocToObj } from "utils";
 
 interface IUserPageProps {
   visitingUser: IUser;
@@ -66,7 +66,7 @@ const UserPage = (props: IUserPageProps) => {
           />
         ))}
       </PostFeed>
-      <StyledButton label={"Load more"} onClick={loadMore} />
+      <StyledButton label="Load more" onClick={loadMore} />
     </main>
   );
 };

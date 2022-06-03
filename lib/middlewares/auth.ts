@@ -1,8 +1,8 @@
+import { APIAction } from "enums";
 import jwt from "jsonwebtoken";
 import { NextApiRequest } from "next";
+import { IUserReq } from "types";
 import { ServerError, verifyPassword } from "../server";
-import { IUserReq } from "../../types";
-import { APIAction } from "enums";
 const SECRET_KEY = "secret-key";
 
 export function generateToken(email: string, username: string, id: string) {

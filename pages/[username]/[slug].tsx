@@ -1,14 +1,14 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { IconButton } from "@mui/material";
-import React, { useContext, useState } from "react";
-import { AuthorLink, PostBanner, StyledText } from "../../components";
-import { DBService } from "../../enums";
-import { AppContext, useIsoEffect } from "../../hooks";
-import { HTTPService, serverUrl } from "../../lib/client";
-import { mongoConnection } from "../../lib/server";
-import { IPost } from "../../types";
-import { postDocToObj } from "../../utils";
+import { AuthorLink, PostBanner, StyledText } from "components";
+import { PageRoute } from "enums";
+import { AppContext, useRealtimePost } from "hooks";
+import { serverUrl } from "lib/client";
+import { mongoConnection } from "lib/server";
+import { useContext } from "react";
+import { IPost } from "types";
+import { postDocToObj } from "utils";
 
 interface IPostPage {
   post: IPost;
@@ -37,7 +37,11 @@ export async function getStaticProps({ params }) {
 export async function getStaticPaths() {
   console.info("-> [username][slug] getStaticPaths()");
   const { Post } = await mongoConnection();
-  const posts = await Post.find().limit(100);
+  const posts = await Post.find()
+    .sort({ createdAt: -1 })
+    .limit(100)
+    .lean()
+    .exec();
   const paths =
     posts.map((post) => {
       const { username, slug } = post;
@@ -53,20 +57,15 @@ export async function getStaticPaths() {
 }
 
 const Post = ({ post, username, slug }: IPostPage) => {
-  const { user: author } = post;
-  const { user } = useContext(AppContext);
-  const [realtimePost, setRealtimePost] = useState(post);
-
-  useIsoEffect(() => {
-    HTTPService.makeGetReq(DBService.POSTS, { username, slug }).then((res) => {
-      if (res.status === 200 && res.data?.post?._id) {
-        const updatedPost = { ...res.data.post, user: author } as IPost;
-        setRealtimePost(updatedPost);
-      }
-    });
-  }, [username, slug]);
+  const { user: author, id } = post;
+  const { user, routerPush } = useContext(AppContext);
+  const realtimePost = useRealtimePost(post);
 
   const { title, body, imageKey } = realtimePost;
+
+  function handleEdit() {
+    routerPush(`${PageRoute.POST_FORM}/${id}`);
+  }
 
   return (
     <>
@@ -88,7 +87,7 @@ const Post = ({ post, username, slug }: IPostPage) => {
       {user?.id === author?.id && (
         <div className="post-edit-container">
           <div className="post-edit-button">
-            <IconButton disableRipple>
+            <IconButton disableRipple onClick={handleEdit}>
               <EditIcon style={{ width: 40, height: 40 }} color="primary" />
             </IconButton>
           </div>

@@ -16,7 +16,7 @@ const PostBanner = ({ src, id }: IPostBanner) => {
         alt="post-image"
         layout="fill"
         objectFit="cover"
-        objectPosition={"50% 20%"}
+        objectPosition="50% 20%"
         priority
       /> */}
       <motion.img

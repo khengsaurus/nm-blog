@@ -3,7 +3,7 @@ import {
   InputLabelProps,
   TextField,
 } from "@mui/material";
-import React, { ChangeEventHandler, CSSProperties } from "react";
+import { ChangeEventHandler, CSSProperties } from "react";
 
 interface IInput {
   label: string;

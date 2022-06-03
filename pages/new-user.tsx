@@ -1,6 +1,6 @@
 import { Alert, Collapse } from "@mui/material";
 import { useCallback, useContext, useEffect, useState } from "react";
-import { CenteredMain, Input, Row, StyledButton } from "../components";
+import { CenteredMain, Input, Row, StyledButton } from "components";
 import {
   APIAction,
   DBService,
@@ -8,10 +8,10 @@ import {
   PageRoute,
   Status,
   Transition,
-} from "../enums";
-import { AppContext } from "../hooks/context";
-import { HTTPService } from "../lib/client";
-import { AlertStatus, IAlert, IUser } from "../types";
+} from "enums";
+import { AppContext } from "hooks/context";
+import { HTTPService } from "lib/client";
+import { AlertStatus, IAlert, IUser } from "types";
 
 const NewUser = () => {
   const { user, handleUser, logout, routerPush } = useContext(AppContext);
@@ -86,7 +86,7 @@ const NewUser = () => {
   return (
     <CenteredMain>
       <Input
-        label={"Username"}
+        label="Username"
         value={username}
         onChange={(e) => setUsername(e.target.value.toLowerCase())}
         style={{ margin: "-5px 0px 5px", width: "150px" }}
@@ -97,7 +97,7 @@ const NewUser = () => {
           <>
             <StyledButton label="Cancel" onClick={cancelRegister} />
             <StyledButton
-              label={"Submit"}
+              label="Submit"
               autoFocus
               type="submit"
               disabled={username.trim() === ""}

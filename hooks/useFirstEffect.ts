@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 const useFirstEffect = (callback: () => any, deps: any[]) => {
   const calledRef = useRef(false);

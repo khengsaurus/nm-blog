@@ -1,8 +1,8 @@
 import { Layout } from "components";
 import type { AppProps } from "next/app";
 import Head from "next/head";
-import AppContextProvider from "../hooks/context";
-import { HomeTheme } from "../lib/client/MuiStyles";
+import AppContextProvider from "hooks/context";
+import { HomeTheme } from "lib/client/MuiStyles";
 import "../styles/globals.scss";
 
 function MyApp({ Component, pageProps }: AppProps) {

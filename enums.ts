@@ -14,8 +14,8 @@ export enum HttpRequest {
 export enum PageRoute {
   HOME = "/",
   LOGIN = "/login",
-  NEWPOST = "/new-post",
-  NEWUSER = "/new-user",
+  NEW_USER = "/new-user",
+  POST_FORM = "/post-form",
   MY_PROFILE = "/my-profile",
   MY_POSTS = "/my-posts",
 }
@@ -90,14 +90,4 @@ export enum Status {
   INFO = "info",
   PENDING = "pending",
   SUCCESS = "success",
-}
-
-/*------------------------------ Client ------------------------------*/
-
-export enum PageTitle {
-  HOME = "Home",
-  LOGIN = "Login",
-  POST = "Post",
-  NEW_USER = "New User",
-  NEW_POST = "New Post",
 }

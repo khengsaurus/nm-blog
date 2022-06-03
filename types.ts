@@ -17,9 +17,9 @@ export interface IAppContext {
   user: IUser;
   userToken: string;
   darkMode: boolean;
-  userSessionActive: boolean;
   history: string[];
   router: NextRouter;
+  userSessionActive: boolean;
   routerPush: (route: string) => void;
   routerBack: () => void;
   logout: () => void;
@@ -46,7 +46,12 @@ interface IHasTimestamps {
   updatedAt: string;
 }
 
-export interface IPost extends IHasId, IHasTimestamps {
+interface IHasImage {
+  imageKey: string;
+  imageName: string;
+}
+
+export interface IPost extends IHasId, IHasTimestamps, IHasImage {
   user: IUser;
   username: string;
   title: string;
@@ -54,7 +59,6 @@ export interface IPost extends IHasId, IHasTimestamps {
   body: string;
   isPrivate: boolean;
   hasMarkdown: boolean;
-  imageKey: string;
 }
 
 export interface IPostReq extends IPost, IRequest {

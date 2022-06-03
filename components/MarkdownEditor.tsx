@@ -1,5 +1,5 @@
 import TextField from "@mui/material/TextField";
-import React, { forwardRef, MutableRefObject } from "react";
+import { forwardRef, MutableRefObject } from "react";
 
 interface IMarkdownEditorProps {
   value: string;
@@ -11,7 +11,13 @@ interface IMarkdownEditorProps {
 
 const MarkdownEditor = forwardRef<MutableRefObject<any>, IMarkdownEditorProps>(
   (props: IMarkdownEditorProps, ref?: MutableRefObject<any>) => {
-    const { value, setValue, fullWidth, rows = 20, label = "Body" } = props;
+    const {
+      value = undefined,
+      setValue,
+      fullWidth,
+      rows = 20,
+      label = "Body",
+    } = props;
 
     return (
       <TextField
