@@ -1,6 +1,6 @@
 import { Dialog, DialogActions, DialogContent } from "@mui/material";
 import React from "react";
-import { StyledButton, StyledCenterText } from "./StyledMui";
+import { StyledButton, StyledCenterText } from "../StyledMui";
 
 interface IButtonProps {
   text?: string;
@@ -14,7 +14,7 @@ interface IActionModalProps {
   buttons: IButtonProps[];
 }
 
-const ActionModalModal = ({ show, text, buttons }: IActionModalProps) => {
+const ActionModal = ({ show, text, buttons }: IActionModalProps) => {
   return (
     <Dialog open={show} BackdropProps={{ invisible: true }}>
       <DialogContent>
@@ -34,4 +34,4 @@ const ActionModalModal = ({ show, text, buttons }: IActionModalProps) => {
   );
 };
 
-export default ActionModalModal;
+export default ActionModal;

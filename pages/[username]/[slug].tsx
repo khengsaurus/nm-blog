@@ -1,12 +1,17 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { IconButton } from "@mui/material";
-import { AuthorLink, PostBanner, StyledText } from "components";
+import {
+  AuthorLink,
+  DeletePostModal,
+  PostBanner,
+  StyledText,
+} from "components";
 import { PageRoute } from "enums";
 import { AppContext, useRealtimePost } from "hooks";
 import { serverUrl } from "lib/client";
 import { mongoConnection } from "lib/server";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { IPost } from "types";
 import { postDocToObj } from "utils";
 
@@ -56,16 +61,18 @@ export async function getStaticPaths() {
   };
 }
 
-const Post = ({ post, username, slug }: IPostPage) => {
+const Post = ({ post }: IPostPage) => {
   const { user: author, id } = post;
   const { user, routerPush } = useContext(AppContext);
-  const realtimePost = useRealtimePost(post);
+  const { realtimePost } = useRealtimePost(post);
 
   const { title, body, imageKey } = realtimePost;
 
   function handleEdit() {
     routerPush(`${PageRoute.POST_FORM}/${id}`);
   }
+
+  const [showDelete, setShowDelete] = useState(false);
 
   return (
     <>
@@ -92,12 +99,17 @@ const Post = ({ post, username, slug }: IPostPage) => {
             </IconButton>
           </div>
           <div className="post-delete-button">
-            <IconButton disableRipple>
+            <IconButton disableRipple onClick={() => setShowDelete(true)}>
               <DeleteIcon style={{ width: 25, height: 25 }} color="primary" />
             </IconButton>
           </div>
         </div>
       )}
+      <DeletePostModal
+        post={realtimePost}
+        showDelete={showDelete}
+        setShowDelete={setShowDelete}
+      />
     </>
   );
 };

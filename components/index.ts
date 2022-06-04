@@ -7,10 +7,10 @@ import Layout from "./Layout";
 import { CircleLoader } from "./Loaders";
 import MarkdownEditor from "./MarkdownEditor";
 import MarkdownViewer from "./MarkdownViewer";
+import { ActionModal, DeletePostModal } from "./Modals";
 import NavBar from "./NavBar";
 import PostBanner from "./PostBanner";
 import ProfileNav from "./ProfileNav";
-import ActionModal from "./ActionModal";
 import {
   Centered,
   CenteredMain,
@@ -29,6 +29,7 @@ import {
 export {
   AuthorLink,
   CircleLoader,
+  DeletePostModal,
   EditPreviewMarkdown,
   EditPostButtons,
   HomeButton,

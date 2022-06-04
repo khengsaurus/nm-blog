@@ -1,7 +1,7 @@
 import {
-  ActionModal,
   CircleLoader,
   Column,
+  DeletePostModal,
   EditPostButtons,
   EditPreviewMarkdown,
   ImageForm,
@@ -10,7 +10,7 @@ import {
 import { DBService, ErrorMessage, HttpRequest, PageRoute, Status } from "enums";
 import { AppContext, useAsync, useRealtimePost } from "hooks";
 import { HTTPService, uploadImage } from "lib/client";
-import { deleteImage, deletePost } from "lib/client/tasks";
+import { deleteImage } from "lib/client/tasks";
 import { ServerError } from "lib/server";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { IResponse } from "types";
@@ -38,9 +38,8 @@ const getSaveButtonLabel = (saveStatus: Status) => {
 };
 
 const EditPost = ({ id }: IPostPage) => {
-  const { user, updatePostSlugs, routerBack, routerPush } =
-    useContext(AppContext);
-  const existingPost = useRealtimePost({ id, user });
+  const { user, updatePostSlugs, routerPush } = useContext(AppContext);
+  const { realtimePost, refreshPost } = useRealtimePost({ id, user });
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [body, setBody] = useState("");
@@ -51,7 +50,7 @@ const EditPost = ({ id }: IPostPage) => {
   const [showDelete, setShowDelete] = useState(false);
   const hasEditedSlug = useRef(false);
   const isNewPost = id === "new";
-  const imageUpdated = !!newImage || _imageName !== existingPost?.imageName;
+  const imageUpdated = !!newImage || _imageName !== realtimePost?.imageName;
 
   useEffect(() => {
     if (!hasEditedSlug.current) {
@@ -62,7 +61,7 @@ const EditPost = ({ id }: IPostPage) => {
   useEffect(() => {
     if (!isNewPost) {
       const { title, slug, body, imageName, isPrivate, hasMarkdown } =
-        existingPost || {};
+        realtimePost || {};
       setTitle(title);
       setSlug(slug);
       setBody(body);
@@ -71,7 +70,7 @@ const EditPost = ({ id }: IPostPage) => {
       setHasMarkdown(hasMarkdown);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isNewPost, existingPost]);
+  }, [isNewPost, realtimePost]);
 
   const _handlePost = useCallback(() => {
     return new Promise(async (resolve, reject) => {
@@ -114,8 +113,8 @@ const EditPost = ({ id }: IPostPage) => {
         return;
       }
       let imageError = false,
-        imageKey = existingPost?.imageKey || "",
-        imageName = existingPost?.imageName || "";
+        imageKey = realtimePost?.imageKey || "",
+        imageName = realtimePost?.imageName || "";
       if (imageUpdated) {
         await deleteImage(imageKey)
           .then(() => {
@@ -164,9 +163,11 @@ const EditPost = ({ id }: IPostPage) => {
       setBody("");
       setNewImage(null);
       setImageName("");
+    } else {
+      refreshPost();
     }
     updatePostSlugs(user);
-  }, [isNewPost, user, updatePostSlugs]);
+  }, [isNewPost, user, refreshPost, updatePostSlugs]);
 
   const { execute: handleSave, status: saveStatus } = useAsync<
     IResponse,
@@ -184,37 +185,12 @@ const EditPost = ({ id }: IPostPage) => {
     !body?.trim() ||
     saveStatus !== Status.IDLE ||
     (id !== "new" &&
-      title === existingPost?.title &&
-      slug === existingPost?.slug &&
-      body === existingPost?.body &&
-      isPrivate === existingPost?.isPrivate &&
-      hasMarkdown === existingPost?.hasMarkdown &&
+      title === realtimePost?.title &&
+      slug === realtimePost?.slug &&
+      body === realtimePost?.body &&
+      isPrivate === realtimePost?.isPrivate &&
+      hasMarkdown === realtimePost?.hasMarkdown &&
       !imageUpdated);
-
-  const { execute: handleDelete, status: deleteStatus } = useAsync<
-    IResponse,
-    ServerError
-  >(
-    isNewPost ? null : () => deletePost(existingPost),
-    () => {
-      updatePostSlugs(user);
-      routerPush(PageRoute.HOME);
-    },
-    (r: IResponse) => r.status === 200,
-    false
-  );
-
-  const buttons = [
-    {
-      text: "Cancel",
-      action: () => setShowDelete(false),
-    },
-    {
-      text: "Delete",
-      action: handleDelete,
-      disabled: deleteStatus !== Status.IDLE,
-    },
-  ];
 
   return (
     <main className="left">
@@ -258,15 +234,15 @@ const EditPost = ({ id }: IPostPage) => {
           saveDisabled={saveDisabled}
           handleSave={handleSave}
           isEdit={!isNewPost}
-          onCancel={isNewPost ? null : routerBack}
+          onCancel={isNewPost ? null : () => routerPush(PageRoute.MY_POSTS)}
           onDelete={isNewPost ? null : () => setShowDelete(true)}
         />
       </Column>
       {!isNewPost && (
-        <ActionModal
-          show={showDelete}
-          text="Are you sure you wish to delete this post?"
-          buttons={buttons}
+        <DeletePostModal
+          post={realtimePost}
+          showDelete={showDelete}
+          setShowDelete={setShowDelete}
         />
       )}
     </main>

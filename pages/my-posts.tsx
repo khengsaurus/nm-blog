@@ -3,7 +3,7 @@ import {
   CircleLoader,
   PostFeed,
   StyledButton,
-  StyledText,
+  StyledCenterText,
 } from "components";
 import PostCard from "components/PostCard";
 import { AppContext } from "hooks";
@@ -21,11 +21,13 @@ const MyPosts = () => {
   );
 
   return (
-    <main className="left">
+    <main>
+      <section className="header">
+        <StyledCenterText text="My Posts" variant="h2" />
+      </section>
       {user ? (
         <>
-          <StyledText text="My Posts:" variant="h4" />
-          <PostFeed style={{ justifyContent: "flex-start" }}>
+          <PostFeed>
             {posts.map((post, index) => (
               <PostCard
                 key={index}

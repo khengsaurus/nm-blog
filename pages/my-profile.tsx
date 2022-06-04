@@ -13,7 +13,7 @@ const MyProfile = () => {
           {user?.avatar && (
             <Image src={`api/images?key=${user.avatar}`} alt="avatar" />
           )}
-          <StyledText text={user?.username} variant="h2" />
+          <StyledText text={user?.username} variant="h3" />
           <StyledText text="Bio:" variant="h4" />
           <StyledText text={user?.bio || "(None)"} variant="body1" />
         </>
