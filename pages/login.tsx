@@ -1,5 +1,5 @@
 import { Alert, Collapse } from "@mui/material";
-import { CenteredMain, Input, StyledButton } from "components";
+import { CenteredMain, Input, Row, StyledButton } from "components";
 import {
   APIAction,
   DBService,
@@ -134,12 +134,16 @@ const Login = () => {
           password
         />
       </Collapse>
-      <br />
-      <StyledButton
-        label={showRegister ? "Back" : "Register"}
-        onClick={() => setShowRegister(!showRegister)}
-      />
-      {showRegister ? renderRegisterButton() : renderLoginButton()}
+      <Row style={{ width: 180 }}>
+        <StyledButton
+          label={showRegister ? "Back" : "Register"}
+          onClick={() => {
+            setAlert(null);
+            setShowRegister(!showRegister);
+          }}
+        />
+        {showRegister ? renderRegisterButton() : renderLoginButton()}
+      </Row>
       <Collapse
         in={!!alert}
         timeout={{ enter: Transition.FAST, exit: Transition.INSTANT }}

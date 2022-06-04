@@ -5,7 +5,7 @@ import { IResponse, IUser } from "types";
 import { ServerError } from "../server";
 import { validateAuth } from "./auth";
 
-export async function handleRequest<R>(
+export async function handleRequest(
   req: NextApiRequest,
   res: NextApiResponse,
   callback: (p: NextApiRequest) => Promise<IResponse>

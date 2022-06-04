@@ -10,6 +10,7 @@ import MarkdownViewer from "./MarkdownViewer";
 import NavBar from "./NavBar";
 import PostBanner from "./PostBanner";
 import ProfileNav from "./ProfileNav";
+import ActionModal from "./ActionModal";
 import {
   Centered,
   CenteredMain,
@@ -37,6 +38,7 @@ export {
   MarkdownViewer,
   PostBanner,
   ProfileNav,
+  ActionModal,
   StyledButton,
   StyledCenterText,
   StyledText,

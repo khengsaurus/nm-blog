@@ -40,7 +40,8 @@ export function checkOneFileSelected(
   errorHandler: (msg: string) => void
 ) {
   let files = event.target.files;
-  if (files.length !== 1) {
+  if (files.length === 0) return;
+  if (files.length > 1) {
     event.target.value = null;
     errorHandler(ErrorMessage.ONE_IMAGE_ONLY);
     return false;

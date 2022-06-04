@@ -98,6 +98,7 @@ const NewUser = () => {
           </>
         )}
       </Row>
+      <br />
       <Collapse in={!!alert} timeout={Transition.FAST} unmountOnExit>
         <Alert severity={alert?.status as AlertStatus}>{alert?.message}</Alert>
       </Collapse>

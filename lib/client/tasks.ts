@@ -1,5 +1,5 @@
-import { APIAction, DBService, ErrorMessage } from "enums";
-import { IResponse } from "types";
+import { APIAction, DBService, ErrorMessage, HttpRequest } from "enums";
+import { IPost, IResponse } from "types";
 import { HTTPService } from ".";
 
 // Tasks to be run as non-render-blocking, e.g. API calls to populate data etc
@@ -32,17 +32,24 @@ export async function uploadImage(attachment: any): Promise<string> {
   });
 }
 
-export async function deleteImage(imageKey: string): Promise<string> {
+export async function deleteImage(imageKey: string): Promise<IResponse> {
   if (!imageKey) return;
   return new Promise(async (resolve, reject) => {
-    await HTTPService.deleteImage(imageKey)
-      .then((res) => {
-        if (res.status === 200) {
-          resolve(res.data?.message); // ServerInfo.FILE_DELETED
-        } else {
-          reject(new Error(ErrorMessage.IMAGE_DELETE_FAIL));
-        }
-      })
+    await HTTPService.makeAuthHttpReq(DBService.IMAGES, HttpRequest.DELETE, {
+      imageKey,
+    })
+      .then((res) => resolve(res))
+      .catch((err) => reject(err));
+  });
+}
+
+export function deletePost(post: Partial<IPost>): Promise<IResponse> {
+  return new Promise(async (resolve, reject) => {
+    deleteImage(post.imageKey);
+    await HTTPService.makeAuthHttpReq(DBService.POSTS, HttpRequest.DELETE, {
+      id: post.id,
+    })
+      .then((res) => resolve(res))
       .catch((err) => reject(err));
   });
 }

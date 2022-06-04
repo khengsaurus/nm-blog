@@ -23,6 +23,7 @@ export interface IAppContext {
   routerPush: (route: string) => void;
   routerBack: () => void;
   logout: () => void;
+  updatePostSlugs: (user: IUser) => void;
   handleUser: (token: string, user: IUser) => void;
   setDarkMode: (_?: boolean) => void;
 }
@@ -75,7 +76,7 @@ export interface IUser extends IHasId, Partial<IHasTimestamps> {
   email: string;
   password: string;
   username: string;
-  posts: IPost[];
+  posts: Partial<IPost>[];
 }
 
 export interface IUserReq extends IUser, IRequest {

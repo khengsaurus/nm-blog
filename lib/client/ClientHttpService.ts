@@ -97,12 +97,6 @@ class ClientHTTPService {
       },
     });
   };
-
-  deleteImage = async (imageKey: string): Promise<IResponse> => {
-    return this.makeAuthHttpReq(DBService.IMAGES, HttpRequest.DELETE, {
-      imageKey,
-    });
-  };
 }
 
 export default ClientHTTPService;

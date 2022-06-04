@@ -17,6 +17,7 @@ const initialContext: IAppContext = {
   routerPush: null,
   routerBack: null,
   logout: null,
+  updatePostSlugs: null,
   handleUser: null,
   setDarkMode: null,
 };
@@ -59,13 +60,9 @@ const AppContextProvider = (props: any) => {
 
   /* -------------------- End router stuff -------------------- */
 
-  const handleUser = useCallback(
-    (token: string, user: IUser) => {
-      HTTPService.setBearer(token, user.id);
-      setUserToken(token);
-      setUser(user);
-      // Make a separate call to populate user's posts to reduce load time for login events
-      getPostSlugs(user.username).then((res) => {
+  const updatePostSlugs = useCallback(
+    (user: IUser) => {
+      getPostSlugs(user?.username).then((res) => {
         if (res.status === 200 && res.data.user) {
           const _user = { ...user };
           _user.posts = res.data.user.posts || [];
@@ -73,7 +70,17 @@ const AppContextProvider = (props: any) => {
         }
       });
     },
-    [setUserToken]
+    [setUser]
+  );
+
+  const handleUser = useCallback(
+    (token: string, user: IUser) => {
+      HTTPService.setBearer(token, user.id);
+      setUserToken(token);
+      setUser(user);
+      updatePostSlugs(user);
+    },
+    [setUserToken, updatePostSlugs]
   );
 
   const userTokenLogin = useCallback(async () => {
@@ -135,6 +142,7 @@ const AppContextProvider = (props: any) => {
         routerPush,
         routerBack,
         logout,
+        updatePostSlugs,
         handleUser,
         setDarkMode,
       }}

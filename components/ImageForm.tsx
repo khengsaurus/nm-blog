@@ -5,18 +5,12 @@ import { Row, StyledText } from "components";
 import { checkFileSize, checkFileType, checkOneFileSelected } from "utils";
 
 interface IImageForm {
-  newImage: any;
-  setNewImage: (image: any) => void;
   imageName?: string;
   setImageName?: (imageName: string) => void;
+  setNewImage: (image: any) => void;
 }
 
-const ImageForm = ({
-  newImage,
-  setNewImage,
-  imageName,
-  setImageName,
-}: IImageForm) => {
+const ImageForm = ({ setNewImage, imageName, setImageName }: IImageForm) => {
   const errHandler = (msg: string) => console.info(msg);
 
   async function handleAttachment(event: React.ChangeEvent<HTMLInputElement>) {
@@ -48,15 +42,15 @@ const ImageForm = ({
         Add image
         <input type="file" hidden onChange={handleAttachment} />
       </Button>
-      {(!!newImage || imageName) && (
+      {imageName && (
         <Row style={{ justifyContent: "flex-end" }}>
-          <StyledText variant="body1" text={newImage?.name || imageName} />
+          <StyledText variant="body1" text={imageName} />
           <IconButton
             edge="end"
             aria-label="delete-image"
             onClick={() => {
-              setImageName("");
               setNewImage(null);
+              setImageName("");
             }}
           >
             <DeleteIcon />

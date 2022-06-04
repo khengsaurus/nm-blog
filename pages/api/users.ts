@@ -36,7 +36,11 @@ export default async function handler(
 async function handleGet(req: NextApiRequest, res: NextApiResponse) {
   const reqQuery = req.query as Partial<IUserReq>;
   if (!reqQuery.username) {
-    return handleBadRequest(res);
+    return forwardResponse(res, {
+      status: 200,
+      message: ServerInfo.POST_NA,
+      data: { user: {} },
+    });
   } else {
     return (
       reqQuery.action === APIAction.GET_POST_SLUGS
@@ -162,7 +166,7 @@ async function handleLogin(reqBody: Partial<IUserReq>): Promise<IResponse> {
   });
 }
 
-async function getPostSlugs(reqBody: Partial<IUserReq>) {
+async function getPostSlugs(reqBody: Partial<IUserReq>): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     const { username } = reqBody;
     try {
@@ -243,11 +247,11 @@ async function patchDoc(req: NextApiRequest): Promise<IResponse> {
 }
 
 async function deleteDoc(req: NextApiRequest) {
-  const reqBody: Partial<IUserReq> = req.body;
+  const { userId } = req.query as Partial<IUserReq>;
   return new Promise(async (resolve, reject) => {
     try {
       const { User } = await mongoConnection();
-      User.findByIdAndDelete(reqBody.userId, (err, _, __) => {
+      User.findByIdAndDelete(userId, (err, _, __) => {
         if (!!err) {
           reject(new ServerError(500, err.message));
         } else {

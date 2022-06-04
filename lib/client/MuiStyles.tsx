@@ -211,7 +211,7 @@ function newMuiTheme(darkMode: boolean) {
         styleOverrides: {
           root: {
             padding: "0px",
-            marginTop: "-4px",
+            margin: "0px 5px",
             justifyContent: "space-between",
             minHeight: "15px",
           },
@@ -389,10 +389,11 @@ function newMuiTheme(darkMode: boolean) {
       MuiSvgIcon: {
         styleOverrides: {
           root: {
-            color: mainText,
-            "&:hover": {
-              color: highlightColor,
-            },
+            color: "inherit",
+            // color: mainText,
+            // "&:hover": {
+            //   color: highlightColor,
+            // },
           },
         },
       },

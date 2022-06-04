@@ -1,4 +1,5 @@
 import {
+  ActionModal,
   CircleLoader,
   Column,
   EditPostButtons,
@@ -6,19 +7,12 @@ import {
   ImageForm,
   Input,
 } from "components";
-import { DBService, ErrorMessage, HttpRequest, Status } from "enums";
+import { DBService, ErrorMessage, HttpRequest, PageRoute, Status } from "enums";
 import { AppContext, useAsync, useRealtimePost } from "hooks";
 import { HTTPService, uploadImage } from "lib/client";
-import { deleteImage } from "lib/client/tasks";
+import { deleteImage, deletePost } from "lib/client/tasks";
 import { ServerError } from "lib/server";
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { IResponse } from "types";
 
 interface IPostPage {
@@ -30,8 +24,22 @@ export async function getServerSideProps({ params }) {
   return { props: { id } };
 }
 
+const getSaveButtonLabel = (saveStatus: Status) => {
+  switch (saveStatus) {
+    case Status.IDLE:
+      return "Save";
+    case Status.PENDING:
+      return <CircleLoader />;
+    case Status.SUCCESS:
+      return "👌🏻";
+    case Status.ERROR:
+      return "⚠️";
+  }
+};
+
 const EditPost = ({ id }: IPostPage) => {
-  const { user } = useContext(AppContext);
+  const { user, updatePostSlugs, routerBack, routerPush } =
+    useContext(AppContext);
   const existingPost = useRealtimePost({ id, user });
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
@@ -40,8 +48,10 @@ const EditPost = ({ id }: IPostPage) => {
   const [newImage, setNewImage] = useState<any>(null);
   const [_imageName, setImageName] = useState("");
   const [hasMarkdown, setHasMarkdown] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
   const hasEditedSlug = useRef(false);
   const isNewPost = id === "new";
+  const imageUpdated = !!newImage || _imageName !== existingPost?.imageName;
 
   useEffect(() => {
     if (!hasEditedSlug.current) {
@@ -106,7 +116,7 @@ const EditPost = ({ id }: IPostPage) => {
       let imageError = false,
         imageKey = existingPost?.imageKey || "",
         imageName = existingPost?.imageName || "";
-      if (!!newImage || _imageName !== imageName) {
+      if (imageUpdated) {
         await deleteImage(imageKey)
           .then(() => {
             imageKey = "";
@@ -148,43 +158,63 @@ const EditPost = ({ id }: IPostPage) => {
   }
 
   const _cleanup = useCallback(() => {
-    setTitle("");
-    setSlug("");
-    setBody("");
-    setNewImage(null);
-  }, []);
+    if (isNewPost) {
+      setTitle("");
+      setSlug("");
+      setBody("");
+      setNewImage(null);
+      setImageName("");
+    }
+    updatePostSlugs(user);
+  }, [isNewPost, user, updatePostSlugs]);
 
   const { execute: handleSave, status: saveStatus } = useAsync<
     IResponse,
     ServerError
   >(
     isNewPost ? _handlePost : _handlePatch,
-    isNewPost ? _cleanup : null,
+    _cleanup,
     (r: IResponse) => r.status === 200,
     false
   );
 
-  const saveDisabled = useMemo(
-    () =>
-      !title?.trim() ||
-      !slug?.trim() ||
-      !body?.trim() ||
-      saveStatus !== Status.IDLE,
-    [title, slug, body, saveStatus]
+  const saveDisabled =
+    !title?.trim() ||
+    !slug?.trim() ||
+    !body?.trim() ||
+    saveStatus !== Status.IDLE ||
+    (id !== "new" &&
+      title === existingPost?.title &&
+      slug === existingPost?.slug &&
+      body === existingPost?.body &&
+      isPrivate === existingPost?.isPrivate &&
+      hasMarkdown === existingPost?.hasMarkdown &&
+      !imageUpdated);
+
+  const { execute: handleDelete, status: deleteStatus } = useAsync<
+    IResponse,
+    ServerError
+  >(
+    isNewPost ? null : () => deletePost(existingPost),
+    () => {
+      updatePostSlugs(user);
+      routerPush(PageRoute.HOME);
+    },
+    (r: IResponse) => r.status === 200,
+    false
   );
 
-  const saveButtonLabel = useMemo(() => {
-    switch (saveStatus) {
-      case Status.IDLE:
-        return "Save";
-      case Status.PENDING:
-        return <CircleLoader />;
-      case Status.SUCCESS:
-        return "👌🏻";
-      case Status.ERROR:
-        return "⚠️";
-    }
-  }, [saveStatus]);
+  const buttons = [
+    {
+      text: "Cancel",
+      action: () => setShowDelete(false),
+    },
+    {
+      text: "Delete",
+      action: handleDelete,
+      disabled: deleteStatus !== Status.IDLE,
+    },
+  ];
 
   return (
     <main className="left">
@@ -215,21 +245,30 @@ const EditPost = ({ id }: IPostPage) => {
           setBody={setBody}
         />
         <ImageForm
-          newImage={newImage}
-          setNewImage={setNewImage}
           imageName={_imageName}
           setImageName={setImageName}
+          setNewImage={setNewImage}
         />
         <EditPostButtons
           isPrivate={isPrivate}
           setIsPrivate={setIsPrivate}
           hasMarkdown={hasMarkdown}
           setHasMarkdown={setHasMarkdown}
-          saveButtonLabel={saveButtonLabel}
+          saveButtonLabel={getSaveButtonLabel(saveStatus)}
           saveDisabled={saveDisabled}
           handleSave={handleSave}
+          isEdit={!isNewPost}
+          onCancel={isNewPost ? null : routerBack}
+          onDelete={isNewPost ? null : () => setShowDelete(true)}
         />
       </Column>
+      {!isNewPost && (
+        <ActionModal
+          show={showDelete}
+          text="Are you sure you wish to delete this post?"
+          buttons={buttons}
+        />
+      )}
     </main>
   );
 };

@@ -1,5 +1,5 @@
 import { Row, StyledButton } from "components";
-import React from "react";
+import React, { useState } from "react";
 import CheckBox from "./CheckBox";
 
 interface IEditPostButtons {
@@ -10,7 +10,12 @@ interface IEditPostButtons {
   saveButtonLabel: any;
   saveDisabled: boolean;
   handleSave: () => Promise<any>;
+  isEdit: boolean;
+  onCancel?: () => void;
+  onDelete?: () => void;
 }
+
+const lastButtonStyle = { marginRight: -10 };
 
 const EditPostButtons = ({
   isPrivate,
@@ -20,28 +25,61 @@ const EditPostButtons = ({
   saveButtonLabel,
   saveDisabled,
   handleSave,
+  isEdit,
+  onCancel = null,
+  onDelete = null,
 }: IEditPostButtons) => {
+  const [cancelCalled, setCancelCalled] = useState(false);
+
+  function renderCancelDelete() {
+    return (
+      <div>
+        <StyledButton
+          label={"Cancel"}
+          disabled={cancelCalled}
+          onClick={() => {
+            setCancelCalled(true);
+            onCancel();
+          }}
+          style={lastButtonStyle}
+        />
+        <StyledButton
+          label="Delete"
+          onClick={onDelete}
+          style={lastButtonStyle}
+        />
+      </div>
+    );
+  }
+
+  function renderSaveButton() {
+    return (
+      <StyledButton
+        label={saveButtonLabel}
+        disabled={saveDisabled}
+        onClick={handleSave}
+        style={lastButtonStyle}
+      />
+    );
+  }
+
   return (
     <>
-      <Row style={{ justifyContent: "flex-start" }}>
+      <div className={`row ${isEdit ? "last-end" : ""}`}>
         <CheckBox
           value={isPrivate}
           setValue={setIsPrivate}
           label="Private post"
         />
-      </Row>
-      <div className="justify-start-last-end">
+        {isEdit && renderSaveButton()}
+      </div>
+      <div className="row last-end">
         <CheckBox
           value={hasMarkdown}
           setValue={setHasMarkdown}
           label="Has markdown"
         />
-        <StyledButton
-          label={saveButtonLabel}
-          disabled={saveDisabled}
-          onClick={handleSave}
-          style={{ marginRight: -10 }}
-        />
+        {isEdit ? renderCancelDelete() : renderSaveButton()}
       </div>
     </>
   );

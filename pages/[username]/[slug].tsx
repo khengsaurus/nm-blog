@@ -78,7 +78,7 @@ const Post = ({ post, username, slug }: IPostPage) => {
         )}
         <section className="header">
           <StyledText text={title} variant="h2" />
-          <AuthorLink author={user} title />
+          <AuthorLink author={author} title />
         </section>
         <section className="post-body">
           <StyledText text={body} variant="body1" />

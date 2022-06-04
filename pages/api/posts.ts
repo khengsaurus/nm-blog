@@ -128,7 +128,7 @@ async function createDoc(req: NextApiRequest): Promise<IResponse> {
                     }
                   );
                 } else {
-                  throw new ServerError();
+                  throw new ServerError(500, ErrorMessage.POST_CREATE_FAIL);
                 }
               })
               .catch((err) => reject(new ServerError(500, err?.message)));
@@ -161,27 +161,45 @@ async function patchDoc(req: NextApiRequest): Promise<IResponse> {
             data: postData,
           });
         })
-        .catch((err) => reject(new ServerError(500, err.message)));
+        .catch((err) => reject(new ServerError(500, err?.message)));
     } catch (err) {
       reject(new ServerError(500, err?.message));
     }
   });
 }
 
-async function deleteDoc(req: Partial<IPostReq>): Promise<IResponse> {
+async function deleteDoc(req: NextApiRequest): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
-    const { userId, id } = req;
+    let session: ClientSession = null;
     try {
-      const { Post } = await mongoConnection();
-      await Post.deleteOne({ user: userId, _id: id }).then((res) => {
-        if (res.acknowledged) {
-          resolve({ status: 200, message: ServerInfo.POST_DELETED });
-        } else {
-          reject(new ServerError());
-        }
+      const { MongoConnection } = await mongoConnection();
+      session = await MongoConnection.startSession();
+      await session.withTransaction(async () => {
+        const { Post, User } = await mongoConnection();
+        const { userId, id } = req.query as Partial<IPostReq>;
+        await Post.findByIdAndDelete(id)
+          .then(() => {
+            User.findByIdAndUpdate(
+              userId,
+              { $pullAll: { posts: [id] } },
+              { lean: true, new: true },
+              function (err, doc) {
+                if (err) {
+                  throw new ServerError(500, err?.message);
+                } else {
+                  resolve({ status: 200, message: ServerInfo.POST_DELETED });
+                }
+              }
+            );
+          })
+          .catch((err) => {
+            throw new ServerError(500, err.message);
+          });
       });
     } catch (err) {
       reject(new ServerError(500, err?.message));
+    } finally {
+      session?.endSession();
     }
   });
 }
