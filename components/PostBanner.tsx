@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
+import { useDocumentListener } from "hooks";
 import Image from "next/image";
-import React from "react";
+import React, { useCallback, useState } from "react";
 
 interface IPostBanner {
   src?: string;
@@ -9,28 +10,43 @@ interface IPostBanner {
 }
 
 const PostBanner = ({ src, id }: IPostBanner) => {
+  const [view, setView] = useState(false);
+
+  const handleCloseCallback = useCallback((e) => {
+    if (e.key === "Escape") setView(false);
+  }, []);
+
+  useDocumentListener("keydown", handleCloseCallback);
+
   return src ? (
-    <header className="banner-image">
-      {/* <Image
-        src={src}
-        alt="post-image"
-        layout="fill"
-        objectFit="cover"
-        objectPosition="50% 20%"
-        priority
-      /> */}
-      <motion.img
-        src={src}
-        alt="post-image"
-        layoutId={`banner-${id}`}
-        style={{
-          height: "100%",
-          width: "100%",
-          objectFit: "cover",
-          objectPosition: "50% 40%",
-        }}
-      />
-    </header>
+    <>
+      <header className="banner-image">
+        <motion.img
+          src={src}
+          alt="post-banner-image"
+          layoutId={`banner-${id}`}
+          style={{
+            height: "100%",
+            width: "100%",
+            objectFit: "cover",
+            objectPosition: "50% 40%",
+            cursor: "pointer",
+          }}
+          onClick={() => setView(true)}
+        />
+      </header>
+      <div
+        className={`transparent-overlay ${view ? "" : "hide"}`}
+        onClick={() => setView(false)}
+      >
+        <Image
+          alt="post-full-image"
+          src={src}
+          layout="fill"
+          objectFit="contain"
+        />
+      </div>
+    </>
   ) : null;
 };
 

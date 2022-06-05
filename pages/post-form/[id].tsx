@@ -163,6 +163,8 @@ const EditPost = ({ id }: IPostPage) => {
       setBody("");
       setNewImage(null);
       setImageName("");
+      setIsPrivate(false);
+      setHasMarkdown(false);
     } else {
       refreshPost();
     }
