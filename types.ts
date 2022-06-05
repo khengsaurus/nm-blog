@@ -38,7 +38,7 @@ interface IRequest {
 }
 
 interface IHasId {
-  id?: string;
+  id: string;
   _id?: string;
 }
 
@@ -52,14 +52,17 @@ interface IHasImage {
   imageName: string;
 }
 
-export interface IPost extends IHasId, IHasTimestamps, IHasImage {
-  user: IUser;
-  username: string;
-  title: string;
-  slug: string;
-  body: string;
-  isPrivate: boolean;
-  hasMarkdown: boolean;
+export interface IPost
+  extends Partial<IHasId>,
+    Partial<IHasImage>,
+    Partial<IHasTimestamps> {
+  slug?: string;
+  username?: string;
+  user?: IUser;
+  title?: string;
+  body?: string;
+  isPrivate?: boolean;
+  hasMarkdown?: boolean;
 }
 
 export interface IPostReq extends IPost, IRequest {
@@ -76,7 +79,7 @@ export interface IUser extends IHasId, Partial<IHasTimestamps> {
   email: string;
   password: string;
   username: string;
-  posts: Partial<IPost>[];
+  posts: IPost[];
 }
 
 export interface IUserReq extends IUser, IRequest {

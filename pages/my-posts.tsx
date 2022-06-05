@@ -23,7 +23,7 @@ const MyPosts = () => {
   return (
     <main>
       <section className="header">
-        <StyledCenterText text="My Posts" variant="h2" />
+        <StyledCenterText text="My Posts" variant="h3" />
       </section>
       {user ? (
         <>

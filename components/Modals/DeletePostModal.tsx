@@ -7,7 +7,7 @@ import { IPost, IResponse } from "types";
 import ActionModal from "./ActionModal";
 
 interface IDeletePostModal {
-  post: Partial<IPost>;
+  post: IPost;
   showDelete: boolean;
   setShowDelete: (b: boolean) => void;
 }

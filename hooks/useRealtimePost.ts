@@ -5,7 +5,7 @@ import { IPost } from "types";
 import { postDocToObj } from "utils";
 import useIsoEffect from "./useIsoEffect";
 
-const useRealtimePost = (post: Partial<IPost>) => {
+const useRealtimePost = (post: IPost) => {
   const { id, slug, username, user } = post;
   const [realtimePost, setRealtimePost] = useState(post);
 

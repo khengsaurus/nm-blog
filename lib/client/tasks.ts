@@ -43,7 +43,7 @@ export async function deleteImage(imageKey: string): Promise<IResponse> {
   });
 }
 
-export function deletePost(post: Partial<IPost>): Promise<IResponse> {
+export function deletePost(post: IPost): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     deleteImage(post.imageKey);
     await HTTPService.makeAuthHttpReq(DBService.POSTS, HttpRequest.DELETE, {
