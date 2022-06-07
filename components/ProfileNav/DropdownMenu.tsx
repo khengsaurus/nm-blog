@@ -8,6 +8,7 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import { renderButton } from "components/utils";
 import { PageRoute } from "enums";
 import { AppContext } from "hooks";
+import { themes } from "lib/client";
 import {
   forwardRef,
   MutableRefObject,
@@ -27,7 +28,7 @@ interface IDropdownMenu {
 const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
   (props: IDropdownMenu, ref?: MutableRefObject<any>) => {
     const { handleClose } = props;
-    const { routerPush, user, logout } = useContext(AppContext);
+    const { user, logout, routerPush, setTheme } = useContext(AppContext);
     const [activeMenu, setActiveMenu] = useState("main");
     const [menuHeight, setMenuHeight] = useState(null);
     const dropdownRef = useRef(null);
@@ -106,15 +107,15 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
           <DropdownItem callback={() => setActiveMenu("main")} hasBack>
             {renderButton("Themes", 18)}
           </DropdownItem>
-          <DropdownItem leftIcon={<BoltIcon />}>
-            {renderButton("Default")}
-          </DropdownItem>
-          <DropdownItem leftIcon={<BoltIcon />}>
-            {renderButton("Green")}
-          </DropdownItem>
-          <DropdownItem leftIcon={<BoltIcon />}>
-            {renderButton("White")}
-          </DropdownItem>
+          {Object.keys(themes).map((opt) => (
+            <DropdownItem
+              key={opt}
+              leftIcon={<BoltIcon />}
+              callback={() => setTheme(opt)}
+            >
+              {renderButton(opt)}
+            </DropdownItem>
+          ))}
         </div>
       );
     }

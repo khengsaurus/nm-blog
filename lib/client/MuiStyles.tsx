@@ -2,26 +2,22 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { TransitionSpeed } from "enums";
 import { AppContext } from "hooks";
 import { useContext, useMemo } from "react";
+import { ITheme } from "types";
+import themes from "./themes";
 
 export const HomeTheme = (props: any) => {
-  const { darkMode } = useContext(AppContext);
+  const { theme } = useContext(AppContext);
   const _theme = useMemo(() => {
-    return newMuiTheme(darkMode);
-  }, [darkMode]);
+    const _theme = themes[theme] || themes["blue"];
+    return newMuiTheme(_theme);
+  }, [theme]);
 
   return <ThemeProvider theme={_theme} {...props} />;
 };
 
-const grey = "rgb(66, 80, 107)";
-const blue = "rgb(62, 97, 155)";
-const red = "rgb(239, 75, 76)";
-const white = "rgb(230, 230, 230)";
+function newMuiTheme(theme: ITheme) {
+  const { componentDark, componentLight, highlightColor, mainText } = theme;
 
-function newMuiTheme(darkMode: boolean) {
-  const backgroundColor = darkMode ? grey : grey;
-  const componentHighlight = darkMode ? blue : blue;
-  const mainText = darkMode ? white : white;
-  const highlightColor = darkMode ? red : red;
   const accordionWidth = {
     minWidth: "200px",
     width: "80vw",
@@ -30,7 +26,7 @@ function newMuiTheme(darkMode: boolean) {
 
   return createTheme({
     palette: {
-      primary: { main: backgroundColor },
+      primary: { main: componentDark },
       secondary: { main: highlightColor },
       text: { primary: mainText },
       action: {
@@ -47,12 +43,11 @@ function newMuiTheme(darkMode: boolean) {
       subtitle1: { color: mainText },
       subtitle2: { color: mainText },
     },
-
     components: {
       MuiAccordion: {
         styleOverrides: {
           root: {
-            backgroundColor,
+            backgroundColor: componentDark,
             boxShadow: "none",
             ...accordionWidth,
             "&:before": { content: "none" },
@@ -65,7 +60,7 @@ function newMuiTheme(darkMode: boolean) {
       MuiAccordionDetails: {
         styleOverrides: {
           root: {
-            backgroundColor,
+            backgroundColor: componentDark,
             padding: 2,
             overflowX: "hidden",
             overflowY: "scroll",
@@ -78,7 +73,7 @@ function newMuiTheme(darkMode: boolean) {
       MuiAccordionSummary: {
         styleOverrides: {
           root: {
-            backgroundColor,
+            backgroundColor: componentDark,
             boxShadow: "none",
             color: mainText,
             minHeight: "40px",
@@ -111,7 +106,7 @@ function newMuiTheme(darkMode: boolean) {
         styleOverrides: {
           root: {
             height: 50,
-            backgroundColor: componentHighlight,
+            backgroundColor: componentLight,
             alignItems: "center",
             justifyContent: "space-between",
           },
@@ -166,9 +161,9 @@ function newMuiTheme(darkMode: boolean) {
       MuiCardContent: {
         styleOverrides: {
           root: {
-            border: `2px solid ${grey}`,
+            border: `2px solid ${componentDark}`,
             padding: "4px 12px",
-            backgroundColor: grey,
+            backgroundColor: componentDark,
             "&:last-child": {
               padding: "4px 8px",
             },
@@ -194,6 +189,17 @@ function newMuiTheme(darkMode: boolean) {
           },
         },
       },
+      MuiContainer: {
+        styleOverrides: {
+          root: {
+            color: mainText,
+            backgroundColor: "transparent !important",
+            borderColor: mainText,
+            margin: 0,
+            paddingRight: "0px !important",
+          },
+        },
+      },
       MuiDialog: {
         styleOverrides: {
           paper: {
@@ -203,7 +209,7 @@ function newMuiTheme(darkMode: boolean) {
             overflowX: "hidden",
             overflowY: "hidden",
             userSelect: "none",
-            backgroundColor,
+            backgroundColor: componentDark,
           },
         },
       },
@@ -283,9 +289,9 @@ function newMuiTheme(darkMode: boolean) {
       MuiOutlinedInput: {
         styleOverrides: {
           root: {
-            borderColor: white,
+            borderColor: mainText,
             ".MuiOutlinedInput-notchedOutline": {
-              borderColor: white,
+              borderColor: mainText,
               borderWidth: "1px",
             },
             "&:hover .MuiOutlinedInput-notchedOutline": {

@@ -1,6 +1,17 @@
+import { Container } from "@mui/system";
 import { marked } from "marked";
 import React from "react";
 import sanitizeHtml from "sanitize-html";
+// import hljs from "highlight.js";
+
+// marked.setOptions({
+//   langPrefix: "hljs language-",
+//   renderer: new marked.Renderer(),
+//   highlight: function (code, language) {
+//     const validLanguage = hljs.getLanguage(language) ? language : "plaintext";
+//     return hljs.highlight(validLanguage, code).value.replace(/&amp;/g, "&");
+//   },
+// });
 
 const allowedTags = sanitizeHtml.defaults.allowedTags.concat([
   "img",
@@ -29,8 +40,8 @@ const MarkdownViewer = ({
   hasMarkdown,
 }: IMarkdownViewerProps) => {
   return (
-    <div
-      className={`markdown-viewer ${hasMarkdown ? "show" : ""}`}
+    <Container
+      className={`markdown-viewer ${hasMarkdown ? "show" : "hide"}`}
       style={{ height }}
       dangerouslySetInnerHTML={{
         __html: sanitizeHtml(marked(text), {

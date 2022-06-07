@@ -8,6 +8,8 @@ import useLocalStorage from "./useLocalStorage";
 import useWindowListener from "./useWindowListener";
 
 const initialContext: IAppContext = {
+  theme: "embers",
+  setTheme: null,
   user: null,
   userToken: "",
   darkMode: false,
@@ -19,7 +21,6 @@ const initialContext: IAppContext = {
   logout: null,
   updatePostSlugs: null,
   handleUser: null,
-  setDarkMode: null,
 };
 
 export const AppContext = createContext<IAppContext>(initialContext);
@@ -31,6 +32,8 @@ const AppContextProvider = (props: any) => {
   const [userSessionActive, setUserSessionActive] = useState(true);
   const historyRef = useRef([]);
   const router = useRouter();
+  //TODO: remove
+  const [theme, setTheme] = useState("embers");
 
   /* -------------------- Start Router stuff -------------------- */
   const routerPush = useCallback(
@@ -133,6 +136,8 @@ const AppContextProvider = (props: any) => {
   return (
     <AppContext.Provider
       value={{
+        theme,
+        setTheme,
         user,
         userToken,
         darkMode,

@@ -1,7 +1,9 @@
-import { useMemo, ReactNode, useContext, useEffect } from "react";
-import { NavBar } from ".";
+import { Box } from "@mui/material";
 import { PageRoute } from "enums";
 import { AppContext } from "hooks";
+import { useContext, useEffect } from "react";
+import { NavBar } from ".";
+import themes from "lib/client/themes";
 
 const authRoutes: string[] = [
   PageRoute.MY_POSTS,
@@ -14,7 +16,11 @@ interface ILayoutProps {
 }
 
 const Layout = ({ children }: ILayoutProps) => {
-  const { router, userSessionActive, routerPush } = useContext(AppContext);
+  const { router, userSessionActive, routerPush, theme } =
+    useContext(AppContext);
+  // const _backgroundColor =
+  //   themes[user?.theme || "blue"].mainBackground || "rgb(45, 60, 90)";
+  const _backgroundColor = themes[theme].mainBackground || "rgb(40, 40, 40)";
 
   useEffect(() => {
     if (
@@ -28,7 +34,9 @@ const Layout = ({ children }: ILayoutProps) => {
   return (
     <>
       <NavBar />
-      {children}
+      <Box className="background" style={{ backgroundColor: _backgroundColor }}>
+        {children}
+      </Box>
     </>
   );
 };

@@ -14,6 +14,8 @@ export interface IResponse {
 /*------------------------------ . ------------------------------*/
 
 export interface IAppContext {
+  theme: string; //TODO: move into user
+  setTheme: (_?: string) => void;
   user: IUser;
   userToken: string;
   darkMode: boolean;
@@ -25,7 +27,18 @@ export interface IAppContext {
   logout: () => void;
   updatePostSlugs: (user: IUser) => void;
   handleUser: (token: string, user: IUser) => void;
-  setDarkMode: (_?: boolean) => void;
+}
+
+export interface ITheme {
+  mainBackground: string;
+  componentDark: string;
+  componentLight: string;
+  highlightColor: string;
+  mainText: string;
+}
+
+export interface IThemeOptions {
+  [key: string]: ITheme;
 }
 
 export interface IAlert {
@@ -80,6 +93,7 @@ export interface IUser extends IHasId, Partial<IHasTimestamps> {
   password: string;
   username: string;
   posts: IPost[];
+  theme: string;
 }
 
 export interface IUserReq extends IUser, IRequest {

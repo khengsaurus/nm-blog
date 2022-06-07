@@ -14,14 +14,21 @@
   border-radius: 4px;
 }
 
+@mixin no-scroll {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 $main-side-margin: clamp(20px, 4vw, 100px);
 $main-width: calc(100vw - (2 * $main-side-margin));
 $speed: 350ms;
-$main-bg: rgb(45, 60, 90);
+$main-bg: rgb(40, 40, 40);
 $white-main: rgb(195, 195, 195);
 $grey-dark: #242526;
 $grey-main: #484a4d;
 $grey-light: #525357;
+
 $big-button-dim: 80px;
 $medium-button-dim: 50px;
 
@@ -32,6 +39,14 @@ html {
 
 body {
   margin: 0px;
+}
+
+.background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
 }
 
 main {
@@ -112,6 +127,9 @@ p {
     margin: 3px 0px;
     font-size: 15px;
   }
+}
+textarea {
+  @include no-scroll;
 }
 
 .card-content {
@@ -214,13 +232,18 @@ p {
 
 .markdown-viewer {
   @include round-border;
+  @include no-scroll;
   position: relative;
-  background-color: $white-main;
+  border: 1px solid transparent;
   overflow-y: scroll;
   transition: 400ms;
   width: 0px;
   padding-left: 0px;
+  &.hide {
+    border-color: transparent !important;
+  }
   &.show {
+    border-color: inherit;
     width: calc(50% - 6px);
     padding-left: 5px;
   }
