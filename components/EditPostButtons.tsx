@@ -1,5 +1,6 @@
-import { Row, StyledButton } from "components";
-import React, { useState } from "react";
+import { StyledButton } from "components";
+import { AppContext } from "hooks";
+import React, { useContext, useState } from "react";
 import CheckBox from "./CheckBox";
 
 interface IEditPostButtons {
@@ -11,7 +12,6 @@ interface IEditPostButtons {
   saveDisabled: boolean;
   handleSave: () => Promise<any>;
   isEdit: boolean;
-  onCancel?: () => void;
   onDelete?: () => void;
 }
 
@@ -22,13 +22,13 @@ const EditPostButtons = ({
   setIsPrivate,
   hasMarkdown,
   setHasMarkdown,
+  isEdit,
   saveButtonLabel,
   saveDisabled,
   handleSave,
-  isEdit,
-  onCancel = null,
   onDelete = null,
 }: IEditPostButtons) => {
+  const { routerBack } = useContext(AppContext);
   const [cancelCalled, setCancelCalled] = useState(false);
 
   function renderCancelDelete() {
@@ -39,7 +39,7 @@ const EditPostButtons = ({
           disabled={cancelCalled}
           onClick={() => {
             setCancelCalled(true);
-            onCancel();
+            routerBack();
           }}
           style={lastButtonStyle}
         />

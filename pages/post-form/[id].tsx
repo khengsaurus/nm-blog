@@ -38,7 +38,7 @@ const getSaveButtonLabel = (saveStatus: Status) => {
 };
 
 const EditPost = ({ id }: IPostPage) => {
-  const { user, updatePostSlugs, routerPush } = useContext(AppContext);
+  const { user, updatePostSlugs } = useContext(AppContext);
   const { realtimePost, refreshPost } = useRealtimePost({ id, user });
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
@@ -54,7 +54,12 @@ const EditPost = ({ id }: IPostPage) => {
 
   useEffect(() => {
     if (!hasEditedSlug.current) {
-      setSlug(title?.toLocaleLowerCase().replaceAll(" ", "-"));
+      setSlug(
+        title
+          ?.toLocaleLowerCase()
+          .replace(/[\?\/]/g, "")
+          .replaceAll(" ", "-")
+      );
     }
   }, [title]);
 
@@ -89,8 +94,8 @@ const EditPost = ({ id }: IPostPage) => {
       }
       // no newImage or newImage saved
       if (!hasAttachment || !!imageKey) {
-        HTTPService.makeAuthHttpReq(DBService.POSTS, HttpRequest.POST, {
-          username: user.username,
+        const post = {
+          username: user?.username,
           title,
           slug,
           body,
@@ -98,13 +103,14 @@ const EditPost = ({ id }: IPostPage) => {
           imageName: newImage?.name || "",
           isPrivate,
           hasMarkdown,
-        })
+        };
+        HTTPService.makeAuthHttpReq(DBService.POSTS, HttpRequest.POST, post)
           .then((res) => resolve(res))
           .catch((err) => reject(err));
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newImage, body, slug, title, JSON.stringify(user)]);
+  }, [newImage, body, slug, title, isPrivate, hasMarkdown, user?.username]);
 
   async function _handlePatch() {
     return new Promise(async (resolve, reject) => {
@@ -236,7 +242,6 @@ const EditPost = ({ id }: IPostPage) => {
           saveDisabled={saveDisabled}
           handleSave={handleSave}
           isEdit={!isNewPost}
-          onCancel={isNewPost ? null : () => routerPush(PageRoute.MY_POSTS)}
           onDelete={isNewPost ? null : () => setShowDelete(true)}
         />
       </Column>

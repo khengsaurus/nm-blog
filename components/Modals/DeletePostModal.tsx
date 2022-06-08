@@ -26,7 +26,7 @@ const DeletePostModal = ({
     () => deletePost(post),
     () => {
       updatePostSlugs(user);
-      routerPush(PageRoute.HOME);
+      routerPush(PageRoute.MY_POSTS);
     },
     (r: IResponse) => r.status === 200,
     false

@@ -6,11 +6,11 @@ import { StyledText } from "./StyledMui";
 
 interface ICheckboxProps {
   value: boolean;
-  setValue: (b?: boolean) => void;
   label?: string;
+  setValue: (b?: boolean) => void;
 }
 
-const CheckBox = ({ value, setValue, label }: ICheckboxProps) => {
+const CheckBox = ({ label, value, setValue }: ICheckboxProps) => {
   return (
     <>
       <IconButton

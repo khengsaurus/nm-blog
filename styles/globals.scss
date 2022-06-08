@@ -47,6 +47,7 @@ body {
   left: 0;
   height: 100vh;
   width: 100vw;
+  overflow: scroll;
 }
 
 main {
@@ -210,7 +211,7 @@ textarea {
         margin-left: auto;
       }
       &:hover {
-        background-color: rgba(0, 0, 0, 0.2);
+        background-color: rgba(0, 0, 0, 0.12);
       }
     }
   }
@@ -224,15 +225,15 @@ textarea {
   border: 1px solid transparent;
   overflow-y: scroll;
   transition: 400ms;
-  width: 0px;
-  padding-left: 0px;
   &.hide {
-    border-color: transparent !important;
+    border: none !important;
+    padding: 0px !important;
+    width: 0px;
   }
   &.show {
     border-color: inherit;
-    width: calc(50% - 6px);
     padding-left: 5px;
+    width: calc(50% - 6px);
   }
 }
 

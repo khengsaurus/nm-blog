@@ -9,7 +9,6 @@ import {
 } from "components";
 import { PageRoute } from "enums";
 import { AppContext, useRealtimePost } from "hooks";
-import { serverUrl } from "lib/client";
 import { mongoConnection } from "lib/server";
 import { useContext, useState } from "react";
 import { IPost } from "types";
@@ -22,7 +21,6 @@ interface IPostPage {
 }
 
 export async function getStaticProps({ params }) {
-  console.info("-> [username][slug] getStaticProps()");
   const { username, slug } = params;
   const { Post } = await mongoConnection();
   const post = await Post.findOne({ username, slug })
@@ -40,7 +38,6 @@ export async function getStaticProps({ params }) {
 }
 
 export async function getStaticPaths() {
-  console.info("-> [username][slug] getStaticPaths()");
   const { Post } = await mongoConnection();
   const posts = await Post.find()
     .sort({ createdAt: -1 })
@@ -78,10 +75,7 @@ const Post = ({ post }: IPostPage) => {
     <>
       <main className="left">
         {imageKey && (
-          <PostBanner
-            src={`${serverUrl}/api/images?key=${imageKey}`}
-            id={`${imageKey}`}
-          />
+          <PostBanner src={`/api/images?key=${imageKey}`} id={`${imageKey}`} />
         )}
         <section className="header">
           <StyledText text={title} variant="h2" />

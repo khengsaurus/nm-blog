@@ -13,10 +13,9 @@ interface IHomeProps {
 }
 
 export async function getServerSideProps({ res }) {
-  console.info("-> Home getServerSideProps()");
   res.setHeader(
     "Cache-Control",
-    "public, max-age=300, s-maxage=600, stale-while-revalidate=30"
+    "public, s-maxage=30, stale-while-revalidate=120"
   );
 
   const { Post } = await mongoConnection();
