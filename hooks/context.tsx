@@ -12,7 +12,6 @@ const initialContext: IAppContext = {
   setTheme: null,
   user: null,
   userToken: "",
-  darkMode: false,
   userSessionActive: true,
   history: [],
   router: null,
@@ -27,13 +26,11 @@ export const AppContext = createContext<IAppContext>(initialContext);
 
 const AppContextProvider = (props: any) => {
   const [user, setUser] = useState<IUser>();
-  const [userToken, setUserToken] = useLocalStorage("userToken", "");
-  const [darkMode, setDarkMode] = useState(false);
   const [userSessionActive, setUserSessionActive] = useState(true);
+  const [userToken, setUserToken] = useLocalStorage("userToken", "");
+  const [theme, setTheme] = useLocalStorage("theme", "");
   const historyRef = useRef([]);
   const router = useRouter();
-  //TODO: remove
-  const [theme, setTheme] = useState("embers");
 
   /* -------------------- Start Router stuff -------------------- */
   const routerPush = useCallback(
@@ -136,20 +133,18 @@ const AppContextProvider = (props: any) => {
   return (
     <AppContext.Provider
       value={{
-        theme,
-        setTheme,
         user,
         userToken,
-        darkMode,
         userSessionActive,
+        theme,
         history: historyRef.current,
         router,
+        setTheme,
         routerPush,
         routerBack,
         logout,
         updatePostSlugs,
         handleUser,
-        setDarkMode,
       }}
       {...props}
     />

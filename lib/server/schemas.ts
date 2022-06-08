@@ -7,7 +7,6 @@ export const UserSchema = new Schema<IUser>({
   email: SchemaTypes.String,
   password: SchemaTypes.String,
   username: SchemaTypes.String,
-  theme: SchemaTypes.String,
   posts: [
     {
       type: SchemaTypes.ObjectId,

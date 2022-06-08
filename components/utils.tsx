@@ -5,7 +5,7 @@ export function renderButton(label: string, fontSize = 16) {
     <StyledButton
       label={label}
       style={{
-        paddingLeft: 0,
+        paddingLeft: 10,
         textAlign: "left",
         justifyContent: "left",
         textTransform: "capitalize",

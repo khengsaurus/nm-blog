@@ -1,28 +1,29 @@
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { TransitionSpeed } from "enums";
 import { AppContext } from "hooks";
-import { useContext, useMemo } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { ITheme } from "types";
 import themes from "./themes";
 
 export const HomeTheme = (props: any) => {
   const { theme } = useContext(AppContext);
-  const _theme = useMemo(() => {
-    const _theme = themes[theme] || themes["blue"];
-    return newMuiTheme(_theme);
+  const [muiTheme, setMuiTheme] = useState(newMuiTheme(themes["blue"]));
+
+  useEffect(() => {
+    if (theme) setMuiTheme(newMuiTheme(themes[theme]));
   }, [theme]);
 
-  return <ThemeProvider theme={_theme} {...props} />;
+  return <ThemeProvider theme={muiTheme} {...props} />;
 };
 
 function newMuiTheme(theme: ITheme) {
-  const { componentDark, componentLight, highlightColor, mainText } = theme;
-
-  const accordionWidth = {
-    minWidth: "200px",
-    width: "80vw",
-    maxWidth: "450px",
-  };
+  const {
+    mainBackground,
+    componentDark,
+    componentLight,
+    highlightColor,
+    mainText,
+  } = theme;
 
   return createTheme({
     palette: {
@@ -44,64 +45,6 @@ function newMuiTheme(theme: ITheme) {
       subtitle2: { color: mainText },
     },
     components: {
-      MuiAccordion: {
-        styleOverrides: {
-          root: {
-            backgroundColor: componentDark,
-            boxShadow: "none",
-            ...accordionWidth,
-            "&:before": { content: "none" },
-            "&.Mui-expanded": {
-              margin: "0px",
-            },
-          },
-        },
-      },
-      MuiAccordionDetails: {
-        styleOverrides: {
-          root: {
-            backgroundColor: componentDark,
-            padding: 2,
-            overflowX: "hidden",
-            overflowY: "scroll",
-            ...accordionWidth,
-            // borderTop: `1px solid ${highlightColor}`,
-            // borderBottom: `1px solid ${highlightColor}`
-          },
-        },
-      },
-      MuiAccordionSummary: {
-        styleOverrides: {
-          root: {
-            backgroundColor: componentDark,
-            boxShadow: "none",
-            color: mainText,
-            minHeight: "40px",
-            ...accordionWidth,
-            padding: 0,
-            "&.Mui-expanded": {
-              minHeight: "40px",
-            },
-          },
-          content: {
-            margin: `4px 0px`,
-            "&.Mui-expanded": {
-              margin: `4px 0px !important`,
-            },
-          },
-          expandIconWrapper: {
-            color: mainText,
-            transition: TransitionSpeed.MEDIUM,
-            "&:hover": {
-              color: highlightColor,
-            },
-            "&.Mui-expanded": {
-              color: highlightColor,
-              transform: "rotate(90deg)",
-            },
-          },
-        },
-      },
       MuiToolbar: {
         styleOverrides: {
           root: {
@@ -193,10 +136,13 @@ function newMuiTheme(theme: ITheme) {
         styleOverrides: {
           root: {
             color: mainText,
-            backgroundColor: "transparent !important",
-            borderColor: mainText,
+            backgroundColor: componentDark,
+            border: `2px solid ${mainText}`,
             margin: 0,
             paddingRight: "0px !important",
+            // "&:hover": {
+            //   borderColor: `${highlightColor} !important`,
+            // },
           },
         },
       },

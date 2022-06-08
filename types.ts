@@ -14,14 +14,13 @@ export interface IResponse {
 /*------------------------------ . ------------------------------*/
 
 export interface IAppContext {
-  theme: string; //TODO: move into user
-  setTheme: (_?: string) => void;
   user: IUser;
   userToken: string;
-  darkMode: boolean;
+  theme: string;
   history: string[];
   router: NextRouter;
   userSessionActive: boolean;
+  setTheme: (_?: string) => void;
   routerPush: (route: string) => void;
   routerBack: () => void;
   logout: () => void;
@@ -93,7 +92,6 @@ export interface IUser extends IHasId, Partial<IHasTimestamps> {
   password: string;
   username: string;
   posts: IPost[];
-  theme: string;
 }
 
 export interface IUserReq extends IUser, IRequest {

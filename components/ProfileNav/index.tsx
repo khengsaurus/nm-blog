@@ -27,8 +27,8 @@ const ProfileNav = () => {
 
   return (
     <div className="profile-nav">
-      <li className="nav-item" ref={iconRef}>
-        <IconButton onClick={() => setOpen(!open)}>
+      <li className="nav-item">
+        <IconButton onClick={() => setOpen(!open)} ref={iconRef}>
           <PersonOutlineIcon />
         </IconButton>
       </li>

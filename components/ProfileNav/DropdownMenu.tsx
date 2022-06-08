@@ -5,6 +5,7 @@ import KeyIcon from "@mui/icons-material/Key";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PaletteIcon from "@mui/icons-material/Palette";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import { Container } from "@mui/system";
 import { renderButton } from "components/utils";
 import { PageRoute } from "enums";
 import { AppContext } from "hooks";
@@ -42,12 +43,12 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
     );
 
     useEffect(() => {
-      setMenuHeight(dropdownRef.current?.firstChild.offsetHeight);
+      setMenuHeight(dropdownRef.current?.firstChild.offsetHeight + 8);
     }, []);
 
     function calcHeight(el) {
       const height = el.offsetHeight;
-      setMenuHeight(height);
+      setMenuHeight(height + 8);
     }
 
     const handleLogout = useCallback(() => {
@@ -170,13 +171,13 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
     }
 
     return (
-      <div
+      <Container
         className="dropdown"
-        style={{ height: menuHeight }}
+        style={{ height: menuHeight, width: "258px", padding: 2 }}
         ref={dropdownRef}
       >
         {!!user ? renderLoggedInMenu() : renderNotLoggedInMenu()}
-      </div>
+      </Container>
     );
   }
 );

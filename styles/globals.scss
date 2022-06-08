@@ -156,7 +156,7 @@ textarea {
 
 .profile-nav {
   $nav-size: 60px;
-  $border: 1px solid $grey-main;
+  $border: 1px solid inherit;
   $padding: 6px;
   ul {
     list-style: none;
@@ -182,7 +182,6 @@ textarea {
     $button-size: calc($nav-size * 0.5);
     width: $button-size;
     height: $button-size;
-    background-color: $grey-main;
     border-radius: 50%;
     padding: 5px;
     display: flex;
@@ -193,7 +192,6 @@ textarea {
     position: absolute;
     top: 45px;
     right: $padding;
-    background-color: $grey-dark;
     border: $border;
     padding: 4px;
     overflow: hidden;
@@ -202,29 +200,17 @@ textarea {
   .menu {
     width: 250px;
     a {
-      &.menu-item {
-        @include flex-(row);
-        @include round-border;
-        height: 45px;
-        align-items: center;
-        transition: background $speed;
-        padding: $padding;
-        .right {
-          margin-left: auto;
-          background-color: transparent;
-        }
-        span {
-          &.icon-button {
-            margin-right: 10px;
-          }
-          &.back {
-            padding-right: 2px;
-            background-color: transparent;
-          }
-        }
-        &:hover {
-          background-color: $grey-light;
-        }
+      @include flex-(row);
+      @include round-border;
+      height: 45px;
+      align-items: center;
+      transition: background $speed;
+      padding: $padding;
+      .right {
+        margin-left: auto;
+      }
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.2);
       }
     }
   }
@@ -234,6 +220,7 @@ textarea {
   @include round-border;
   @include no-scroll;
   position: relative;
+  background-color: transparent !important;
   border: 1px solid transparent;
   overflow-y: scroll;
   transition: 400ms;

@@ -12,22 +12,14 @@ interface IDropdownItemProps {
 const DropdownItem = (props: IDropdownItemProps) => {
   const { callback, hasBack, leftIcon, children, rightIcon } = props;
   return (
-    <a href="#" className="menu-item" onClick={callback}>
+    <a href="#" onClick={callback}>
       {hasBack ? (
-        <span className="icon-button back">
-          <IconButton>{<ChevronLeftIcon />}</IconButton>
-        </span>
+        <IconButton>{<ChevronLeftIcon />}</IconButton>
       ) : leftIcon ? (
-        <span className="icon-button">
-          <IconButton>{leftIcon}</IconButton>
-        </span>
+        <IconButton>{leftIcon}</IconButton>
       ) : null}
       {children}
-      {rightIcon && (
-        <span className="icon-button right">
-          <IconButton>{rightIcon}</IconButton>
-        </span>
-      )}
+      {rightIcon && <IconButton className="right">{rightIcon}</IconButton>}
     </a>
   );
 };
