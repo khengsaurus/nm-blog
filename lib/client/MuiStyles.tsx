@@ -139,10 +139,7 @@ function newMuiTheme(theme: ITheme) {
             backgroundColor: componentDark,
             border: `2px solid ${mainText}`,
             margin: 0,
-            paddingRight: "0px !important",
-            // "&:hover": {
-            //   borderColor: `${highlightColor} !important`,
-            // },
+            padding: 0,
           },
         },
       },

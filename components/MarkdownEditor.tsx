@@ -15,7 +15,7 @@ const MarkdownEditor = forwardRef<MutableRefObject<any>, IMarkdownEditorProps>(
       value = undefined,
       setValue,
       fullWidth,
-      rows = 20,
+      rows = 16,
       label = "Body",
     } = props;
 

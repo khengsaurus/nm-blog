@@ -2,8 +2,8 @@ import { IThemeOptions } from "types";
 
 const themes: IThemeOptions = {
   blue: {
-    mainBackground: "rgb(70, 80, 110)",
-    componentDark: "rgb(66, 80, 123)",
+    mainBackground: "rgb(77, 88, 121)",
+    componentDark: "rgb(66, 80, 135)",
     componentLight: "rgb(62, 97, 155)",
     highlightColor: "rgb(239, 75, 76)",
     mainText: "rgb(233, 233, 235)",
@@ -36,7 +36,7 @@ const themes: IThemeOptions = {
     highlightColor: "rgb(225, 207, 86)",
     mainText: "rgb(233, 233, 235)",
   },
-  moss: {
+  teal: {
     mainBackground: "rgb(1, 97, 112)",
     componentDark: "rgb(0, 138, 147)",
     componentLight: "rgb(90, 180, 188)",

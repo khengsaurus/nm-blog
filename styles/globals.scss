@@ -23,18 +23,14 @@
 $main-side-margin: clamp(20px, 4vw, 100px);
 $main-width: calc(100vw - (2 * $main-side-margin));
 $speed: 350ms;
-$main-bg: rgb(40, 40, 40);
-$white-main: rgb(195, 195, 195);
-$grey-dark: #242526;
-$grey-main: #484a4d;
-$grey-light: #525357;
+$init-bg-color: rgb(40, 40, 40);
 
 $big-button-dim: 80px;
 $medium-button-dim: 50px;
 
 html {
   font-family: "Roboto", sans-serif;
-  background-color: $main-bg;
+  background-color: $init-bg-color;
 }
 
 body {
@@ -54,7 +50,7 @@ main {
   @include flex-(column);
   @include orientate-contents-(center);
   font-family: "Roboto", sans-serif;
-  margin: 70px $main-side-margin;
+  margin: 60px $main-side-margin;
   &.left {
     @include orientate-contents-(flex-start);
   }
@@ -243,9 +239,9 @@ textarea {
     @include orientate-contents-(center);
     height: $medium-button-dim;
     width: $medium-button-dim;
+    border: none !important;
     border-top-left-radius: 50%;
     border-bottom-left-radius: 50%;
-    background-color: $grey-dark;
     position: fixed;
     bottom: calc($medium-button-dim / 2);
     transition: $speed;
@@ -262,8 +258,8 @@ textarea {
     @include orientate-contents-(center);
     height: $big-button-dim;
     width: $big-button-dim;
+    border: none !important;
     border-radius: 50%;
-    background-color: $grey-dark;
     z-index: 1;
   }
   .post-delete-button {

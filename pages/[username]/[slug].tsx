@@ -1,8 +1,10 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { IconButton } from "@mui/material";
+import Container from "@mui/system/Container";
 import {
   AuthorLink,
+  DarkContainer,
   DeletePostModal,
   PostBanner,
   StyledText,
@@ -71,6 +73,11 @@ const Post = ({ post }: IPostPage) => {
 
   const [showDelete, setShowDelete] = useState(false);
 
+  function handleDeleteClick(e: React.MouseEvent) {
+    e.stopPropagation();
+    setShowDelete(true);
+  }
+
   return (
     <>
       <main className="left">
@@ -78,8 +85,12 @@ const Post = ({ post }: IPostPage) => {
           <PostBanner src={`/api/images?key=${imageKey}`} id={`${imageKey}`} />
         )}
         <section className="header">
-          <StyledText text={title} variant="h2" />
-          <AuthorLink author={author} title />
+          <DarkContainer>
+            <StyledText text={title} variant="h2" />
+          </DarkContainer>
+          <DarkContainer>
+            <AuthorLink author={author} title />
+          </DarkContainer>
         </section>
         <section className="post-body">
           <StyledText text={body} variant="body1" />
@@ -87,16 +98,16 @@ const Post = ({ post }: IPostPage) => {
       </main>
       {user?.id === author?.id && (
         <div className="post-edit-container">
-          <div className="post-edit-button">
+          <Container className="post-edit-button">
             <IconButton disableRipple onClick={handleEdit}>
               <EditIcon style={{ width: 40, height: 40 }} color="primary" />
             </IconButton>
-          </div>
-          <div className="post-delete-button">
-            <IconButton disableRipple onClick={() => setShowDelete(true)}>
+          </Container>
+          <Container className="post-delete-button">
+            <IconButton disableRipple onClick={handleDeleteClick}>
               <DeleteIcon style={{ width: 25, height: 25 }} color="primary" />
             </IconButton>
-          </div>
+          </Container>
         </div>
       )}
       <DeletePostModal

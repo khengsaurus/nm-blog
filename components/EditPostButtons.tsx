@@ -1,4 +1,5 @@
 import { StyledButton } from "components";
+import { PageRoute } from "enums";
 import { AppContext } from "hooks";
 import React, { useContext, useState } from "react";
 import CheckBox from "./CheckBox";
@@ -28,7 +29,7 @@ const EditPostButtons = ({
   handleSave,
   onDelete = null,
 }: IEditPostButtons) => {
-  const { routerBack } = useContext(AppContext);
+  const { routerPush } = useContext(AppContext);
   const [cancelCalled, setCancelCalled] = useState(false);
 
   function renderCancelDelete() {
@@ -39,7 +40,7 @@ const EditPostButtons = ({
           disabled={cancelCalled}
           onClick={() => {
             setCancelCalled(true);
-            routerBack();
+            routerPush(PageRoute.MY_POSTS);
           }}
           style={lastButtonStyle}
         />

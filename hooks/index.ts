@@ -6,6 +6,7 @@ import useFirstEffectAsync from "./useFirstEffectAsync";
 import useIsoEffect from "./useIsoEffect";
 import useLocalStorage from "./useLocalStorage";
 import usePaginatePosts from "./usePaginatePosts";
+import useRefClick from "./useRefClick";
 import useRealtimePost from "./useRealtimePost";
 import useWindowListener from "./useWindowListener";
 
@@ -18,6 +19,7 @@ export {
   useIsoEffect,
   useLocalStorage,
   usePaginatePosts,
+  useRefClick,
   useRealtimePost,
   useWindowListener,
 };

@@ -18,10 +18,10 @@ interface ILayoutProps {
 const Layout = ({ children }: ILayoutProps) => {
   const { router, userSessionActive, theme, routerPush } =
     useContext(AppContext);
-  const [bgColor, setBgColor] = useState(themes["embers"].mainBackground);
+  const [bgColor, setBgColor] = useState(themes["embers"]?.mainBackground);
 
   useEffect(() => {
-    setBgColor(themes[theme || "embers"].mainBackground);
+    setBgColor(themes[theme || "embers"]?.mainBackground);
   }, [theme]);
 
   useEffect(() => {

@@ -1,4 +1,5 @@
 import AuthorLink from "./AuthorLink";
+import DarkContainer from "./DarkContainer";
 import EditPostButtons from "./EditPostButtons";
 import EditPreviewMarkdown from "./EditPreviewMarkdown";
 import ImageForm from "./ImageForm";
@@ -29,6 +30,7 @@ import {
 export {
   AuthorLink,
   CircleLoader,
+  DarkContainer,
   DeletePostModal,
   EditPreviewMarkdown,
   EditPostButtons,
