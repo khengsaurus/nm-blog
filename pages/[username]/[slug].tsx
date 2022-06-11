@@ -1,6 +1,6 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import { IconButton } from "@mui/material";
+import { Fab, IconButton } from "@mui/material";
 import Container from "@mui/system/Container";
 import {
   AuthorLink,
@@ -11,6 +11,7 @@ import {
 } from "components";
 import { PageRoute } from "enums";
 import { AppContext, useRealtimePost } from "hooks";
+import markdown from "lib/client/markdown";
 import { mongoConnection } from "lib/server";
 import { useContext, useState } from "react";
 import { IPost } from "types";
@@ -64,14 +65,13 @@ const Post = ({ post }: IPostPage) => {
   const { user: author, id } = post;
   const { user, routerPush } = useContext(AppContext);
   const { realtimePost } = useRealtimePost(post);
-
   const { title, body, imageKey } = realtimePost;
+  const [showDelete, setShowDelete] = useState(false);
+  const [showMarkdown, setShowMarkdown] = useState(realtimePost?.hasMarkdown);
 
   function handleEdit() {
     routerPush(`${PageRoute.POST_FORM}/${id}`);
   }
-
-  const [showDelete, setShowDelete] = useState(false);
 
   function handleDeleteClick(e: React.MouseEvent) {
     e.stopPropagation();
@@ -92,13 +92,30 @@ const Post = ({ post }: IPostPage) => {
             <AuthorLink author={author} title />
           </DarkContainer>
         </section>
-        <section className="post-body">
-          <StyledText text={body} variant="body1" />
-        </section>
+        {showMarkdown ? (
+          <Container
+            className="markdown-view"
+            dangerouslySetInnerHTML={{ __html: markdown(body) }}
+          />
+        ) : (
+          <section className="post-body">
+            <StyledText text={body} variant="body1" />
+          </section>
+        )}
       </main>
       {user?.id === author?.id && (
         <div className="post-edit-container">
-          <Container className="post-edit-button">
+          <Fab className="post-edit-button" onClick={handleEdit} disableRipple>
+            <EditIcon style={{ width: 40, height: 40 }} />
+          </Fab>
+          <Fab
+            className="post-delete-button"
+            onClick={handleDeleteClick}
+            disableRipple
+          >
+            <DeleteIcon style={{ width: 25, height: 25 }} />
+          </Fab>
+          {/* <Container className="post-edit-button">
             <IconButton disableRipple onClick={handleEdit}>
               <EditIcon style={{ width: 40, height: 40 }} color="primary" />
             </IconButton>
@@ -107,7 +124,7 @@ const Post = ({ post }: IPostPage) => {
             <IconButton disableRipple onClick={handleDeleteClick}>
               <DeleteIcon style={{ width: 25, height: 25 }} color="primary" />
             </IconButton>
-          </Container>
+          </Container> */}
         </div>
       )}
       <DeletePostModal

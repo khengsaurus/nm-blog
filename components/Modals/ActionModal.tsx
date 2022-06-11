@@ -4,21 +4,22 @@ import { StyledButton, StyledCenterText } from "../StyledMui";
 
 interface IButtonProps {
   text?: string;
-  action?: () => void;
   disabled?: boolean;
+  action?: () => void;
 }
 
 interface IActionModalProps {
   show: boolean;
   text: string;
   buttons: IButtonProps[];
+  id?: string;
 }
 
 const ActionModal = forwardRef<MutableRefObject<any>, IActionModalProps>(
   (props: IActionModalProps, ref: MutableRefObject<any>) => {
-    const { show, text, buttons } = props;
+    const { show, text, buttons, id } = props;
     return (
-      <Dialog open={show} BackdropProps={{ invisible: true }} ref={ref}>
+      <Dialog open={show} BackdropProps={{ invisible: true }} ref={ref} id={id}>
         <DialogContent>
           <StyledCenterText text={text} variant="subtitle1" />
         </DialogContent>

@@ -17,17 +17,11 @@ export const HomeTheme = (props: any) => {
 };
 
 function newMuiTheme(theme: ITheme) {
-  const {
-    mainBackground,
-    componentDark,
-    componentLight,
-    highlightColor,
-    mainText,
-  } = theme;
+  const { background, primary, secondary, highlightColor, mainText } = theme;
 
   return createTheme({
     palette: {
-      primary: { main: componentDark },
+      primary: { main: primary },
       secondary: { main: highlightColor },
       text: { primary: mainText },
       action: {
@@ -49,7 +43,7 @@ function newMuiTheme(theme: ITheme) {
         styleOverrides: {
           root: {
             height: 50,
-            backgroundColor: componentLight,
+            backgroundColor: secondary,
             alignItems: "center",
             justifyContent: "space-between",
           },
@@ -104,9 +98,9 @@ function newMuiTheme(theme: ITheme) {
       MuiCardContent: {
         styleOverrides: {
           root: {
-            border: `2px solid ${componentDark}`,
+            border: `2px solid ${primary}`,
             padding: "4px 12px",
-            backgroundColor: componentDark,
+            backgroundColor: primary,
             "&:last-child": {
               padding: "4px 8px",
             },
@@ -136,7 +130,7 @@ function newMuiTheme(theme: ITheme) {
         styleOverrides: {
           root: {
             color: mainText,
-            backgroundColor: componentDark,
+            backgroundColor: primary,
             border: `2px solid ${mainText}`,
             margin: 0,
             padding: 0,
@@ -152,7 +146,7 @@ function newMuiTheme(theme: ITheme) {
             overflowX: "hidden",
             overflowY: "hidden",
             userSelect: "none",
-            backgroundColor: componentDark,
+            backgroundColor: primary,
           },
         },
       },
@@ -181,6 +175,14 @@ function newMuiTheme(theme: ITheme) {
             margin: "8px 0px",
             borderColor: mainText,
             // '&:first-of-type': { paddingTop: null }
+          },
+        },
+      },
+      MuiFab: {
+        styleOverrides: {
+          root: {
+            backgroundColor: `${secondary} !important`,
+            color: mainText
           },
         },
       },

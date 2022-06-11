@@ -29,9 +29,9 @@ export interface IAppContext {
 }
 
 export interface ITheme {
-  mainBackground: string;
-  componentDark: string;
-  componentLight: string;
+  background: string;
+  primary: string;
+  secondary: string;
   highlightColor: string;
   mainText: string;
 }

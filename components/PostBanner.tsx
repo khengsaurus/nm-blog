@@ -1,22 +1,19 @@
+import { Fade } from "@mui/material";
 import { motion } from "framer-motion";
-import { useDocumentListener } from "hooks";
+import { useKeyListener } from "hooks";
 import Image from "next/image";
-import React, { useCallback, useState } from "react";
+import { Fragment, useCallback, useState } from "react";
 
 interface IPostBanner {
-  src?: string;
-  id?: string;
-  paddingPx?: number;
+  src: string;
+  id: string;
 }
 
 const PostBanner = ({ src, id }: IPostBanner) => {
   const [view, setView] = useState(false);
 
-  const handleCloseCallback = useCallback((e) => {
-    if (e.key === "Escape") setView(false);
-  }, []);
-
-  useDocumentListener("keydown", handleCloseCallback);
+  const hideImage = useCallback(() => setView(false), []);
+  useKeyListener("Escape", hideImage);
 
   return src ? (
     <>
@@ -35,17 +32,16 @@ const PostBanner = ({ src, id }: IPostBanner) => {
           onClick={() => setView(true)}
         />
       </header>
-      <div
-        className={`transparent-overlay ${view ? "" : "hide"}`}
-        onClick={() => setView(false)}
-      >
-        <Image
-          alt="post-full-image"
-          src={src}
-          layout="fill"
-          objectFit="contain"
-        />
-      </div>
+      <Fade in={view} unmountOnExit onClick={hideImage}>
+        <div className={"transparent-overlay"}>
+          <Image
+            alt="post-full-image"
+            src={src}
+            layout="fill"
+            objectFit="contain"
+          />
+        </div>
+      </Fade>
     </>
   ) : null;
 };

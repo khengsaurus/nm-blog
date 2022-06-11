@@ -2,14 +2,13 @@ import { useEffect } from "react";
 
 function useDocumentListener(
   event: string,
-  callback: (p?: any) => any,
+  callback: (e?: any) => any,
   apply = true
 ) {
   useEffect(() => {
-    apply && callback && document.addEventListener(event, callback);
+    if (apply && callback) document?.addEventListener(event, callback);
 
-    return () =>
-      apply && callback && document.removeEventListener(event, callback);
+    return () => document?.removeEventListener(event, callback);
   }, [apply, event, callback]);
 }
 

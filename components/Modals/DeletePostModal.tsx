@@ -1,5 +1,5 @@
 import { PageRoute, Status } from "enums";
-import { AppContext, useAsync, useRefClick } from "hooks";
+import { AppContext, useAsync, useKeyListener, useRefClick } from "hooks";
 import { deletePost } from "lib/client/tasks";
 import { ServerError } from "lib/server";
 import { useCallback, useContext, useRef } from "react";
@@ -18,9 +18,11 @@ const DeletePostModal = ({
   setShowDelete,
 }: IDeletePostModal) => {
   const { user, routerPush, updatePostSlugs } = useContext(AppContext);
+  const handleClose = useCallback(() => setShowDelete(false), [setShowDelete]);
   const modalRef = useRef(null);
-  const close = useCallback(() => setShowDelete(false), [setShowDelete]);
-  useRefClick(modalRef, close, showDelete);
+  useRefClick(modalRef, handleClose, showDelete);
+
+  useKeyListener("Escape", handleClose);
 
   const { execute: handleDelete, status: deleteStatus } = useAsync<
     IResponse,
@@ -38,7 +40,7 @@ const DeletePostModal = ({
   const buttons = [
     {
       text: "Cancel",
-      action: close,
+      action: handleClose,
     },
     {
       text: "Delete",

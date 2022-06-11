@@ -4,10 +4,11 @@ import useDocumentListener from "./useDocumentListener";
 import useFirstEffect from "./useFirstEffect";
 import useFirstEffectAsync from "./useFirstEffectAsync";
 import useIsoEffect from "./useIsoEffect";
+import useKeyListener from "./useKeyListener";
 import useLocalStorage from "./useLocalStorage";
 import usePaginatePosts from "./usePaginatePosts";
-import useRefClick from "./useRefClick";
 import useRealtimePost from "./useRealtimePost";
+import useRefClick from "./useRefClick";
 import useWindowListener from "./useWindowListener";
 
 export {
@@ -17,6 +18,7 @@ export {
   useFirstEffect,
   useFirstEffectAsync,
   useIsoEffect,
+  useKeyListener,
   useLocalStorage,
   usePaginatePosts,
   useRefClick,

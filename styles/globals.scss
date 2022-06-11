@@ -72,6 +72,7 @@ main {
       min-height: fit-content;
     }
     &.post-body {
+      padding: 0px 10px;
       p {
         padding: 0px;
         margin: 8px 0px;
@@ -82,12 +83,12 @@ main {
 }
 
 h1 {
-  padding: 10px 0px !important;
+  padding: 8px 0px !important;
   font-size: 38px !important;
   margin: 0;
 }
 h2 {
-  padding: 8px 0px !important;
+  padding: 6px 0px !important;
   font-size: 32px !important;
   margin: 0;
 }
@@ -213,7 +214,7 @@ textarea {
   }
 }
 
-.markdown-viewer {
+.markdown-preview {
   @include round-border;
   @include no-scroll;
   position: relative;
@@ -233,33 +234,36 @@ textarea {
   }
 }
 
+.markdown-view {
+  background-color: transparent !important;
+  border: none !important;
+  padding: 0px 10px !important;
+  &.card {
+    padding: 0px !important;
+    h1: {
+      padding: 2px 0px !important;
+    }
+  }
+}
+
 .post-edit-container {
   @mixin delete-button {
-    @include flex-(column);
-    @include orientate-contents-(center);
     height: $medium-button-dim;
     width: $medium-button-dim;
-    border: none !important;
-    border-top-left-radius: 50%;
-    border-bottom-left-radius: 50%;
+    border-top-right-radius: 0%;
+    border-bottom-right-radius: 0%;
     position: fixed;
     bottom: calc($medium-button-dim / 2);
     transition: $speed;
     z-index: 0;
   }
-  @include flex-(column);
-  @include orientate-contents-(center);
   position: fixed;
   bottom: 10px;
   right: 10px;
   transition: $speed;
   .post-edit-button {
-    @include flex-(column);
-    @include orientate-contents-(center);
     height: $big-button-dim;
     width: $big-button-dim;
-    border: none !important;
-    border-radius: 50%;
     z-index: 1;
   }
   .post-delete-button {
@@ -300,11 +304,6 @@ textarea {
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 1000;
   transition: $speed;
-  opacity: 1;
-  &.hide {
-    opacity: 0;
-    visibility: hidden;
-  }
 }
 
 /* CSSTransition classes  */
