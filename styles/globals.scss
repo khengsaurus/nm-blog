@@ -72,7 +72,7 @@ main {
       min-height: fit-content;
     }
     &.post-body {
-      padding: 0px 10px;
+      padding: 0px;
       p {
         padding: 0px;
         margin: 8px 0px;
@@ -124,6 +124,10 @@ p {
   &.date {
     margin: 3px 0px;
     font-size: 15px;
+  }
+  &.icon {
+    margin: 0;
+    padding: 10px;
   }
 }
 textarea {
@@ -193,7 +197,7 @@ textarea {
     border: $border;
     padding: 4px;
     overflow: hidden;
-    transition: height $speed;
+    transition: $speed !important;
   }
   .menu {
     width: 250px;

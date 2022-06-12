@@ -32,7 +32,7 @@ const ProfileNav = () => {
           <PersonOutlineIcon />
         </IconButton>
       </li>
-      {open && <DropdownMenu handleClose={handleClose} ref={menuRef} />}
+      <DropdownMenu open={open} handleClose={handleClose} ref={menuRef} />
     </div>
   );
 };

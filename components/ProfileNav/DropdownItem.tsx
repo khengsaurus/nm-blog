@@ -16,7 +16,11 @@ const DropdownItem = (props: IDropdownItemProps) => {
       {hasBack ? (
         <IconButton>{<ChevronLeftIcon />}</IconButton>
       ) : leftIcon ? (
-        <IconButton>{leftIcon}</IconButton>
+        typeof leftIcon === "string" ? (
+          <p className='icon'>{leftIcon}</p>
+        ) : (
+          <IconButton>{leftIcon}</IconButton>
+        )
       ) : null}
       {children}
       {rightIcon && <IconButton className="right">{rightIcon}</IconButton>}

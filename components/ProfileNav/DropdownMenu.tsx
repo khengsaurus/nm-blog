@@ -5,6 +5,7 @@ import KeyIcon from "@mui/icons-material/Key";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PaletteIcon from "@mui/icons-material/Palette";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import Fade from "@mui/material/Fade";
 import { Container } from "@mui/system";
 import { renderButton } from "components/utils";
 import { PageRoute } from "enums";
@@ -23,16 +24,25 @@ import { CSSTransition } from "react-transition-group";
 import DropdownItem from "./DropdownItem";
 
 interface IDropdownMenu {
+  open: boolean;
   handleClose: () => void;
 }
 
+const themeMenuHeight = 57 * (Object.keys(themes).length + 1) + 8;
+
 const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
   (props: IDropdownMenu, ref?: MutableRefObject<any>) => {
-    const { handleClose } = props;
+    const { open, handleClose } = props;
     const { user, logout, routerPush, setTheme } = useContext(AppContext);
     const [activeMenu, setActiveMenu] = useState("main");
-    const [menuHeight, setMenuHeight] = useState(null);
+    const [menuHeight, setMenuHeight] = useState(0);
     const dropdownRef = useRef(null);
+
+    const setDefaultMenuHeight = useCallback(() => {
+      setMenuHeight((user ? 3 : 2) * 57 + 8);
+    }, [user]);
+
+    useEffect(() => setDefaultMenuHeight, [setDefaultMenuHeight]);
 
     const handleNav = useCallback(
       (route: PageRoute) => {
@@ -42,15 +52,6 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
       [handleClose, routerPush]
     );
 
-    useEffect(() => {
-      setMenuHeight(dropdownRef.current?.firstChild.offsetHeight + 8);
-    }, []);
-
-    function calcHeight(el) {
-      const height = el.offsetHeight;
-      setMenuHeight(height + 8);
-    }
-
     const handleLogout = useCallback(() => {
       logout();
       handleClose();
@@ -59,13 +60,15 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
     function renderMainMenu() {
       return (
         <div className="menu">
-          <DropdownItem
-            leftIcon={<PersonOutlineIcon />}
-            rightIcon={<ChevronRightIcon />}
-            callback={() => setActiveMenu("profile")}
-          >
-            {renderButton("Profile")}
-          </DropdownItem>
+          {user && (
+            <DropdownItem
+              leftIcon={<PersonOutlineIcon />}
+              rightIcon={<ChevronRightIcon />}
+              callback={() => setActiveMenu("profile")}
+            >
+              {renderButton("Profile")}
+            </DropdownItem>
+          )}
           <DropdownItem
             leftIcon={<PaletteIcon />}
             rightIcon={<ChevronRightIcon />}
@@ -73,9 +76,18 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
           >
             {renderButton("Theme")}
           </DropdownItem>
-          <DropdownItem leftIcon={<LogoutIcon />} callback={handleLogout}>
-            {renderButton("Logout")}
-          </DropdownItem>
+          {user ? (
+            <DropdownItem leftIcon={<LogoutIcon />} callback={handleLogout}>
+              {renderButton("Logout")}
+            </DropdownItem>
+          ) : (
+            <DropdownItem
+              leftIcon={<KeyIcon />}
+              callback={() => handleNav(PageRoute.LOGIN)}
+            >
+              {renderButton("Login")}
+            </DropdownItem>
+          )}
         </div>
       );
     }
@@ -111,7 +123,7 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
           {Object.keys(themes).map((opt) => (
             <DropdownItem
               key={opt}
-              leftIcon={<BoltIcon />}
+              leftIcon={themes[opt].icon}
               callback={() => setTheme(opt)}
             >
               {renderButton(opt)}
@@ -121,14 +133,17 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
       );
     }
 
-    function renderLoggedInMenu() {
+    function renderMenu() {
       return (
         <div ref={ref}>
           <CSSTransition
             in={activeMenu === "main"}
             classNames="menu-primary"
             timeout={350}
-            onEnter={calcHeight}
+            onEnter={setDefaultMenuHeight}
+            // function calcHeight(el) {
+            //   setMenuHeight(el.offsetHeight + 8);
+            // }
             unmountOnExit
           >
             {renderMainMenu()}
@@ -138,7 +153,7 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
             in={activeMenu === "profile"}
             classNames="menu-secondary"
             timeout={350}
-            onEnter={calcHeight}
+            onEnter={setDefaultMenuHeight}
             unmountOnExit
           >
             {renderProfileMenu()}
@@ -148,7 +163,7 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
             in={activeMenu === "theme"}
             classNames="menu-secondary"
             timeout={350}
-            onEnter={calcHeight}
+            onEnter={() => setMenuHeight(themeMenuHeight)}
             unmountOnExit
           >
             {renderThemeMenu()}
@@ -157,27 +172,16 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
       );
     }
 
-    function renderNotLoggedInMenu() {
-      return (
-        <div className="menu" ref={ref}>
-          <DropdownItem
-            leftIcon={<KeyIcon />}
-            callback={() => handleNav(PageRoute.LOGIN)}
-          >
-            {renderButton("Login")}
-          </DropdownItem>
-        </div>
-      );
-    }
-
     return (
-      <Container
-        className="dropdown"
-        style={{ height: menuHeight, width: "258px", padding: 2 }}
-        ref={dropdownRef}
-      >
-        {!!user ? renderLoggedInMenu() : renderNotLoggedInMenu()}
-      </Container>
+      <Fade in={open} unmountOnExit>
+        <Container
+          className="dropdown"
+          style={{ height: menuHeight, width: "258px", padding: 2 }}
+          ref={dropdownRef}
+        >
+          {renderMenu()}
+        </Container>
+      </Fade>
     );
   }
 );

@@ -115,16 +115,6 @@ const Post = ({ post }: IPostPage) => {
           >
             <DeleteIcon style={{ width: 25, height: 25 }} />
           </Fab>
-          {/* <Container className="post-edit-button">
-            <IconButton disableRipple onClick={handleEdit}>
-              <EditIcon style={{ width: 40, height: 40 }} color="primary" />
-            </IconButton>
-          </Container>
-          <Container className="post-delete-button">
-            <IconButton disableRipple onClick={handleDeleteClick}>
-              <DeleteIcon style={{ width: 25, height: 25 }} color="primary" />
-            </IconButton>
-          </Container> */}
         </div>
       )}
       <DeletePostModal
