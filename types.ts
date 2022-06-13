@@ -89,6 +89,7 @@ export interface IUser extends IHasId, Partial<IHasTimestamps> {
   id: string;
   avatar: string;
   bio: string;
+  bioMD: boolean;
   email: string;
   password: string;
   username: string;

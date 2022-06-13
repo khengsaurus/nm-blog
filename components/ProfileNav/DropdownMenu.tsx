@@ -1,4 +1,3 @@
-import BoltIcon from "@mui/icons-material/Bolt";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import DynamicFeedIcon from "@mui/icons-material/DynamicFeed";
 import KeyIcon from "@mui/icons-material/Key";
@@ -141,9 +140,7 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
             classNames="menu-primary"
             timeout={350}
             onEnter={setDefaultMenuHeight}
-            // function calcHeight(el) {
-            //   setMenuHeight(el.offsetHeight + 8);
-            // }
+            // fn calcHeight(el) => setMenuHeight(el.offsetHeight + 8)
             unmountOnExit
           >
             {renderMainMenu()}
@@ -173,7 +170,11 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
     }
 
     return (
-      <Fade in={open} unmountOnExit>
+      <Fade
+        in={open}
+        unmountOnExit
+        onExit={() => setTimeout(() => setActiveMenu("main"), 500)}
+      >
         <Container
           className="dropdown"
           style={{ height: menuHeight, width: "258px", padding: 2 }}

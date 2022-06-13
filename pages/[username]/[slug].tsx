@@ -1,6 +1,6 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import { Fab, IconButton } from "@mui/material";
+import { Fab } from "@mui/material";
 import Container from "@mui/system/Container";
 import {
   AuthorLink,
@@ -67,6 +67,7 @@ const Post = ({ post }: IPostPage) => {
   const { realtimePost } = useRealtimePost(post);
   const { title, body, imageKey } = realtimePost;
   const [showDelete, setShowDelete] = useState(false);
+  // TODO: option to view original
   const [showMarkdown, setShowMarkdown] = useState(realtimePost?.hasMarkdown);
 
   function handleEdit() {

@@ -176,7 +176,6 @@ textarea {
   }
   .nav-item {
     @include orientate-contents-(center);
-    width: calc($nav-size * 0.8);
     display: flex;
   }
   .icon-button {

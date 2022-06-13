@@ -2,6 +2,7 @@ import AuthorLink from "./AuthorLink";
 import DarkContainer from "./DarkContainer";
 import EditPostButtons from "./EditPostButtons";
 import EditPreviewMarkdown from "./EditPreviewMarkdown";
+import EditProfileButtons from "./EditProfileButtons";
 import ImageForm from "./ImageForm";
 import Input from "./Input";
 import Layout from "./Layout";
@@ -33,6 +34,7 @@ export {
   DarkContainer,
   DeletePostModal,
   EditPreviewMarkdown,
+  EditProfileButtons,
   EditPostButtons,
   HomeButton,
   ImageForm,
@@ -41,11 +43,11 @@ export {
   MarkdownViewer,
   PostBanner,
   ProfileNav,
-  ActionModal,
   StyledButton,
   StyledCenterText,
   StyledText,
   TextNavButton,
+  ActionModal,
   Centered,
   CenteredMain,
   Column,
