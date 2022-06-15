@@ -4,7 +4,7 @@ import CardContent from "@mui/material/CardContent";
 import { AuthorLink, Row } from "components";
 import { motion } from "framer-motion";
 import { AppContext } from "hooks";
-import markdown from "lib/client/markdown";
+import { markdown } from "lib/client";
 import moment from "moment";
 import { useContext } from "react";
 import { IPost } from "types";

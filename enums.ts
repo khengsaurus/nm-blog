@@ -19,6 +19,7 @@ export enum PageRoute {
   POST_FORM = "/post-form",
   MY_PROFILE = "/my-profile",
   MY_POSTS = "/my-posts",
+  EDIT_PROFILE = "/edit-profile",
 }
 
 export enum TransitionSpeed {

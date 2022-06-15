@@ -54,6 +54,9 @@ main {
   &.left {
     @include orientate-contents-(flex-start);
   }
+  &.pad-top {
+    margin-top: 80px;
+  }
   &.transparent {
     background-color: transparent;
   }
@@ -232,7 +235,7 @@ textarea {
   }
   &.show {
     border-color: inherit;
-    padding-left: 5px;
+    padding-left: 10px;
     width: calc(50% - 6px);
   }
 }
@@ -240,7 +243,6 @@ textarea {
 .markdown-view {
   background-color: transparent !important;
   border: none !important;
-  padding: 0px 10px !important;
   &.card {
     padding: 0px !important;
     h1: {
@@ -249,7 +251,7 @@ textarea {
   }
 }
 
-.post-edit-container {
+.edit-container {
   @mixin delete-button {
     height: $medium-button-dim;
     width: $medium-button-dim;
@@ -264,17 +266,17 @@ textarea {
   bottom: 10px;
   right: 10px;
   transition: $speed;
-  .post-edit-button {
+  .edit-button {
     height: $big-button-dim;
     width: $big-button-dim;
     z-index: 1;
   }
-  .post-delete-button {
+  .delete-button {
     @include delete-button;
     right: calc($medium-button-dim/2);
   }
   &:hover {
-    .post-delete-button {
+    .delete-button {
       @include delete-button;
       right: 80px;
     }

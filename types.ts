@@ -88,6 +88,7 @@ export interface IPostReq extends IPost, IRequest {
 export interface IUser extends IHasId, Partial<IHasTimestamps> {
   id: string;
   avatar: string;
+  avatarKey: string;
   bio: string;
   bioMD: boolean;
   email: string;

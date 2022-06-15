@@ -1,6 +1,6 @@
 import { Container } from "@mui/system";
-import markdown from "lib/client/markdown";
-import React from "react";
+import { markdown } from "lib/client";
+
 interface IMarkdownViewerProps {
   text: string;
   height?: string | number;

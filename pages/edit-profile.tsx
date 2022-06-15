@@ -1,19 +1,17 @@
 import {
   CircleLoader,
   Column,
-  DeletePostModal,
-  EditPostButtons,
   EditPreviewMarkdown,
   EditProfileButtons,
   ImageForm,
-  Input,
+  StyledText,
 } from "components";
-import { DBService, ErrorMessage, HttpRequest, PageRoute, Status } from "enums";
-import { AppContext, useAsync, useRealtimePost } from "hooks";
+import { DBService, HttpRequest, Status } from "enums";
+import { AppContext, useAsync } from "hooks";
 import { HTTPService, uploadImage } from "lib/client";
 import { deleteImage } from "lib/client/tasks";
 import { ServerError } from "lib/server";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { IResponse } from "types";
 
 const getSaveButtonLabel = (saveStatus: Status) => {
@@ -30,7 +28,7 @@ const getSaveButtonLabel = (saveStatus: Status) => {
 };
 
 const EditProfile = () => {
-  const { user } = useContext(AppContext);
+  const { user, handleUser } = useContext(AppContext);
   const [username, setUsername] = useState(user?.username);
   const [bio, setBio] = useState(user?.bio);
   const [newAvatar, setNewAvatar] = useState<any>(null);
@@ -40,16 +38,57 @@ const EditProfile = () => {
 
   useEffect(() => {
     if (user) {
+      setAvatarName(user.avatar);
       setUsername(user.username);
       setBio(user.bio);
-      setAvatarName(user.avatar);
+      setBioHasMD(user.bioMD);
     }
   }, [user]);
 
   async function saveProfile() {
     return new Promise(async (resolve, reject) => {
-      console.log("Save called");
-      resolve(null);
+      let imageError = false,
+        imageName = user?.avatar || "",
+        imageKey = user?.avatarKey || "";
+      if (imageUpdated) {
+        await deleteImage(imageKey)
+          .then(() => {
+            imageKey = "";
+            imageName = "";
+          })
+          .catch((err) => {
+            imageError = true;
+            reject(err);
+            return;
+          });
+      }
+      if (!!newAvatar) {
+        await uploadImage(newAvatar)
+          .then((_imageKey) => {
+            imageKey = _imageKey;
+            imageName = newAvatar.name;
+          })
+          .catch((err) => {
+            imageError = true;
+            reject(err);
+            return;
+          });
+      }
+      if (!imageError) {
+        await HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequest.PATCH, {
+          bio,
+          bioMD: bioHasMD,
+          avatar: imageName,
+          avatarKey: imageKey,
+        })
+          .then((res) => {
+            if (res.data?.token && res.data?.user) {
+              handleUser(res.data.token, res.data.user);
+            }
+            resolve(res);
+          })
+          .catch((err) => reject(err));
+      }
     });
   }
 
@@ -60,25 +99,35 @@ const EditProfile = () => {
 
   const saveDisabled =
     !username?.trim() ||
-    (username === user?.username && bio === user?.bio && !imageUpdated);
+    (username === user?.username &&
+      bio === user?.bio &&
+      bioHasMD === user?.bioMD &&
+      !imageUpdated);
 
   return (
     <main className="left">
       <Column>
-        <Input
+        {/* <Input
           label="Username"
           value={username || ""}
           onChange={(e) => setUsername(e.target.value)}
           inputProps={{ maxLength: 50 }}
           maxWidth
+        /> */}
+        <StyledText
+          text={user?.username}
+          variant="h3"
+          style={{ alignSelf: "flex-start", marginLeft: "3px" }}
         />
         <br />
         <EditPreviewMarkdown
+          label="Bio"
           body={bio || ""}
           hasMarkdown={bioHasMD}
           setBody={setBio}
         />
         <ImageForm
+          label="Add avatar"
           imageName={avatarName}
           setImageName={setAvatarName}
           setNewImage={setNewAvatar}

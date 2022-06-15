@@ -2,22 +2,16 @@ import TextField from "@mui/material/TextField";
 import { forwardRef, MutableRefObject } from "react";
 
 interface IMarkdownEditorProps {
+  label: string;
   value: string;
-  setValue: (val: string) => void;
   fullWidth: boolean;
   rows?: number;
-  label?: string;
+  setValue: (val: string) => void;
 }
 
 const MarkdownEditor = forwardRef<MutableRefObject<any>, IMarkdownEditorProps>(
   (props: IMarkdownEditorProps, ref?: MutableRefObject<any>) => {
-    const {
-      value = undefined,
-      setValue,
-      fullWidth,
-      rows = 16,
-      label = "Body",
-    } = props;
+    const { label, value, fullWidth, rows = 16, setValue } = props;
 
     return (
       <TextField

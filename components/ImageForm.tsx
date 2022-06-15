@@ -5,12 +5,18 @@ import { Row, StyledText } from "components";
 import { checkFileSize, checkFileType, checkOneFileSelected } from "utils";
 
 interface IImageForm {
+  label: string;
   imageName?: string;
   setImageName?: (imageName: string) => void;
   setNewImage: (image: any) => void;
 }
 
-const ImageForm = ({ setNewImage, imageName, setImageName }: IImageForm) => {
+const ImageForm = ({
+  label,
+  imageName,
+  setNewImage,
+  setImageName,
+}: IImageForm) => {
   const errHandler = (msg: string) => console.info(msg);
 
   async function handleAttachment(event: React.ChangeEvent<HTMLInputElement>) {
@@ -39,7 +45,7 @@ const ImageForm = ({ setNewImage, imageName, setImageName }: IImageForm) => {
           marginLeft: 10,
         }}
       >
-        Add image
+        {label}
         <input type="file" hidden onChange={handleAttachment} />
       </Button>
       {imageName && (

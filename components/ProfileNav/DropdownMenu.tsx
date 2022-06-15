@@ -41,7 +41,7 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
       setMenuHeight((user ? 3 : 2) * 57 + 8);
     }, [user]);
 
-    useEffect(() => setDefaultMenuHeight, [setDefaultMenuHeight]);
+    useEffect(() => setDefaultMenuHeight(), [setDefaultMenuHeight, user]);
 
     const handleNav = useCallback(
       (route: PageRoute) => {

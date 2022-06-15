@@ -11,7 +11,7 @@ import {
 } from "components";
 import { PageRoute } from "enums";
 import { AppContext, useRealtimePost } from "hooks";
-import markdown from "lib/client/markdown";
+import { markdown } from "lib/client";
 import { mongoConnection } from "lib/server";
 import { useContext, useState } from "react";
 import { IPost } from "types";
@@ -105,12 +105,12 @@ const Post = ({ post }: IPostPage) => {
         )}
       </main>
       {user?.id === author?.id && (
-        <div className="post-edit-container">
-          <Fab className="post-edit-button" onClick={handleEdit} disableRipple>
+        <div className="edit-container">
+          <Fab className="edit-button" onClick={handleEdit} disableRipple>
             <EditIcon style={{ width: 40, height: 40 }} />
           </Fab>
           <Fab
-            className="post-delete-button"
+            className="delete-button"
             onClick={handleDeleteClick}
             disableRipple
           >

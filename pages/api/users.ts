@@ -210,9 +210,11 @@ async function handleTokenLogin(
 async function patchDoc(req: NextApiRequest): Promise<IResponse> {
   const reqBody: Partial<IUserReq> = req.body;
   return new Promise(async (resolve, reject) => {
+    const { action, userId, ..._existingUser } = reqBody;
+    const { email, username } = _existingUser;
     try {
+      let user;
       const { User } = await mongoConnection();
-      const { email, username, action, userId } = reqBody;
       if (action === APIAction.USER_SET_USERNAME) {
         await User.exists({ username }).then(async (exists) => {
           if (exists) {
@@ -220,29 +222,34 @@ async function patchDoc(req: NextApiRequest): Promise<IResponse> {
               status: 200,
               message: ServerInfo.USERNAME_TAKEN,
             });
-          } else {
-            const user = await User.findById(userId);
-            user.username = username;
-            await user
-              .save()
-              .then((userData) => {
-                const token = generateToken(email, username, userData._id);
-                resolve({
-                  status: 200,
-                  message: ServerInfo.USER_UPDATED,
-                  data: {
-                    user: processUserData(userData, userData._id),
-                    token,
-                  },
-                });
-              })
-              .catch((err) => reject(new ServerError(500, err.message)));
+            return;
           }
         });
+        user = await User.findById(userId);
+        user.username = username;
+      } else {
+        user = await User.findById(userId);
+        for (const key of Object.keys(_existingUser))
+          user[key] = _existingUser[key];
       }
+      await user
+        .save()
+        .then((userData) => {
+          const token = generateToken(email, username, userData._id);
+          resolve({
+            status: 200,
+            message: ServerInfo.USER_UPDATED,
+            data: {
+              user: processUserData(userData, userData._id),
+              token,
+            },
+          });
+        })
+        .catch((err) => reject(new ServerError(500, err.message)));
     } catch (err) {
       reject(new ServerError(500, err.message));
     }
+    resolve({ status: 200 });
   });
 }
 

@@ -15,6 +15,7 @@ interface IInput {
   maxRows?: number;
   variant?: "standard" | "outlined";
   password?: boolean;
+  readonly?: boolean;
   style?: CSSProperties;
   inputProps?: InputBaseComponentProps;
   inputLabelProps?: InputLabelProps;
@@ -24,12 +25,13 @@ interface IInput {
 
 const Input = (props: IInput) => {
   const {
-    password = false,
-    variant = "standard",
-    style = {},
-    maxWidth = false,
-    width = "160px",
     marginTop = 0,
+    password = false,
+    maxWidth = false,
+    readonly = false,
+    variant = "standard",
+    width = "160px",
+    style = {},
     inputProps = {},
     inputLabelProps = {},
     ...rest
@@ -40,6 +42,7 @@ const Input = (props: IInput) => {
       {...rest}
       multiline={props?.rows > 1}
       type={password ? "password" : "text"}
+      disabled={readonly}
       variant={variant}
       inputProps={inputProps}
       InputLabelProps={inputLabelProps}

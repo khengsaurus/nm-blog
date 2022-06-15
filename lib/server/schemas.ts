@@ -3,6 +3,7 @@ import { IPost, IUser } from "types";
 
 export const UserSchema = new Schema<IUser>({
   avatar: SchemaTypes.String,
+  avatarKey: SchemaTypes.String,
   bio: SchemaTypes.String,
   bioMD: SchemaTypes.Boolean,
   email: SchemaTypes.String,

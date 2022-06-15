@@ -182,7 +182,7 @@ function newMuiTheme(theme: ITheme) {
         styleOverrides: {
           root: {
             backgroundColor: `${secondary} !important`,
-            color: mainText
+            color: mainText,
           },
         },
       },

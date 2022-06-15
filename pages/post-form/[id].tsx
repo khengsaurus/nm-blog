@@ -224,11 +224,13 @@ const EditPost = ({ id }: IPostPage) => {
         />
         <br />
         <EditPreviewMarkdown
+          label="Body"
           body={body}
           hasMarkdown={hasMarkdown}
           setBody={setBody}
         />
         <ImageForm
+          label="Add image"
           imageName={_imageName}
           setImageName={setImageName}
           setNewImage={setNewImage}
