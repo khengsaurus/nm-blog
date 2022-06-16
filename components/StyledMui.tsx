@@ -1,7 +1,7 @@
 import { Button, Typography } from "@mui/material";
 import { PageRoute } from "enums";
 import { AppContext } from "hooks";
-import { useContext } from "react";
+import React, { useContext } from "react";
 
 interface IStyledTextProps {
   text: string;
@@ -36,7 +36,7 @@ interface IStyledButtonProps {
   disabled?: boolean;
   style?: any;
   sx?: any;
-  onClick?: () => void;
+  onClick?: (e?: React.MouseEvent) => void;
 }
 
 export const StyledButton = ({
@@ -62,9 +62,7 @@ export const StyledButton = ({
       size={size}
       variant={variant}
       autoFocus={autoFocus}
-      onClick={() =>
-        navigate ? routerPush(navigate) : onClick ? onClick() : null
-      }
+      onClick={(e) => (navigate ? routerPush(navigate) : onClick(e))}
       type={type}
       disabled={disabled}
       disableRipple

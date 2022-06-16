@@ -58,6 +58,7 @@ const ImageForm = ({
               setNewImage(null);
               setImageName("");
             }}
+            disableRipple
           >
             <DeleteIcon />
           </IconButton>

@@ -25,7 +25,7 @@ const EditPreviewMarkdown = ({
       <MarkdownViewer
         text={hasMarkdown ? body : ""}
         hasMarkdown={hasMarkdown}
-        height={401}
+        height={447}
       />
     </Row>
   );

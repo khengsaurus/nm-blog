@@ -200,6 +200,11 @@ const EditPost = ({ id }: IPostPage) => {
       hasMarkdown === realtimePost?.hasMarkdown &&
       !imageUpdated);
 
+  function handleDeleteClick(e: React.MouseEvent) {
+    e.stopPropagation();
+    setShowDelete(true);
+  }
+
   return (
     <main className="left">
       <Column>
@@ -244,7 +249,7 @@ const EditPost = ({ id }: IPostPage) => {
           saveDisabled={saveDisabled}
           handleSave={handleSave}
           isEdit={!isNewPost}
-          onDelete={isNewPost ? null : () => setShowDelete(true)}
+          deleteClick={handleDeleteClick}
         />
       </Column>
       {!isNewPost && (

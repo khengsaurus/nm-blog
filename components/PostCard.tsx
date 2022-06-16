@@ -49,7 +49,7 @@ const PostCard = ({
           borderTop: imageKey ? "none" : null,
         }}
       >
-        <div className="card-content">
+        <div className={`card-content ${imageKey ? "has-image" : ""}`}>
           <h6>{title}</h6>
           <Row style={{ justifyContent: "flex-start" }}>
             {hasAuthorLink && <AuthorLink author={user} />}

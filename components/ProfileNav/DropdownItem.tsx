@@ -14,16 +14,20 @@ const DropdownItem = (props: IDropdownItemProps) => {
   return (
     <a href="#" onClick={callback}>
       {hasBack ? (
-        <IconButton>{<ChevronLeftIcon />}</IconButton>
+        <IconButton disableRipple>{<ChevronLeftIcon />}</IconButton>
       ) : leftIcon ? (
         typeof leftIcon === "string" ? (
-          <p className='icon'>{leftIcon}</p>
+          <p className="icon">{leftIcon}</p>
         ) : (
-          <IconButton>{leftIcon}</IconButton>
+          <IconButton disableRipple>{leftIcon}</IconButton>
         )
       ) : null}
       {children}
-      {rightIcon && <IconButton className="right">{rightIcon}</IconButton>}
+      {rightIcon && (
+        <IconButton className="right" disableRipple>
+          {rightIcon}
+        </IconButton>
+      )}
     </a>
   );
 };

@@ -17,6 +17,7 @@ const NavBar: React.FC = () => {
         <IconButton
           aria-label="home"
           onClick={() => routerPush(PageRoute.HOME)}
+          disableRipple
         >
           <HomeIcon />
         </IconButton>
@@ -24,6 +25,7 @@ const NavBar: React.FC = () => {
           <IconButton
             aria-label="new-item"
             onClick={() => routerPush(PageRoute.POST_FORM + "/new")}
+            disableRipple
           >
             <AddIcon />
           </IconButton>

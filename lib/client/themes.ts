@@ -7,6 +7,7 @@ const themes: IThemeOptions = {
     secondary: "rgb(70, 99, 190)",
     highlightColor: "rgb(239, 75, 76)",
     mainText: "rgb(233, 233, 235)",
+    mainTextDisabled: "rgba(233, 233, 235, 0.5)",
     icon: "🔷",
   },
   cabana: {
@@ -15,6 +16,7 @@ const themes: IThemeOptions = {
     secondary: "rgb(190, 55, 78)",
     highlightColor: "rgb(225, 207, 86)",
     mainText: "rgb(233, 233, 235)",
+    mainTextDisabled: "rgba(233, 233, 235, 0.5)",
     icon: "🏝",
   },
   cactus: {
@@ -23,6 +25,7 @@ const themes: IThemeOptions = {
     secondary: "rgb(180, 89, 108)",
     highlightColor: "rgb(216, 127, 129)",
     mainText: "rgb(255, 200, 165)",
+    mainTextDisabled: "rgba(255, 200, 165, 0.5)",
     icon: "🌵",
   },
   dark: {
@@ -31,6 +34,7 @@ const themes: IThemeOptions = {
     secondary: "rgb(85, 85, 85)",
     highlightColor: "rgb(160, 160, 160)",
     mainText: "rgb(235, 235, 235)",
+    mainTextDisabled: "rgba(235, 235, 235, 0.5)",
     icon: "🌚",
   },
   embers: {
@@ -39,6 +43,7 @@ const themes: IThemeOptions = {
     secondary: "rgb(245, 71, 104)",
     highlightColor: "rgb(255, 140, 119)",
     mainText: "rgb(234, 235, 237)",
+    mainTextDisabled: "rgba(234, 235, 237, 0.5)",
     icon: "🔥",
   },
   lavendar: {
@@ -47,6 +52,7 @@ const themes: IThemeOptions = {
     secondary: "rgb(194, 80, 139)",
     highlightColor: "rgb(245, 125, 186)",
     mainText: "rgb(234, 235, 237)",
+    mainTextDisabled: "rgba(234, 235, 237, 0.5)",
     icon: "💜",
   },
   moss: {
@@ -55,6 +61,7 @@ const themes: IThemeOptions = {
     secondary: "rgb(49, 70, 67)",
     highlightColor: "rgb(151, 207, 138)",
     mainText: "rgb(172, 209, 175)",
+    mainTextDisabled: "rgba(172, 209, 175, 0.5)",
     icon: "🌿",
   },
 };

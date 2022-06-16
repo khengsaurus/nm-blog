@@ -11,7 +11,7 @@ interface IMarkdownEditorProps {
 
 const MarkdownEditor = forwardRef<MutableRefObject<any>, IMarkdownEditorProps>(
   (props: IMarkdownEditorProps, ref?: MutableRefObject<any>) => {
-    const { label, value, fullWidth, rows = 16, setValue } = props;
+    const { label, value, fullWidth, rows = 18, setValue } = props;
 
     return (
       <TextField

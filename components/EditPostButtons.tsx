@@ -13,7 +13,7 @@ interface IEditPostButtons {
   saveDisabled: boolean;
   handleSave: () => Promise<any>;
   isEdit: boolean;
-  onDelete?: () => void;
+  deleteClick?: (e: React.MouseEvent) => void;
 }
 
 const lastButtonStyle = { marginRight: -10 };
@@ -27,7 +27,7 @@ const EditPostButtons = ({
   saveButtonLabel,
   saveDisabled,
   handleSave,
-  onDelete = null,
+  deleteClick = null,
 }: IEditPostButtons) => {
   const { routerPush } = useContext(AppContext);
   const [cancelCalled, setCancelCalled] = useState(false);
@@ -46,7 +46,7 @@ const EditPostButtons = ({
         />
         <StyledButton
           label="Delete"
-          onClick={onDelete}
+          onClick={deleteClick}
           style={lastButtonStyle}
         />
       </div>

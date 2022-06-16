@@ -17,7 +17,8 @@ export const HomeTheme = (props: any) => {
 };
 
 function newMuiTheme(theme: ITheme) {
-  const { background, primary, secondary, highlightColor, mainText } = theme;
+  const { primary, secondary, highlightColor, mainText, mainTextDisabled } =
+    theme;
 
   return createTheme({
     palette: {
@@ -60,7 +61,7 @@ function newMuiTheme(theme: ITheme) {
               color: highlightColor,
             },
             "&:disabled": {
-              color: "rgb(75, 75, 75) !important",
+              color: mainTextDisabled,
             },
             "&.MuiCheckbox-root.Mui-checked": {
               color: highlightColor,
@@ -78,7 +79,7 @@ function newMuiTheme(theme: ITheme) {
             backgroundColor: "transparent !important",
             fontSize: 16,
             "&:disabled": {
-              color: "rgb(75, 75, 75) !important",
+              color: mainTextDisabled,
             },
           },
         },
@@ -261,7 +262,7 @@ function newMuiTheme(theme: ITheme) {
               cursor: "pointer",
             },
             "&:disabled": {
-              color: "rgb(75, 75, 75) !important",
+              color: mainTextDisabled,
             },
             margin: 0,
           },

@@ -34,6 +34,7 @@ export interface ITheme {
   secondary: string;
   highlightColor: string;
   mainText: string;
+  mainTextDisabled: string;
   icon: string;
 }
 
