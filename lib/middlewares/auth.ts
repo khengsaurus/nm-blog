@@ -20,8 +20,7 @@ export function generateToken(email: string, username: string, id: string) {
 export function decodeToken<T>(req: NextApiRequest) {
   let { action, token } = req.body;
   if (action !== APIAction.USER_TOKEN_LOGIN) {
-    token = req.headers?.authorization || "Bearer ";
-    token = token.split("Bearer ")[1];
+    token = req.headers?.usertoken as string;
   }
   return jwt.verify(token, SECRET_KEY) as T;
 }
@@ -33,13 +32,12 @@ export function decodeToken<T>(req: NextApiRequest) {
 export async function validateAuth(req: NextApiRequest): Promise<boolean> {
   return new Promise((resolve, reject) => {
     const userId = req.body?.userId || req.query?.userId;
-    let token: any = req.headers?.authorization || "Bearer ";
-    token = token.split("Bearer ")[1];
-    if (!token) {
+    let userToken: any = req.headers?.usertoken;
+    if (!userToken) {
       reject(new ServerError(401));
     }
-    token = jwt.verify(token, SECRET_KEY) as object;
-    if (token?.id === userId) {
+    userToken = jwt.verify(userToken, SECRET_KEY) as object;
+    if (userToken?.id === userId) {
       resolve(true);
     } else {
       reject(new ServerError(401));

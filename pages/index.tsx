@@ -14,7 +14,6 @@ interface IHomeProps {
 }
 
 export async function getServerSideProps({ res }) {
-  console.info(`-> ${PageRoute.HOME} getServerSideProps()`);
   res.setHeader(
     "Cache-Control",
     "public, s-maxage=30, stale-while-revalidate=120"

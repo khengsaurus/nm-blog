@@ -1,3 +1,4 @@
+import FourOFour from "../404";
 import Avatar from "@mui/material/Avatar";
 import {
   Column,
@@ -19,7 +20,6 @@ interface IUserPageProps {
 
 export async function getServerSideProps({ params, res }) {
   const { username } = params;
-  console.info(`-> [${username}] getServerSideProps() `);
   res.setHeader(
     "Cache-Control",
     "public, max-age=300, s-maxage=600, stale-while-revalidate=30"
@@ -41,12 +41,16 @@ export async function getServerSideProps({ params, res }) {
       if (user) user.posts = _posts;
     });
 
-  return { props: { visitingUser: user } };
+  return {
+    props: {
+      visitingUser: user,
+    },
+  };
 }
 
 const UserPage = (props: IUserPageProps) => {
   const { visitingUser } = props;
-  const { avatarKey, bio, username } = visitingUser;
+  const { avatarKey, bio, username } = visitingUser || {};
   const { posts, limitReached, loadMore } = usePaginatePosts(
     !!visitingUser?.username,
     true,
@@ -54,7 +58,7 @@ const UserPage = (props: IUserPageProps) => {
     visitingUser?.username
   );
 
-  return (
+  return visitingUser ? (
     <main>
       <section className="header">
         {avatarKey && (
@@ -86,6 +90,8 @@ const UserPage = (props: IUserPageProps) => {
       </PostFeed>
       {!limitReached && <StyledButton label="Load more" onClick={loadMore} />}
     </main>
+  ) : (
+    <FourOFour />
   );
 };
 

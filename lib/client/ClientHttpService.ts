@@ -26,7 +26,8 @@ class ClientHTTPService {
       headers: {
         "Content-Type": "application/json",
         ...config?.headers,
-        Authorization: `Bearer ${this.bearerToken}`,
+        // Authorization: `Bearer ${this.bearerToken}`, // TODO: vercel
+        userToken: this.bearerToken,
       },
     };
 
@@ -86,7 +87,8 @@ class ClientHTTPService {
     return this.instance.post(DBService.IMAGES, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${this.bearerToken}`,
+        // Authorization: `Bearer ${this.bearerToken}`, // TODO: vercel
+        userToken: this.bearerToken,
       },
     });
   };

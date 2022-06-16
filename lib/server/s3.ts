@@ -2,12 +2,12 @@ import S3 from "aws-sdk/clients/s3";
 import { ServerInfo } from "enums";
 import fs from "fs";
 
-const bucketName = process.env.ENV_AWS__BUCKET;
+const bucketName = process.env.ENV_AWS_BUCKET;
 
 const s3 = new S3({
-  region: process.env.ENV_AWS__REGION,
-  accessKeyId: process.env.ENV_AWS__ACCESS_KEY,
-  secretAccessKey: process.env.ENV_AWS__SECRET_KEY,
+  region: process.env.ENV_AWS_REGION,
+  accessKeyId: process.env.ENV_AWS_ACCESS_KEY,
+  secretAccessKey: process.env.ENV_AWS_SECRET_KEY,
 });
 
 export function getFileStream(fileKey) {

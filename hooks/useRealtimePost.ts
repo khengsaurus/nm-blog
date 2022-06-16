@@ -6,10 +6,11 @@ import { postDocToObj } from "utils";
 import useIsoEffect from "./useIsoEffect";
 
 const useRealtimePost = (post: IPost) => {
-  const { id, slug, username, user } = post;
+  const { id, slug, username, user } = post || {};
   const [realtimePost, setRealtimePost] = useState(post);
 
   const refreshPost = useCallback(() => {
+    if (!id) return null;
     HTTPService.makeGetReq(DBService.POSTS, { id, slug, username }).then(
       (res) => {
         if (res.status === 200 && res.data?.post?._id) {

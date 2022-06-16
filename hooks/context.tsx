@@ -86,6 +86,7 @@ const AppContextProvider = (props: any) => {
   const userTokenLogin = useCallback(async () => {
     return new Promise((resolve) => {
       if (userToken) {
+        HTTPService.setBearer(userToken, user?.id);
         HTTPService.handleTokenLogin(userToken).then((res) => {
           if (res.status === 200 && res.data?.user) {
             handleUser(userToken, res.data.user);
@@ -98,7 +99,7 @@ const AppContextProvider = (props: any) => {
         resolve(false);
       }
     });
-  }, [handleUser, userToken]);
+  }, [handleUser, userToken, user?.id]);
 
   const sessionValidation = useFirstEffectAsync(
     userTokenLogin,
