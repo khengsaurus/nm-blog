@@ -1,9 +1,10 @@
 import {
   Centered,
   CircleLoader,
+  DarkContainer,
   PostFeed,
   StyledButton,
-  StyledCenterText,
+  StyledText,
 } from "components";
 import PostCard from "components/PostCard";
 import { AppContext } from "hooks";
@@ -23,7 +24,9 @@ const MyPosts = () => {
   return (
     <main>
       <section className="header">
-        <StyledCenterText text="My Posts" variant="h3" />
+        <DarkContainer>
+          <StyledText text="My Posts" variant="h3" />
+        </DarkContainer>
       </section>
       {user ? (
         <>

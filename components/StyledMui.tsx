@@ -19,6 +19,7 @@ interface IStyledTextProps {
     | "body2";
   textAlign?: "left" | "center" | "right";
   placeSelf?: "left" | "center" | "right";
+  paragraph?: boolean;
   nowrap?: boolean;
   style?: any;
 }
@@ -114,6 +115,7 @@ export const HomeButton = ({
 export const StyledText = ({
   text,
   color,
+  paragraph = false,
   variant = "body1",
   padding = variant.startsWith("h") ? "5px 0px" : "0px",
   textAlign = "left",
@@ -128,7 +130,7 @@ export const StyledText = ({
         padding,
         textAlign,
         placeSelf,
-        whiteSpace: nowrap ? "nowrap" : null,
+        whiteSpace: paragraph ? "pre-line" : nowrap ? "nowrap" : null,
         textOverflow: nowrap ? "ellipsis" : null,
         ...style,
       }}

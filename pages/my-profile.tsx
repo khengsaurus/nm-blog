@@ -1,6 +1,5 @@
 import EditIcon from "@mui/icons-material/Edit";
-import { Avatar } from "@mui/material";
-import Fab from "@mui/material/Fab";
+import { Avatar, Fab } from "@mui/material";
 import { Centered, CircleLoader, DarkContainer, StyledText } from "components";
 import { PageRoute } from "enums";
 import { AppContext } from "hooks";
@@ -12,7 +11,7 @@ const MyProfile = () => {
   const { bio, bioMD, avatarKey, username } = user || {};
 
   return (
-    <main className="left pad-top">
+    <main className="pad-top">
       {user ? (
         <>
           {avatarKey && (

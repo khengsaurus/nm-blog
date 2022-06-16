@@ -1,13 +1,14 @@
 import { Box } from "@mui/material";
 import { PageRoute } from "enums";
 import { AppContext } from "hooks";
-import themes from "lib/client/themes";
+import { themes } from "lib/client";
 import { useContext, useEffect, useState } from "react";
 import { NavBar } from ".";
 
 const authRoutes: string[] = [
   PageRoute.MY_POSTS,
   PageRoute.MY_PROFILE,
+  PageRoute.EDIT_PROFILE,
   PageRoute.POST_FORM,
 ];
 

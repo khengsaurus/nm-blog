@@ -1,9 +1,15 @@
-import { PostFeed, StyledButton, StyledCenterText } from "components";
+import Avatar from "@mui/material/Avatar";
+import {
+  Column,
+  DarkContainer,
+  PostFeed,
+  StyledButton,
+  StyledText,
+} from "components";
 import PostCard from "components/PostCard";
 import { PAGINATE_LIMIT } from "consts";
 import { usePaginatePosts } from "hooks";
 import { mongoConnection } from "lib/server";
-import React from "react";
 import { IUser } from "types";
 import { postDocToObj, userDocToObj } from "utils";
 
@@ -40,7 +46,8 @@ export async function getServerSideProps({ params, res }) {
 
 const UserPage = (props: IUserPageProps) => {
   const { visitingUser } = props;
-  const { posts, loadMore } = usePaginatePosts(
+  const { avatarKey, bio, username } = visitingUser;
+  const { posts, limitReached, loadMore } = usePaginatePosts(
     !!visitingUser?.username,
     true,
     visitingUser?.posts,
@@ -50,10 +57,21 @@ const UserPage = (props: IUserPageProps) => {
   return (
     <main>
       <section className="header">
-        <StyledCenterText
-          text={`Posts by ${visitingUser?.username}`}
-          variant="h3"
-        />
+        {avatarKey && (
+          <Avatar
+            alt={`${username}-avatar`}
+            src={`/api/images?key=${avatarKey}`}
+            sx={{ width: 140, height: 140, marginRight: "20px" }}
+          />
+        )}
+        <Column style={{ alignItems: avatarKey ? "flex-start" : "center" }}>
+          <DarkContainer>
+            <StyledText text={username} variant="h2" />
+          </DarkContainer>
+          <DarkContainer>
+            <StyledText text={bio} variant="body1" paragraph />
+          </DarkContainer>
+        </Column>
       </section>
       <PostFeed>
         {posts.map((post, index) => (
@@ -66,7 +84,7 @@ const UserPage = (props: IUserPageProps) => {
           />
         ))}
       </PostFeed>
-      <StyledButton label="Load more" onClick={loadMore} />
+      {!limitReached && <StyledButton label="Load more" onClick={loadMore} />}
     </main>
   );
 };

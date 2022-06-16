@@ -107,13 +107,6 @@ const EditProfile = () => {
   return (
     <main className="left">
       <Column>
-        {/* <Input
-          label="Username"
-          value={username || ""}
-          onChange={(e) => setUsername(e.target.value)}
-          inputProps={{ maxLength: 50 }}
-          maxWidth
-        /> */}
         <StyledText
           text={user?.username}
           variant="h3"

@@ -1,4 +1,4 @@
-import { PostFeed, StyledButton, StyledCenterText } from "components";
+import { DarkContainer, PostFeed, StyledButton, StyledText } from "components";
 import PostCard from "components/PostCard";
 import { PAGINATE_LIMIT } from "consts";
 import { PageRoute } from "enums";
@@ -43,7 +43,9 @@ const Home: React.FC = ({ initPosts }: IHomeProps) => {
   return (
     <main>
       <section className="header">
-        <StyledCenterText text="Public Posts" variant="h3" />
+        <DarkContainer>
+          <StyledText text="Public Posts" variant="h3" />
+        </DarkContainer>
       </section>
       <PostFeed>
         {posts.map((post, index) => (

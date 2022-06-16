@@ -1,19 +1,21 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import { Fab } from "@mui/material";
+import { Avatar, Fab } from "@mui/material";
 import Container from "@mui/system/Container";
 import {
   AuthorLink,
   DarkContainer,
   DeletePostModal,
   PostBanner,
+  Row,
   StyledText,
 } from "components";
 import { PageRoute } from "enums";
 import { AppContext, useRealtimePost } from "hooks";
 import { markdown } from "lib/client";
 import { mongoConnection } from "lib/server";
-import { useContext, useState } from "react";
+import moment from "moment";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { IPost } from "types";
 import { postDocToObj } from "utils";
 
@@ -64,11 +66,17 @@ export async function getStaticPaths() {
 const Post = ({ post }: IPostPage) => {
   const { user: author, id } = post;
   const { user, routerPush } = useContext(AppContext);
-  const { realtimePost } = useRealtimePost(post);
-  const { title, body, imageKey } = realtimePost;
   const [showDelete, setShowDelete] = useState(false);
-  // TODO: option to view original
-  const [showMarkdown, setShowMarkdown] = useState(realtimePost?.hasMarkdown);
+  const { realtimePost } = useRealtimePost(post);
+  const { title, body, imageKey, updatedAt, createdAt } = realtimePost;
+
+  const dateText = useMemo(() => {
+    if (createdAt === updatedAt) {
+      return moment(new Date(createdAt)).format("DD/MM/YY");
+    } else {
+      return `Updated on ${moment(new Date(updatedAt)).format("DD/MM/YY")}`;
+    }
+  }, [createdAt, updatedAt]);
 
   function handleEdit() {
     routerPush(`${PageRoute.POST_FORM}/${id}`);
@@ -85,22 +93,32 @@ const Post = ({ post }: IPostPage) => {
         {imageKey && (
           <PostBanner src={`/api/images?key=${imageKey}`} id={`${imageKey}`} />
         )}
-        <section className="header">
+        <section className="header column">
           <DarkContainer>
             <StyledText text={title} variant="h2" />
           </DarkContainer>
+          <Row style={{ justifyContent: "flex-start", alignItems: "flex-end" }}>
+            <DarkContainer>
+              <AuthorLink author={author} title />
+            </DarkContainer>
+            <Avatar
+              alt={`${author?.username}-avatar`}
+              src={`/api/images?key=${author?.avatarKey}`}
+              sx={{ height: "40px", width: "40px", marginLeft: "10px" }}
+            />
+          </Row>
           <DarkContainer>
-            <AuthorLink author={author} title />
+            <StyledText text={dateText} variant="h4" />
           </DarkContainer>
         </section>
-        {showMarkdown ? (
+        {realtimePost?.hasMarkdown ? (
           <Container
             className="markdown-view"
             dangerouslySetInnerHTML={{ __html: markdown(body) }}
           />
         ) : (
           <section className="post-body">
-            <StyledText text={body} variant="body1" />
+            <StyledText text={body} variant="body1" paragraph />
           </section>
         )}
       </main>
