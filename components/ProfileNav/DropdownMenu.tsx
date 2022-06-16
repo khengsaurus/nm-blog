@@ -173,7 +173,12 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
       <Fade
         in={open}
         unmountOnExit
-        onExit={() => setTimeout(() => setActiveMenu("main"), 500)}
+        onExit={() =>
+          setTimeout(() => {
+            setDefaultMenuHeight();
+            setActiveMenu("main");
+          }, 500)
+        }
       >
         <Container
           className="dropdown"

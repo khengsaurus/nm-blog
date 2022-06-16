@@ -1,36 +1,43 @@
 import { marked } from "marked";
-import sanitizeHtml from "sanitize-html";
-// import hljs from "highlight.js";
+import hljs from "highlight.js";
 
-// marked.setOptions({
-//   langPrefix: "hljs language-",
-//   renderer: new marked.Renderer(),
-//   highlight: function (code, language) {
-//     const validLanguage = hljs.getLanguage(language) ? language : "plaintext";
-//     return hljs.highlight(validLanguage, code).value.replace(/&amp;/g, "&");
-//   },
-// });
-
-const allowedTags = sanitizeHtml.defaults.allowedTags.concat([
-  "img",
-  "h1",
-  "h2",
-  "h3",
-]);
-
-const allowedAttributes = Object.assign(
-  {},
-  sanitizeHtml.defaults.allowedAttributes,
-  {
-    img: ["alt", "src"],
+function getCodeTheme(theme: string) {
+  switch (theme) {
+    case "blue":
+      return "colorBrewer";
+    case "embers":
+      return "github";
+    case "dark":
+    case "lavendar":
+      return "dracula";
+    case "cactus":
+      return "atomOneDark";
+    case "cabana":
+    case "moss":
+      return "monokaiSublime";
+    default:
+      return theme;
   }
-);
+}
 
-function markdown(text: string) {
-  return sanitizeHtml(marked(text), {
-    allowedTags,
-    allowedAttributes,
+function markdown(text: string, theme: string) {
+  marked.setOptions({
+    renderer: new marked.Renderer(),
+    highlight: function (code, lang) {
+      hljs.configure(theme ? { classPrefix: `${getCodeTheme(theme)}-` } : null);
+      const language = hljs.getLanguage(lang) ? lang : "plaintext";
+      return hljs.highlight(code, { language }).value;
+    },
+    langPrefix: "hljs language-",
+    pedantic: false,
+    gfm: true,
+    breaks: false,
+    sanitize: false,
+    smartLists: true,
+    smartypants: false,
+    xhtml: false,
   });
+  return marked.parse(text);
 }
 
 export default markdown;

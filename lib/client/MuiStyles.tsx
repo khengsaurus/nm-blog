@@ -133,7 +133,7 @@ function newMuiTheme(theme: ITheme) {
             backgroundColor: primary,
             border: `2px solid ${mainText}`,
             margin: 0,
-            padding: 0,
+            padding: "5px !important",
           },
         },
       },

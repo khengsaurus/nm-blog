@@ -11,11 +11,10 @@ import {
   StyledText,
 } from "components";
 import { PageRoute } from "enums";
-import { AppContext, useRealtimePost } from "hooks";
-import { markdown } from "lib/client";
+import { AppContext, useMarkdown, useRealtimePost } from "hooks";
 import { mongoConnection } from "lib/server";
 import moment from "moment";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { IPost } from "types";
 import { postDocToObj } from "utils";
 
@@ -65,10 +64,12 @@ export async function getStaticPaths() {
 
 const Post = ({ post }: IPostPage) => {
   const { user: author, id } = post;
-  const { user, routerPush } = useContext(AppContext);
+  const { theme, user, routerPush } = useContext(AppContext);
   const [showDelete, setShowDelete] = useState(false);
   const { realtimePost } = useRealtimePost(post);
-  const { title, body, imageKey, updatedAt, createdAt } = realtimePost;
+  const { title, body, hasMarkdown, imageKey, updatedAt, createdAt } =
+    realtimePost;
+  const markdown = useMarkdown(hasMarkdown, theme, body);
 
   const dateText = useMemo(() => {
     if (createdAt === updatedAt) {
@@ -114,7 +115,7 @@ const Post = ({ post }: IPostPage) => {
         {realtimePost?.hasMarkdown ? (
           <Container
             className="markdown-view"
-            dangerouslySetInnerHTML={{ __html: markdown(body) }}
+            dangerouslySetInnerHTML={{ __html: markdown }}
           />
         ) : (
           <section className="post-body">

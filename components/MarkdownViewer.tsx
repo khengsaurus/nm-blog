@@ -1,5 +1,6 @@
 import { Container } from "@mui/system";
-import { markdown } from "lib/client";
+import { AppContext, useMarkdown } from "hooks";
+import { useContext } from "react";
 
 interface IMarkdownViewerProps {
   text: string;
@@ -12,11 +13,14 @@ const MarkdownViewer = ({
   height,
   hasMarkdown,
 }: IMarkdownViewerProps) => {
+  const { theme } = useContext(AppContext);
+  const markdown = useMarkdown(hasMarkdown, theme, text);
+
   return (
     <Container
       className={`markdown-preview ${hasMarkdown ? "show" : "hide"}`}
       style={{ height }}
-      dangerouslySetInnerHTML={{ __html: markdown(text) }}
+      dangerouslySetInnerHTML={{ __html: markdown }}
     />
   );
 };

@@ -6,6 +6,7 @@ import useFirstEffectAsync from "./useFirstEffectAsync";
 import useIsoEffect from "./useIsoEffect";
 import useKeyListener from "./useKeyListener";
 import useLocalStorage from "./useLocalStorage";
+import useMarkdown from "./useMarkdown";
 import usePaginatePosts from "./usePaginatePosts";
 import useRealtimePost from "./useRealtimePost";
 import useRefClick from "./useRefClick";
@@ -20,6 +21,7 @@ export {
   useIsoEffect,
   useKeyListener,
   useLocalStorage,
+  useMarkdown,
   usePaginatePosts,
   useRefClick,
   useRealtimePost,

@@ -3,8 +3,7 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import { AuthorLink, Row } from "components";
 import { motion } from "framer-motion";
-import { AppContext } from "hooks";
-import { markdown } from "lib/client";
+import { AppContext, useMarkdown } from "hooks";
 import moment from "moment";
 import { useContext } from "react";
 import { IPost } from "types";
@@ -22,9 +21,10 @@ const PostCard = ({
   hasAuthorLink = true,
   hasDate = true,
 }: IPostCard) => {
-  const { routerPush } = useContext(AppContext);
+  const { theme, routerPush } = useContext(AppContext);
   const { title, slug, body, user, imageKey, updatedAt, hasMarkdown } = post;
   const date = moment(new Date(updatedAt)).format("DD/MM/YY");
+  const markdown = useMarkdown(hasMarkdown, theme, body);
 
   return (
     <Card onClick={() => routerPush(`/${user?.username}/${slug}`)}>
@@ -58,7 +58,7 @@ const PostCard = ({
           {hasMarkdown ? (
             <div
               className="markdown-view card"
-              dangerouslySetInnerHTML={{ __html: markdown(body) }}
+              dangerouslySetInnerHTML={{ __html: markdown }}
             />
           ) : (
             <p className={`body ${imageKey ? "short" : "long"}`}>{body}</p>
