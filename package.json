@@ -1,5 +1,5 @@
 {
-  "name": "next-mongo-client",
+  "name": "next-mongo-blog",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000",
