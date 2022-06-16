@@ -33,7 +33,6 @@ const EditProfile = () => {
   const [bio, setBio] = useState(user?.bio);
   const [newAvatar, setNewAvatar] = useState<any>(null);
   const [avatarName, setAvatarName] = useState("");
-  const [bioHasMD, setBioHasMD] = useState(false);
   const imageUpdated = !!newAvatar || avatarName !== user?.avatar;
 
   useEffect(() => {
@@ -41,7 +40,6 @@ const EditProfile = () => {
       setAvatarName(user.avatar);
       setUsername(user.username);
       setBio(user.bio);
-      setBioHasMD(user.bioMD);
     }
   }, [user]);
 
@@ -77,7 +75,6 @@ const EditProfile = () => {
       if (!imageError) {
         await HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequest.PATCH, {
           bio,
-          bioMD: bioHasMD,
           avatar: imageName,
           avatarKey: imageKey,
         })
@@ -99,10 +96,7 @@ const EditProfile = () => {
 
   const saveDisabled =
     !username?.trim() ||
-    (username === user?.username &&
-      bio === user?.bio &&
-      bioHasMD === user?.bioMD &&
-      !imageUpdated);
+    (username === user?.username && bio === user?.bio && !imageUpdated);
 
   return (
     <main className="left">
@@ -116,7 +110,7 @@ const EditProfile = () => {
         <EditPreviewMarkdown
           label="Bio"
           body={bio || ""}
-          hasMarkdown={bioHasMD}
+          hasMarkdown={false}
           setBody={setBio}
         />
         <ImageForm
@@ -126,10 +120,8 @@ const EditProfile = () => {
           setNewImage={setNewAvatar}
         />
         <EditProfileButtons
-          bioHasMD={bioHasMD}
           saveDisabled={saveDisabled || saveStatus === Status.ERROR}
           handleSave={handleSave}
-          setBioHasMD={setBioHasMD}
         />
       </Column>
     </main>

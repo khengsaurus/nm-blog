@@ -8,7 +8,7 @@ import { useContext } from "react";
 
 const MyProfile = () => {
   const { user, routerPush } = useContext(AppContext);
-  const { bio, bioMD, avatarKey, username } = user || {};
+  const { bio, avatarKey, username } = user || {};
 
   return (
     <main className="pad-top">
@@ -25,14 +25,7 @@ const MyProfile = () => {
             <StyledText text={username} variant="h2" />
           </DarkContainer>
           <DarkContainer>
-            {bioMD && bio ? (
-              <div
-                className="markdown-view card"
-                dangerouslySetInnerHTML={{ __html: markdown(bio) }}
-              />
-            ) : (
-              <StyledText text={bio || "(No bio)"} variant="h4" />
-            )}
+            <StyledText text={bio || "(No bio)"} variant="h4" paragraph />
           </DarkContainer>
           <div className="edit-container">
             <Fab

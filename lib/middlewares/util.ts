@@ -71,7 +71,6 @@ export function processUserData(user: any, id: string): Partial<IUser> {
     avatar: user.avatar || "",
     avatarKey: user.avatarKey || "",
     bio: user.bio || "",
-    bioMD: user.bioMD || false,
     posts: posts,
   };
 }
