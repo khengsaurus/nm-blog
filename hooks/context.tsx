@@ -28,7 +28,7 @@ const AppContextProvider = (props: any) => {
   const [user, setUser] = useState<IUser>();
   const [userSessionActive, setUserSessionActive] = useState(true);
   const [userToken, setUserToken] = useLocalStorage("userToken", "");
-  const [theme, setTheme] = useLocalStorage("theme", "");
+  const [theme, setTheme] = useLocalStorage("theme", "embers");
   const historyRef = useRef([]);
   const router = useRouter();
 

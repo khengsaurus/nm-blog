@@ -2,6 +2,9 @@
 
 module.exports = {
   reactStrictMode: true,
+  env: {
+    BEARER: "vpUnCJhmLITt3IP9F8FjWG9Y",
+  },
   images: {
     domains: ["localhost", "localhost:3000"],
   },

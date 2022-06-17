@@ -5,6 +5,7 @@ const useMarkdown = (hasMarkdown: boolean, theme: string, body: string) => {
   const [_markdown, setMarkdown] = useState("");
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
     if (hasMarkdown && theme && body) {
       setMarkdown(markdown(body, theme));
     } else {

@@ -2,6 +2,8 @@ import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { APIAction, DBService, HttpRequest } from "enums";
 import { IResponse } from "types";
 
+const authBearer = { Authorization: `Bearer ${process.env.BEARER}` };
+
 class ClientHTTPService {
   private instance: AxiosInstance;
   private bearerToken: string;
@@ -26,7 +28,7 @@ class ClientHTTPService {
       headers: {
         "Content-Type": "application/json",
         ...config?.headers,
-        // Authorization: `Bearer ${this.bearerToken}`, // TODO: vercel
+        ...authBearer,
         userToken: this.bearerToken,
       },
     };
@@ -87,7 +89,7 @@ class ClientHTTPService {
     return this.instance.post(DBService.IMAGES, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
-        // Authorization: `Bearer ${this.bearerToken}`, // TODO: vercel
+        ...authBearer,
         userToken: this.bearerToken,
       },
     });

@@ -7,7 +7,7 @@ import themes from "./themes";
 
 export const HomeTheme = (props: any) => {
   const { theme } = useContext(AppContext);
-  const [muiTheme, setMuiTheme] = useState(newMuiTheme(themes["blue"]));
+  const [muiTheme, setMuiTheme] = useState(newMuiTheme(themes["embers"]));
 
   useEffect(() => {
     if (theme) setMuiTheme(newMuiTheme(themes[theme]));
