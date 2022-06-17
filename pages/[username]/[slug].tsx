@@ -93,7 +93,10 @@ const Post = ({ post }: IPostPage) => {
     <>
       <main className="left">
         {imageKey && (
-          <PostBanner src={`/api/images?key=${imageKey}`} id={`${imageKey}`} />
+          <PostBanner
+            src={`${process.env.ENV_AWS_S3_SRC}${imageKey}`}
+            id={`${imageKey}`}
+          />
         )}
         <section className="header column">
           <DarkContainer>
@@ -105,7 +108,7 @@ const Post = ({ post }: IPostPage) => {
             </DarkContainer>
             <Avatar
               alt={`${author?.username}-avatar`}
-              src={`/api/images?key=${author?.avatarKey}`}
+              src={`${process.env.ENV_AWS_S3_SRC}${author?.avatarKey}`}
               sx={{ height: "40px", width: "40px", marginLeft: "10px" }}
             />
           </Row>

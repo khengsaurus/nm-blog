@@ -29,7 +29,7 @@ const PostCard = ({
       {imageKey && (
         <CardMedia>
           <motion.img
-            src={`/api/images?key=${imageKey}`}
+            src={`${process.env.ENV_AWS_S3_SRC}${imageKey}`}
             alt="post-image"
             layoutId={`banner-${imageKey}${postTag}`}
             style={{

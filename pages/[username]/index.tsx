@@ -64,7 +64,7 @@ const UserPage = (props: IUserPageProps) => {
         {avatarKey && (
           <Avatar
             alt={`${username}-avatar`}
-            src={`/api/images?key=${avatarKey}`}
+            src={`${process.env.ENV_AWS_S3_SRC}${avatarKey}`}
             sx={{ width: 140, height: 140, marginRight: "20px" }}
           />
         )}

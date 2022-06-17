@@ -33,7 +33,7 @@ const ProfileNav = () => {
           {user?.avatarKey ? (
             <Avatar
               alt={`profile-icon`}
-              src={`/api/images?key=${user.avatarKey}`}
+              src={`${process.env.ENV_AWS_S3_SRC}${user.avatarKey}`}
               sx={{ width: 24, height: 24 }}
             />
           ) : (

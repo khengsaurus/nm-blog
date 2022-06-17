@@ -4,9 +4,14 @@ module.exports = {
   reactStrictMode: true,
   env: {
     BEARER: "vpUnCJhmLITt3IP9F8FjWG9Y",
+    ENV_AWS_S3_SRC: "https://notes-app-1-sg.s3.ap-southeast-1.amazonaws.com/",
   },
   images: {
-    domains: ["localhost", "localhost:3000"],
+    domains: [
+      "localhost",
+      "localhost:3000",
+      "https://notes-app-1-sg.s3.ap-southeast-1.amazonaws.com",
+    ],
   },
   async redirects() {
     return [

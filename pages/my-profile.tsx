@@ -17,7 +17,7 @@ const MyProfile = () => {
           {avatarKey && (
             <Avatar
               alt={`${username}-avatar`}
-              src={`/api/images?key=${avatarKey}`}
+              src={`${process.env.ENV_AWS_S3_SRC}${avatarKey}`}
               sx={{ width: 200, height: 200 }}
             />
           )}
