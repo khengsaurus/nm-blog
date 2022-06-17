@@ -99,13 +99,12 @@ async function createDoc(req: NextApiRequest): Promise<IResponse> {
       session = await MongoConnection.startSession();
       await session.withTransaction(async () => {
         const { Post, User } = await mongoConnection();
-        const reqBody: Partial<IPostReq> = req.body;
-        const { slug, userId } = reqBody;
-        await Post.exists({ slug, user: userId }).then((exists) => {
+        const userId = req.headers["user-id"];
+        const post: Partial<IPostReq> = req.body;
+        await Post.exists({ slug: post.slug, user: userId }).then((exists) => {
           if (exists) {
             throw new ServerError(200, ErrorMessage.POST_SLUG_USED);
           } else {
-            const { userId, ...post } = reqBody;
             const newPost = new Post({ ...post, user: userId });
             newPost
               .save()

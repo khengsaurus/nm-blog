@@ -1,6 +1,4 @@
-import { CardMedia } from "@mui/material";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
+import { Card, CardContent, CardMedia } from "@mui/material";
 import { AuthorLink, Row } from "components";
 import { motion } from "framer-motion";
 import { AppContext, useMarkdown } from "hooks";

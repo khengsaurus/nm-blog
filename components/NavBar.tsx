@@ -1,8 +1,6 @@
 import AddIcon from "@mui/icons-material/Add";
 import HomeIcon from "@mui/icons-material/Home";
-import AppBar from "@mui/material/AppBar";
-import IconButton from "@mui/material/IconButton";
-import Toolbar from "@mui/material/Toolbar";
+import { AppBar, IconButton, Toolbar } from "@mui/material";
 import { ProfileNav } from "components";
 import { PageRoute } from "enums";
 import { AppContext } from "hooks";

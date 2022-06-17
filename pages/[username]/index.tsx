@@ -1,5 +1,4 @@
-import FourOFour from "../404";
-import Avatar from "@mui/material/Avatar";
+import { Avatar } from "@mui/material";
 import {
   Column,
   DarkContainer,
@@ -13,6 +12,7 @@ import { usePaginatePosts } from "hooks";
 import { mongoConnection } from "lib/server";
 import { IUser } from "types";
 import { postDocToObj, userDocToObj } from "utils";
+import FourOFour from "../404";
 
 interface IUserPageProps {
   visitingUser: IUser;

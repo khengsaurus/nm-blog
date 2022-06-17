@@ -369,7 +369,7 @@ pre {
   }
   .hljs {
     color: rgb(235, 235, 235);
-    background: rgb(42, 42, 42);
+    background: rgb(32, 34, 36);
   }
   // Atom one dark
   .atomOneDark-comment,
@@ -632,9 +632,11 @@ pre {
   .github-template-tag,
   .github-type {
     color: #a71d5d;
+    // color: rgb(227, 95, 156);
   }
   .github-emphasis {
     color: #a71d5d;
+    // color: rgb(227, 95, 156);
     font-style: italic;
   }
   .github-meta,

@@ -1,7 +1,6 @@
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
-import IconButton from "@mui/material/IconButton";
-import React from "react";
+import { IconButton } from "@mui/material";
 import { StyledText } from "./StyledMui";
 
 interface ICheckboxProps {

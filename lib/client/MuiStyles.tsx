@@ -1,7 +1,7 @@
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { TransitionSpeed } from "enums";
 import { AppContext } from "hooks";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ITheme } from "types";
 import themes from "./themes";
 

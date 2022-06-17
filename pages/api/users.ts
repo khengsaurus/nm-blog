@@ -210,7 +210,8 @@ async function handleTokenLogin(
 async function patchDoc(req: NextApiRequest): Promise<IResponse> {
   const reqBody: Partial<IUserReq> = req.body;
   return new Promise(async (resolve, reject) => {
-    const { action, userId, ..._existingUser } = reqBody;
+    const userId = req.headers["user-id"];
+    const { action, ..._existingUser } = reqBody;
     const { email, username } = _existingUser;
     try {
       let user;

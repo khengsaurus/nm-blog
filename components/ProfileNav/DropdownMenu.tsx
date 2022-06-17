@@ -4,7 +4,7 @@ import KeyIcon from "@mui/icons-material/Key";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PaletteIcon from "@mui/icons-material/Palette";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import Fade from "@mui/material/Fade";
+import { Fade } from "@mui/material";
 import { Container } from "@mui/system";
 import { renderButton } from "components/utils";
 import { PageRoute } from "enums";

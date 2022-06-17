@@ -1,6 +1,5 @@
 import DeleteIcon from "@mui/icons-material/Delete";
-import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
+import { Button, IconButton } from "@mui/material";
 import { Row, StyledText } from "components";
 import { checkFileSize, checkFileType, checkOneFileSelected } from "utils";
 

@@ -55,6 +55,11 @@ export const StyledButton = ({
 }: IStyledButtonProps) => {
   const { routerPush } = useContext(AppContext);
 
+  function handleClick(e?: React.MouseEvent) {
+    if (onClick) onClick(e);
+    if (navigate) routerPush(navigate);
+  }
+
   return (
     <Button
       style={{ color, padding, textTransform: "capitalize", ...style }}
@@ -62,7 +67,7 @@ export const StyledButton = ({
       size={size}
       variant={variant}
       autoFocus={autoFocus}
-      onClick={(e) => (navigate ? routerPush(navigate) : onClick(e))}
+      onClick={handleClick}
       type={type}
       disabled={disabled}
       disableRipple
