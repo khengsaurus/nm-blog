@@ -10,15 +10,15 @@ import {
 } from "./util";
 
 export {
-  decodeToken,
-  generateToken,
-  validateAuth,
-  verify,
   createUserObject,
+  decodeToken,
   errorHandler,
   forwardResponse,
+  generateToken,
   handleAPIError,
   handleBadRequest,
   handleRequest,
   processUserData,
+  validateAuth,
+  verify,
 };

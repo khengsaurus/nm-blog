@@ -38,7 +38,7 @@ export async function getStaticProps({ params }) {
       slug,
       post: postDocToObj(post),
     },
-    revalidate: 2 * 60 * 60 * 1000, // ms
+    revalidate: 60 * 1000,
   };
 }
 
