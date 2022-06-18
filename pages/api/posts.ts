@@ -145,7 +145,7 @@ async function createDoc(req: NextApiRequest): Promise<IResponse> {
 async function patchDoc(req: NextApiRequest): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     try {
-      const { userId, id, ..._set } = req.body as Partial<IPostReq>;
+      const { id, ..._set } = req.body as Partial<IPostReq>;
       const { Post } = await mongoConnection();
       const post = await Post.findById(id);
       for (const key of Object.keys(_set)) {
@@ -175,7 +175,8 @@ async function deleteDoc(req: NextApiRequest): Promise<IResponse> {
       session = await MongoConnection.startSession();
       await session.withTransaction(async () => {
         const { Post, User } = await mongoConnection();
-        const { userId, id } = req.query as Partial<IPostReq>;
+        const userId = req.headers["user-id"];
+        const { id } = req.query as Partial<IPostReq>;
         await Post.findByIdAndDelete(id)
           .then(() => {
             User.findByIdAndUpdate(

@@ -18,24 +18,40 @@ export async function getPostSlugs(username: string): Promise<IResponse> {
   });
 }
 
-export async function uploadImage(attachment: any): Promise<string> {
+export async function getPresignedS3URL(): Promise<IResponse | null> {
+  return HTTPService.makeAuthHttpReq(DBService.IMAGES, HttpRequest.GET, {
+    action: APIAction.GET_UPLOAD_KEY,
+  });
+}
+
+export async function getUploadedImageKey(image: any): Promise<string> {
+  let uploadURL = "";
+  let imageKey = "";
   return new Promise(async (resolve, reject) => {
-    await HTTPService.uploadImage(attachment)
+    if (!image) resolve("");
+    await getPresignedS3URL()
       .then((res) => {
-        if (res.status === 200 && res.data?.key) {
-          resolve(res.data.key);
-        } else {
-          reject(new Error(ErrorMessage.IMAGE_UPLOAD_FAIL));
-        }
+        uploadURL = res?.data?.uploadURL;
+        imageKey = res?.data?.imageKey;
       })
-      .catch((err) => reject(err));
+      .catch((err) => {
+        reject(err);
+        return;
+      });
+    if (uploadURL && imageKey) {
+      await HTTPService.uploadFile(uploadURL, image)
+        .then(() => resolve(imageKey))
+        .catch((err) => reject(err));
+    } else {
+      reject(new Error(ErrorMessage.IMAGE_UPLOAD_500));
+    }
   });
 }
 
 export async function deleteImage(imageKey: string): Promise<IResponse> {
   if (!imageKey) return;
   return new Promise(async (resolve, reject) => {
-    await HTTPService.makeAuthHttpReq(DBService.IMAGES, HttpRequest.DELETE, {
+    HTTPService.makeAuthHttpReq(DBService.IMAGES, HttpRequest.DELETE, {
       imageKey,
     })
       .then((res) => resolve(res))

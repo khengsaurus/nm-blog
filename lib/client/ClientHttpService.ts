@@ -1,6 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
-import { APIAction, DBService, HttpRequest } from "enums";
-import { IResponse } from "types";
+import { APIAction, DBService, ErrorMessage, HttpRequest } from "enums";
 
 const authBearer = { Authorization: `Bearer ${process.env.BEARER}` };
 
@@ -55,6 +54,8 @@ class ClientHTTPService {
         });
       case HttpRequest.POST:
         return this.instance.post(service, { ...bodyOrParams }, reqConfig);
+      case HttpRequest.PUT:
+        return this.instance.put(service, { ...bodyOrParams }, reqConfig);
       case HttpRequest.PATCH:
         return this.instance.patch(service, { ...bodyOrParams }, reqConfig);
       case HttpRequest.DELETE:
@@ -71,13 +72,20 @@ class ClientHTTPService {
     return this.instance.get(service, { params, headers: authBearer });
   }
 
-  uploadImage = async (image: any): Promise<IResponse | null> => {
-    const formData = new FormData();
-    formData.append("image", image);
-    return this.instance.post(DBService.IMAGES, formData, {
+  /**
+   * Upload a file to S3 via a presigned `PutObject` URL.
+   * Invokes a PUT fetch with header "Content-Type": "multipart/form-data"
+   */
+  uploadFile = async (presignedURL: string, file: any): Promise<Response> => {
+    if (!presignedURL || !file) {
+      return Promise.reject(new Error(ErrorMessage.IMAGE_UPLOAD_400));
+    }
+    return fetch(presignedURL, {
+      method: HttpRequest.PUT,
       headers: {
         "Content-Type": "multipart/form-data",
       },
+      body: file,
     });
   };
 }

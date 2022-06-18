@@ -13,6 +13,10 @@ export interface IResponse {
 
 /*------------------------------ . ------------------------------*/
 
+export interface IObject<T> {
+  [key: string]: T;
+}
+
 export interface IAppContext {
   user: IUser;
   userToken: string;

@@ -80,6 +80,8 @@ export enum ErrorMessage {
   IMAGE_DELETE_FAIL = "Failed to delete image",
   IMAGE_UPLOAD_FAIL = "Failed to upload image",
   IMAGE_DOWNLOAD_FAIL = "Failed to download image",
+  IMAGE_UPLOAD_400 = "Image upload missing required params",
+  IMAGE_UPLOAD_500 = "Image upload failed",
 }
 
 export enum APIAction {
@@ -88,6 +90,7 @@ export enum APIAction {
   USER_TOKEN_LOGIN = "user-token-login",
   USER_SET_USERNAME = "user-set-username",
   GET_POST_SLUGS = "get-post-slugs",
+  GET_UPLOAD_KEY = "get-upload-key",
   READ = "read",
 }
 

@@ -9,8 +9,12 @@ import {
 } from "components";
 import { DBService, ErrorMessage, HttpRequest, Status } from "enums";
 import { AppContext, useAsync, useRealtimePost } from "hooks";
-import { HTTPService, uploadImage } from "lib/client";
-import { deleteImage } from "lib/client/tasks";
+import { HTTPService } from "lib/client";
+import {
+  deleteImage,
+  getPresignedS3URL,
+  getUploadedImageKey,
+} from "lib/client/tasks";
 import { ServerError } from "lib/server";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { IResponse } from "types";
@@ -77,24 +81,31 @@ const EditPost = ({ id }: IPostPage) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isNewPost, realtimePost]);
 
-  const _handlePost = useCallback(() => {
+  const _handlePut = () => {
     return new Promise(async (resolve, reject) => {
-      if (!!user?.posts?.find((post) => post.slug === slug)) {
-        reject(new Error(ErrorMessage.POST_SLUG_USED));
-        return;
+      // If existing post with new slug || new post -> check if slug avail
+      if (isNewPost || slug.trim() !== realtimePost?.slug?.trim()) {
+        if (!!user?.posts?.find((post) => post.slug === slug)) {
+          reject(new Error(ErrorMessage.POST_SLUG_USED));
+          return;
+        }
       }
-      const hasAttachment = !!newImage;
       let imageKey = "";
-      if (hasAttachment) {
-        await uploadImage(newImage)
-          .then((_imageKey) => {
-            imageKey = _imageKey;
-          })
-          .catch((err) => reject(err));
+      let imageError = false;
+      if (imageUpdated) {
+        // New image -> delete old image if exists. Do not await this.
+        if (realtimePost?.imageKey)
+          deleteImage(realtimePost.imageKey).catch((err) => console.info(err));
+        await getUploadedImageKey(newImage)
+          .then((key) => (imageKey = key))
+          .catch((err) => {
+            reject(err);
+            imageError = true;
+          });
       }
-      // no newImage or newImage saved
-      if (!hasAttachment || !!imageKey) {
+      if (!imageError) {
         const post = {
+          id: isNewPost ? "" : realtimePost?.id,
           username: user?.username,
           title,
           slug,
@@ -104,63 +115,16 @@ const EditPost = ({ id }: IPostPage) => {
           isPrivate,
           hasMarkdown,
         };
-        HTTPService.makeAuthHttpReq(DBService.POSTS, HttpRequest.POST, post)
+        await HTTPService.makeAuthHttpReq(
+          DBService.POSTS,
+          isNewPost ? HttpRequest.POST : HttpRequest.PATCH,
+          post
+        )
           .then((res) => resolve(res))
           .catch((err) => reject(err));
       }
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newImage, body, slug, title, isPrivate, hasMarkdown, user?.username]);
-
-  async function _handlePatch() {
-    return new Promise(async (resolve, reject) => {
-      if (!!user?.posts?.find((post) => post.id !== id && post.slug === slug)) {
-        reject(new Error(ErrorMessage.POST_SLUG_USED));
-        return;
-      }
-      let imageError = false,
-        imageKey = realtimePost?.imageKey || "",
-        imageName = realtimePost?.imageName || "";
-      if (imageUpdated) {
-        await deleteImage(imageKey)
-          .then(() => {
-            imageKey = "";
-            imageName = "";
-          })
-          .catch((err) => {
-            imageError = true;
-            reject(err);
-            return;
-          });
-      }
-      if (!!newImage) {
-        await uploadImage(newImage)
-          .then((_imageKey) => {
-            imageKey = _imageKey;
-            imageName = newImage.name;
-          })
-          .catch((err) => {
-            imageError = true;
-            reject(err);
-            return;
-          });
-      }
-      if (!imageError) {
-        await HTTPService.makeAuthHttpReq(DBService.POSTS, HttpRequest.PATCH, {
-          id,
-          title,
-          slug,
-          body,
-          imageKey,
-          imageName,
-          isPrivate,
-          hasMarkdown,
-        })
-          .then((res) => resolve(res))
-          .catch((err) => reject(err));
-      }
-    });
-  }
+  };
 
   const _cleanup = useCallback(() => {
     if (isNewPost) {
@@ -180,12 +144,7 @@ const EditPost = ({ id }: IPostPage) => {
   const { execute: handleSave, status: saveStatus } = useAsync<
     IResponse,
     ServerError
-  >(
-    isNewPost ? _handlePost : _handlePatch,
-    _cleanup,
-    (r: IResponse) => r.status === 200,
-    false
-  );
+  >(_handlePut, _cleanup, (r: IResponse) => r.status === 200, false);
 
   const saveDisabled =
     !title?.trim() ||

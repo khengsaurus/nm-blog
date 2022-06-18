@@ -6,10 +6,14 @@ import {
   ImageForm,
   StyledText,
 } from "components";
-import { DBService, HttpRequest, Status } from "enums";
+import { DBService, ErrorMessage, HttpRequest, Status } from "enums";
 import { AppContext, useAsync } from "hooks";
-import { HTTPService, uploadImage } from "lib/client";
-import { deleteImage } from "lib/client/tasks";
+import { HTTPService } from "lib/client";
+import {
+  deleteImage,
+  getPresignedS3URL,
+  getUploadedImageKey,
+} from "lib/client/tasks";
 import { ServerError } from "lib/server";
 import { useContext, useEffect, useState } from "react";
 import { IResponse } from "types";
@@ -46,30 +50,16 @@ const EditProfile = () => {
   async function saveProfile() {
     return new Promise(async (resolve, reject) => {
       let imageError = false,
-        imageName = user?.avatar || "",
-        imageKey = user?.avatarKey || "";
+        imageName = "",
+        imageKey = "";
       if (imageUpdated) {
-        await deleteImage(imageKey)
-          .then(() => {
-            imageKey = "";
-            imageName = "";
-          })
+        if (user?.avatarKey)
+          deleteImage(user.avatarKey).catch((err) => console.info(err));
+        await getUploadedImageKey(newAvatar)
+          .then((key) => (imageKey = key))
           .catch((err) => {
-            imageError = true;
             reject(err);
-            return;
-          });
-      }
-      if (!!newAvatar) {
-        await uploadImage(newAvatar)
-          .then((_imageKey) => {
-            imageKey = _imageKey;
-            imageName = newAvatar.name;
-          })
-          .catch((err) => {
             imageError = true;
-            reject(err);
-            return;
           });
       }
       if (!imageError) {

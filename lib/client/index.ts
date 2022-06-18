@@ -1,8 +1,8 @@
 import ClientHTTPService from "./ClientHttpService";
 import markdown from "./markdown";
-import { getPostSlugs, uploadImage } from "./tasks";
+import { getPostSlugs } from "./tasks";
 import themes from "./themes";
 
 const HTTPService = new ClientHTTPService();
 
-export { HTTPService, themes, getPostSlugs, markdown, uploadImage };
+export { HTTPService, themes, getPostSlugs, markdown };

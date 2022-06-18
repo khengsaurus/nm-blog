@@ -215,7 +215,7 @@ textarea {
     transition: $speed !important;
   }
   .menu {
-    width: 250px;
+    width: 200px;
     a {
       @include flex-(row);
       @include round-border;

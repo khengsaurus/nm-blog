@@ -1,6 +1,7 @@
 import S3 from "aws-sdk/clients/s3";
 import { ServerInfo } from "enums";
-import fs from "fs";
+import { randomBytes } from "crypto";
+import { IObject } from "types";
 
 const bucketName = process.env.ENV_AWS_BUCKET;
 
@@ -8,7 +9,24 @@ const s3 = new S3({
   region: process.env.ENV_AWS_REGION,
   accessKeyId: process.env.ENV_AWS_ACCESS_KEY,
   secretAccessKey: process.env.ENV_AWS_SECRET_KEY,
+  signatureVersion: "v4",
 });
+
+export const generateUploadURL = async (): Promise<IObject<String>> => {
+  return new Promise(async (resolve, reject) => {
+    const rawBytes = await randomBytes(16);
+    const imageKey = rawBytes.toString("hex");
+    const params = {
+      Bucket: process.env.ENV_AWS_BUCKET,
+      Key: imageKey,
+      Expires: 60,
+    };
+    await s3
+      .getSignedUrlPromise("putObject", params)
+      .then((uploadURL) => resolve({ uploadURL, imageKey }))
+      .catch((err) => reject(err));
+  });
+};
 
 export function getFileStream(fileKey) {
   const downloadParams = {
@@ -16,15 +34,6 @@ export function getFileStream(fileKey) {
     Bucket: bucketName,
   };
   return s3.getObject(downloadParams).createReadStream();
-}
-
-export function uploadFile(file) {
-  const uploadParams = {
-    Bucket: bucketName,
-    Body: fs.createReadStream(file.path),
-    Key: file.filename,
-  };
-  return s3.upload(uploadParams).promise();
 }
 
 export function deleteFile(imageKey: string) {

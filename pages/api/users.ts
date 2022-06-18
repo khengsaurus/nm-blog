@@ -255,7 +255,7 @@ async function patchDoc(req: NextApiRequest): Promise<IResponse> {
 }
 
 async function deleteDoc(req: NextApiRequest) {
-  const { userId } = req.query as Partial<IUserReq>;
+  const userId = req.headers["user-id"];
   return new Promise(async (resolve, reject) => {
     try {
       const { User } = await mongoConnection();

@@ -8,7 +8,6 @@ import {
   handleRequest,
   processUserData,
 } from "./util";
-import upload from "./upload";
 
 export {
   decodeToken,
@@ -22,5 +21,4 @@ export {
   handleBadRequest,
   handleRequest,
   processUserData,
-  upload,
 };

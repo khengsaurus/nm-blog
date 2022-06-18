@@ -27,7 +27,7 @@ interface IDropdownMenu {
   handleClose: () => void;
 }
 
-const themeMenuHeight = 57 * (Object.keys(themes).length + 1) + 8;
+const themeMenuHeight = 57 * (Object.keys(themes).length + 1) + 14;
 
 const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
   (props: IDropdownMenu, ref?: MutableRefObject<any>) => {
@@ -38,7 +38,7 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
     const dropdownRef = useRef(null);
 
     const setDefaultMenuHeight = useCallback(() => {
-      setMenuHeight((user ? 3 : 2) * 57 + 8);
+      setMenuHeight((user ? 3 : 2) * 57 + 14);
     }, [user]);
 
     useEffect(() => setDefaultMenuHeight(), [setDefaultMenuHeight, user]);
@@ -182,7 +182,7 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
       >
         <Container
           className="dropdown"
-          style={{ height: menuHeight, width: "258px", padding: 2 }}
+          style={{ height: menuHeight, width: "214px", padding: 0 }}
           ref={dropdownRef}
         >
           {renderMenu()}
