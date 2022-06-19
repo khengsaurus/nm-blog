@@ -76,6 +76,7 @@ export enum ErrorMessage {
   ONE_IMAGE_ONLY = "Only 1 image can be uploaded",
   POST_CREATE_FAIL = "Failed to create post",
   POST_DELETE_FAIL = "Failed to delete post",
+  POST_RETRIEVE_FAIL = "Failed to retrieve post",
   POST_UPDATE_FAIL = "Failed to update post",
   IMAGE_DELETE_FAIL = "Failed to delete image",
   IMAGE_UPLOAD_FAIL = "Failed to upload image",

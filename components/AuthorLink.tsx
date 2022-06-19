@@ -8,30 +8,29 @@ import { StyledText } from "./StyledMui";
 
 interface IAuthorLinkProps {
   author?: IUser;
+  username?: string;
   title?: boolean;
 }
 
-const AuthorLink = ({ author, title = false }: IAuthorLinkProps) => {
+const AuthorLink = ({ username, author, title = false }: IAuthorLinkProps) => {
   const { history, user, routerPush } = useContext(AppContext);
-  const label = `By ${author?.username}`;
+  const _username = username || author?.username;
+  const label = `By ${_username}`;
 
   function handleClick(e: any) {
     e.preventDefault();
     e.stopPropagation();
     routerPush(
-      author.username === user?.username
-        ? PageRoute.MY_POSTS
-        : `/${author.username}`
+      _username === user?.username ? PageRoute.MY_POSTS : `/${_username}`
     );
   }
 
   const renderText = useMemo(() => {
     return (
-      history.length > 0 &&
-      history[history.length - 1] === `/${author?.username}`
+      history.length > 0 && history[history.length - 1] === `/${_username}`
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [author?.username, JSON.stringify(history)]);
+  }, [_username, JSON.stringify(history)]);
 
   return renderText ? (
     title ? (

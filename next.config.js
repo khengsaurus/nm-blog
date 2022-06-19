@@ -23,10 +23,10 @@ module.exports = {
       },
     ];
   },
-  experimental: {
-    runtime: "nodejs",
-    serverComponents: true,
-  },
+  // experimental: {
+  //   runtime: "nodejs",
+  //   serverComponents: true,
+  // },
   compiler: {
     styledComponents: true,
   },

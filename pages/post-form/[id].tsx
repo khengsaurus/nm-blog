@@ -10,11 +10,7 @@ import {
 import { DBService, ErrorMessage, HttpRequest, Status } from "enums";
 import { AppContext, useAsync, useRealtimePost } from "hooks";
 import { HTTPService } from "lib/client";
-import {
-  deleteImage,
-  getPresignedS3URL,
-  getUploadedImageKey,
-} from "lib/client/tasks";
+import { deleteImage, getUploadedImageKey } from "lib/client/tasks";
 import { ServerError } from "lib/server";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { IResponse } from "types";

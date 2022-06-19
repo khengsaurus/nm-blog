@@ -34,7 +34,7 @@ export async function getServerSideProps({ res }) {
 
 const Home: React.FC = ({ initPosts }: IHomeProps) => {
   const { posts, limitReached, loadMore } = usePaginatePosts(
-    true,
+    typeof window !== undefined,
     true,
     initPosts
   );

@@ -1,3 +1,4 @@
+import { one_hour } from "consts";
 import { ErrorMessage, HttpRequest, ServerInfo } from "enums";
 import {
   forwardResponse,
@@ -17,6 +18,7 @@ export default async function handler(
 ) {
   switch (req.method) {
     case HttpRequest.GET:
+      res.setHeader("Cache-Control", `maxage=${one_hour}, must-revalidate`);
       return handleGet(req, res);
     case HttpRequest.POST:
       return handleRequest(req, res, createDoc);
@@ -66,7 +68,7 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
 async function getPost(params: Partial<IPostReq>): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     const { id, username, slug } = params;
-    if (!id && (!username || !slug)) reject(new ServerError(400));
+    if (!id && !username && !slug) reject(new ServerError(400));
     else {
       try {
         const { Post } = await mongoConnection();

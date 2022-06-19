@@ -7,8 +7,8 @@ export function isDev() {
   return process.env.REACT_APP_FLAG?.startsWith("dev");
 }
 
-export function postDocToObj(data: any) {
-  if (data === null) return data;
+export function postDocToObj(data: any): IPost {
+  if (!data) return null;
   const { _id, user, createdAt, updatedAt, ...post } = data;
   post.id = _id?.toString();
   post.createdAt = createdAt?.toString();

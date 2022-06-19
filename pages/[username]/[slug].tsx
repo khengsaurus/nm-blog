@@ -27,18 +27,25 @@ interface IPostPage {
 
 export async function getStaticProps({ params }) {
   const { username, slug } = params;
-  const { Post } = await mongoConnection();
-  const post = await Post.findOne({ username, slug })
-    .populate("user", "-createdAt -email -password -posts")
-    .lean();
+  let _post: IPost = null;
+  try {
+    const { Post } = await mongoConnection();
+    _post = await Post.findOne({ username, slug })
+      .populate("user", "-createdAt -email -password -posts")
+      .lean();
+  } catch (err) {
+    console.info(
+      `Error in [${username}]/[${slug}] getStaticProps: ` + err.message
+    );
+  }
 
   return {
     props: {
       username,
       slug,
-      post: postDocToObj(post),
+      post: postDocToObj(_post),
     },
-    revalidate: 60 * 1000,
+    revalidate: 30,
   };
 }
 
@@ -63,13 +70,20 @@ export async function getStaticPaths() {
   };
 }
 
-const Post = ({ post }: IPostPage) => {
-  const { user: author, id } = post || {};
+const Post = ({ post, username, slug }: IPostPage) => {
   const { theme, user, routerPush } = useContext(AppContext);
   const [showDelete, setShowDelete] = useState(false);
-  const { realtimePost } = useRealtimePost(post);
-  const { title, body, hasMarkdown, imageKey, updatedAt, createdAt } =
-    realtimePost || {};
+  const { realtimePost } = useRealtimePost(post || { username, slug });
+  const {
+    id,
+    title,
+    body,
+    imageKey,
+    user: author,
+    updatedAt,
+    createdAt,
+    hasMarkdown,
+  } = realtimePost || {};
   const markdown = useMarkdown(hasMarkdown, theme, body);
 
   const dateText = useMemo(() => {
@@ -104,7 +118,7 @@ const Post = ({ post }: IPostPage) => {
           </DarkContainer>
           <Row style={{ justifyContent: "flex-start", alignItems: "flex-end" }}>
             <DarkContainer>
-              <AuthorLink author={author} title />
+              <AuthorLink username={username} title />
             </DarkContainer>
             <Avatar
               alt={`${author?.username}-avatar`}

@@ -1,5 +1,4 @@
-import { isEmpty } from "lodash";
-import type { NextApiRequest, NextApiResponse } from "next";
+import { one_hour } from "consts";
 import { APIAction, HttpRequest, ServerInfo } from "enums";
 import {
   createUserObject,
@@ -13,6 +12,8 @@ import {
   verify,
 } from "lib/middlewares";
 import { hashPassword, mongoConnection, ServerError } from "lib/server";
+import { isEmpty } from "lodash";
+import type { NextApiRequest, NextApiResponse } from "next";
 import { IResponse, IUser, IUserReq } from "types";
 
 export default async function handler(
@@ -21,6 +22,7 @@ export default async function handler(
 ) {
   switch (req.method) {
     case HttpRequest.GET:
+      res.setHeader("Cache-Control", `maxage=${one_hour}, must-revalidate`);
       return handleGet(req, res);
     case HttpRequest.POST:
       return handlePost(req, res);
@@ -108,23 +110,25 @@ async function handleRegister(reqBody: Partial<IUserReq>): Promise<IResponse> {
   });
 }
 
-async function getDoc(params: object): Promise<IResponse> {
+async function getDoc(params: Partial<IUserReq>): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     try {
       const { User } = await mongoConnection();
-      await User.findOne(params).then((userData) => {
-        if (isEmpty(userData)) {
-          resolve({ status: 200, message: ServerInfo.USER_NA });
-        } else {
-          resolve({
-            status: 200,
-            message: ServerInfo.USER_RETRIEVED,
-            data: {
-              user: processUserData(userData, userData._id),
-            },
-          });
+      await (params?.id ? User.findById(params.id) : User.findOne(params)).then(
+        (userData) => {
+          if (isEmpty(userData)) {
+            resolve({ status: 200, message: ServerInfo.USER_NA });
+          } else {
+            resolve({
+              status: 200,
+              message: ServerInfo.USER_RETRIEVED,
+              data: {
+                user: processUserData(userData, userData._id),
+              },
+            });
+          }
         }
-      });
+      );
     } catch (err) {
       reject(new ServerError(500, err.message));
     }

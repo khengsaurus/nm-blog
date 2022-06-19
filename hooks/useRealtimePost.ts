@@ -1,37 +1,62 @@
-import { DBService } from "enums";
+import { DBService, ErrorMessage } from "enums";
 import { HTTPService } from "lib/client";
-import { useCallback, useState } from "react";
-import { IPost } from "types";
+import { useCallback, useRef, useState } from "react";
+import { IPost, IUser } from "types";
 import { postDocToObj } from "utils";
 import useIsoEffect from "./useIsoEffect";
 
 const useRealtimePost = (post: IPost) => {
-  const { id, slug, username, user } = post || {};
   const [realtimePost, setRealtimePost] = useState(post);
+  const { id: postId, username, user: author } = post || {};
+  const isFetching = useRef(false);
 
-  const refreshPost = useCallback(() => {
-    if (!id) return null;
-    HTTPService.makeGetReq(DBService.POSTS, { id, slug, username }).then(
-      (res) => {
-        if (res.status === 200 && res.data?.post?._id) {
-          const updatedPost = {
-            ...postDocToObj(res.data.post),
-            user,
-          } as IPost;
-          setRealtimePost(updatedPost);
-        }
-      }
-    );
+  const fetchAuthor = useCallback((): Promise<IUser> => {
+    return new Promise((resolve) => {
+      HTTPService.makeGetReq(DBService.USERS, { id: author?.id, username })
+        .then((res) => resolve(res?.data?.user))
+        .catch((err) => {
+          console.info(err);
+          resolve(author);
+        });
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, slug, username]);
+  }, [author?.id, username]);
+
+  const fetchPost = useCallback((): Promise<IPost> => {
+    return new Promise((resolve) => {
+      const { id, slug, username } = post;
+      HTTPService.makeGetReq(DBService.POSTS, { id, slug, username })
+        .then((res) => {
+          if (res.status === 200 && res.data?.post) {
+            const updatedPost = postDocToObj(res.data?.post) as IPost;
+            resolve(updatedPost);
+          } else throw new Error(ErrorMessage.POST_RETRIEVE_FAIL);
+        })
+        .catch((err) => {
+          console.info(err);
+          resolve(post);
+        });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [post?.id]);
+
+  const refreshPost = useCallback(async () => {
+    if (!isFetching.current) {
+      isFetching.current = true;
+      await Promise.all([fetchAuthor(), fetchPost()]).then(
+        ([_author, _post]) => {
+          isFetching.current = false;
+          _post.user = _author;
+          setRealtimePost(_post);
+        }
+      );
+    }
+  }, [fetchAuthor, fetchPost]);
 
   useIsoEffect(() => {
-    if (id == "new") {
-      setRealtimePost(null);
-    } else {
-      refreshPost();
-    }
-  }, [id, refreshPost]);
+    if (postId == "new") setRealtimePost(null);
+    else refreshPost();
+  }, []);
 
   return { realtimePost, refreshPost };
 };
