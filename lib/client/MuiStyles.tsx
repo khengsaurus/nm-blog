@@ -130,9 +130,10 @@ function newMuiTheme(theme: ITheme) {
       MuiContainer: {
         styleOverrides: {
           root: {
-            color: mainText,
             backgroundColor: primary,
             border: `2px solid ${mainText}`,
+            borderRadius: "4px",
+            color: mainText,
             margin: 0,
             padding: "5px !important",
           },

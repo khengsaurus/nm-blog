@@ -86,12 +86,14 @@ const EditPost = ({ id }: IPostPage) => {
           return;
         }
       }
-      let imageKey = "";
+      let imageKey = realtimePost?.imageKey;
       let imageError = false;
       if (imageUpdated) {
         // New image -> delete old image if exists. Do not await this.
-        if (realtimePost?.imageKey)
+        if (realtimePost?.imageKey) {
+          imageKey = "";
           deleteImage(realtimePost.imageKey).catch((err) => console.info(err));
+        }
         await getUploadedImageKey(newImage)
           .then((key) => (imageKey = key))
           .catch((err) => {
@@ -107,7 +109,9 @@ const EditPost = ({ id }: IPostPage) => {
           slug,
           body,
           imageKey,
-          imageName: newImage?.name || "",
+          imageName: imageUpdated
+            ? newImage?.name || ""
+            : realtimePost?.imageName,
           isPrivate,
           hasMarkdown,
         };

@@ -15,34 +15,39 @@ const usePaginatePosts = (
   const [posts, setPosts] = useState(initPosts || []);
   const [limitReached, setLimitReached] = useState(false);
   const latestUpdated = useRef(false);
+  const isLoading = useRef(false);
 
   const loadMore = useCallback(async () => {
-    const createdAt =
-      latestUpdated.current && posts.length > 0
-        ? posts[posts.length - 1].createdAt
-        : new Date();
+    if (!isLoading.current) {
+      isLoading.current = true;
+      const createdAt =
+        latestUpdated.current && posts.length > 0
+          ? posts[posts.length - 1].createdAt
+          : new Date();
 
-    const query: IObject<any> = { createdAt, limit };
-    if (username) query.username = username;
-    if (publicPosts) query.isPrivate = false;
+      const query: IObject<any> = { createdAt, limit };
+      if (username) query.username = username;
+      if (publicPosts) query.isPrivate = false;
 
-    HTTPService.makeGetReq(DBService.POSTS, query).then((res) => {
-      if (res.status === 200) {
-        if (res.data?.posts?.length > 0) {
-          const _posts = latestUpdated.current
-            ? [...posts, ...res.data.posts]
-            : res.data.posts;
-          setPosts(_posts);
-          latestUpdated.current = true;
+      HTTPService.makeGetReq(DBService.POSTS, query).then((res) => {
+        if (res.status === 200) {
+          if (res.data?.posts?.length > 0) {
+            const _posts = latestUpdated.current
+              ? [...posts, ...res.data.posts]
+              : res.data.posts;
+            setPosts(_posts);
+            latestUpdated.current = true;
+          }
+          if (
+            res.data?.posts?.length < limit ||
+            res.data?.message === ServerInfo.POST_NA
+          ) {
+            setLimitReached(true);
+          }
         }
-        if (
-          res.data?.posts?.length < limit ||
-          res.data?.message === ServerInfo.POST_NA
-        ) {
-          setLimitReached(true);
-        }
-      }
-    });
+        isLoading.current = false;
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [posts?.length, limit, username, setPosts]);
 

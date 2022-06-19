@@ -365,11 +365,29 @@ pre {
       display: block;
       overflow-x: auto;
       padding: 10px;
+      color: rgb(235, 235, 235);
+      background: rgb(32, 34, 36);
+      &.dracula {
+        color: #e9e9f4;
+        background: #282936;
+      }
+      &.colorBrewer {
+        color: #e9e9f4;
+        background: rgb(32, 34, 36);
+      }
+      &.github {
+        color: rgb(225, 225, 225);
+        background: rgb(32, 34, 36);
+      }
+      &.atomOneDark {
+        color: #abb2bf;
+        background: #282c34;
+      }
+      &.monokaiSublime {
+        background: #282828;
+        color: #f8f8f2;
+      }
     }
-  }
-  .hljs {
-    color: rgb(235, 235, 235);
-    background: rgb(32, 34, 36);
   }
   // Atom one dark
   .atomOneDark-comment,
@@ -577,7 +595,8 @@ pre {
   .github-operator,
   .github-punctuation,
   .github-subst {
-    color: #333;
+    color: #ae81ff;
+    // color: #333;
   }
   .github-operator {
     opacity: 0.7;

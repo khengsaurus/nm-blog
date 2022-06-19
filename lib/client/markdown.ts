@@ -21,14 +21,15 @@ function getCodeTheme(theme: string) {
 }
 
 function markdown(text: string, theme: string) {
+  const codeTheme = getCodeTheme(theme);
   marked.setOptions({
     renderer: new marked.Renderer(),
     highlight: function (code, lang) {
-      hljs.configure(theme ? { classPrefix: `${getCodeTheme(theme)}-` } : null);
+      hljs.configure(theme ? { classPrefix: `${codeTheme}-` } : null);
       const language = hljs.getLanguage(lang) ? lang : "plaintext";
       return hljs.highlight(code, { language }).value;
     },
-    langPrefix: "hljs language-",
+    langPrefix: `hljs ${codeTheme} language-`,
     pedantic: false,
     gfm: true,
     breaks: false,

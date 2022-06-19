@@ -14,6 +14,7 @@ import { PageRoute } from "enums";
 import { AppContext, useMarkdown, useRealtimePost } from "hooks";
 import { mongoConnection } from "lib/server";
 import moment from "moment";
+import { GetStaticPropsResult } from "next";
 import FourOFour from "pages/404";
 import { useContext, useMemo, useState } from "react";
 import { IPost } from "types";
@@ -25,7 +26,9 @@ interface IPostPage {
   slug: string;
 }
 
-export async function getStaticProps({ params }) {
+export async function getStaticProps({
+  params,
+}): Promise<GetStaticPropsResult<IPostPage>> {
   const { username, slug } = params;
   let _post: IPost = null;
   try {

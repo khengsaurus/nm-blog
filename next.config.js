@@ -11,7 +11,7 @@ module.exports = {
     domains: [
       "localhost",
       "localhost:3000",
-      "https://notes-app-1-sg.s3.ap-southeast-1.amazonaws.com",
+      "notes-app-1-sg.s3.ap-southeast-1.amazonaws.com",
     ],
   },
   async redirects() {
