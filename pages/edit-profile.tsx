@@ -34,13 +34,16 @@ const EditProfile = () => {
   async function saveProfile() {
     return new Promise(async (resolve, reject) => {
       let imageError = false,
-        imageName = "",
-        imageKey = "";
+        imageName = user?.avatar || "",
+        imageKey = user?.avatarKey || "";
       if (imageUpdated) {
         if (user?.avatarKey)
           deleteImage(user.avatarKey).catch((err) => console.info(err));
         await getUploadedImageKey(newAvatar)
-          .then((key) => (imageKey = key))
+          .then((key) => {
+            imageName = newAvatar?.name;
+            imageKey = key;
+          })
           .catch((err) => {
             reject(err);
             imageError = true;
