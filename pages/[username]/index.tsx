@@ -2,11 +2,11 @@ import { Avatar } from "@mui/material";
 import {
   Column,
   DarkContainer,
+  PostCard,
   PostFeed,
   StyledButton,
   StyledText,
 } from "components";
-import PostCard from "components/PostCard";
 import { PAGINATE_LIMIT } from "consts";
 import { usePaginatePosts } from "hooks";
 import { mongoConnection } from "lib/server";
@@ -64,7 +64,7 @@ const UserPage = (props: IUserPageProps) => {
         {avatarKey && (
           <Avatar
             alt={`${username}-avatar`}
-            src={`${process.env.ENV_AWS_S3_SRC}${avatarKey}`}
+            src={`${process.env.ENV_IK_SRC}${avatarKey}?tr=w-140,h-140`}
             sx={{ width: 140, height: 140, marginRight: "20px" }}
           />
         )}

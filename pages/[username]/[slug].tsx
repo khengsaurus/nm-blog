@@ -109,12 +109,7 @@ const Post = ({ post, username, slug }: IPostPage) => {
   return realtimePost ? (
     <>
       <main className="left">
-        {imageKey && (
-          <PostBanner
-            src={`${process.env.ENV_AWS_S3_SRC}${imageKey}`}
-            id={`${imageKey}`}
-          />
-        )}
+        {imageKey && <PostBanner imageKey={imageKey} id={`${imageKey}`} />}
         <section className="header column">
           <DarkContainer>
             <StyledText text={title} variant="h2" />
@@ -125,7 +120,7 @@ const Post = ({ post, username, slug }: IPostPage) => {
             </DarkContainer>
             <Avatar
               alt={`${author?.username}-avatar`}
-              src={`${process.env.ENV_AWS_S3_SRC}${author?.avatarKey}`}
+              src={`${process.env.ENV_IK_SRC}${author?.avatarKey}?tr=w-40,h-40`}
               sx={{ height: "40px", width: "40px", marginLeft: "10px" }}
             />
           </Row>

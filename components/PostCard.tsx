@@ -29,14 +29,13 @@ const PostCard = ({
       {imageKey && (
         <CardMedia>
           <motion.img
-            src={`${process.env.ENV_AWS_S3_SRC}${imageKey}`}
+            src={`${process.env.ENV_IK_SRC}${imageKey}?tr=w-280,h-80`}
             alt="post-image"
             layoutId={`banner-${imageKey}${postTag}`}
             style={{
               height: "80px",
               width: "100%",
               objectFit: "cover",
-              objectPosition: "50% 40%",
             }}
           />
         </CardMedia>

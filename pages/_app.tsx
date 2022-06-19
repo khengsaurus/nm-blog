@@ -14,6 +14,10 @@ function MyApp({ Component, pageProps }: AppProps) {
             name="viewport"
             content="initial-scale=1.0, width=device-width"
           />
+          <link
+            rel="prefetch-dns preconnect"
+            href="https://notes-app-1-sg.s3.ap-southeast-1.amazonaws.com"
+          />
         </Head>
         <Layout>
           <Component {...pageProps} />

@@ -12,6 +12,7 @@ import MarkdownViewer from "./MarkdownViewer";
 import { ActionModal, DeletePostModal } from "./Modals";
 import NavBar from "./NavBar";
 import PostBanner from "./PostBanner";
+import PostCard from "./PostCard";
 import ProfileNav from "./ProfileNav";
 import {
   Centered,
@@ -27,6 +28,7 @@ import {
   StyledText,
   TextNavButton,
 } from "./StyledMui";
+import { renderButton } from "./utils";
 
 export {
   AuthorLink,
@@ -42,17 +44,19 @@ export {
   Layout,
   MarkdownViewer,
   PostBanner,
+  PostCard,
   ProfileNav,
   StyledButton,
   StyledCenterText,
   StyledText,
   TextNavButton,
+  NavBar,
+  renderButton,
   ActionModal,
   Centered,
   CenteredMain,
   Column,
   MarkdownEditor,
-  NavBar,
   PostFeed,
   Row,
 };

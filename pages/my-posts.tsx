@@ -2,11 +2,11 @@ import {
   Centered,
   CircleLoader,
   DarkContainer,
+  PostCard,
   PostFeed,
   StyledButton,
   StyledText,
 } from "components";
-import PostCard from "components/PostCard";
 import { AppContext } from "hooks";
 import usePaginatePosts from "hooks/usePaginatePosts";
 import { useContext } from "react";

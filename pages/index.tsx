@@ -1,10 +1,13 @@
-import { DarkContainer, PostFeed, StyledButton, StyledText } from "components";
-import PostCard from "components/PostCard";
+import {
+  DarkContainer,
+  PostCard,
+  PostFeed,
+  StyledButton,
+  StyledText,
+} from "components";
 import { PAGINATE_LIMIT } from "consts";
-import { PageRoute } from "enums";
 import { usePaginatePosts } from "hooks";
 import { mongoConnection } from "lib/server";
-import React from "react";
 import { IPost } from "types";
 import { postDocToObj } from "utils";
 
@@ -32,7 +35,7 @@ export async function getServerSideProps({ res }) {
   };
 }
 
-const Home: React.FC = ({ initPosts }: IHomeProps) => {
+const Home = ({ initPosts }: IHomeProps) => {
   const { posts, limitReached, loadMore } = usePaginatePosts(
     typeof window !== undefined,
     true,

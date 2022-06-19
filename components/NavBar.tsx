@@ -6,7 +6,7 @@ import { PageRoute } from "enums";
 import { AppContext } from "hooks";
 import { useContext } from "react";
 
-const NavBar: React.FC = () => {
+const NavBar = () => {
   const { userSessionActive, routerPush } = useContext(AppContext);
 
   return (
