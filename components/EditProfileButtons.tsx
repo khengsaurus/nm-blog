@@ -6,13 +6,18 @@ import CheckBox from "./CheckBox";
 
 interface IEditPostButtons {
   saveDisabled: boolean;
+  saveLabel: string | JSX.Element;
   handleSave: () => Promise<any>;
   handleCancel?: () => void;
 }
 
 const lastButtonStyle = { marginRight: -10 };
 
-const EditProfileButtons = ({ saveDisabled, handleSave }: IEditPostButtons) => {
+const EditProfileButtons = ({
+  saveDisabled,
+  saveLabel,
+  handleSave,
+}: IEditPostButtons) => {
   const { routerPush } = useContext(AppContext);
   const [saveCalled, setSaveCalled] = useState(false);
 
@@ -24,7 +29,7 @@ const EditProfileButtons = ({ saveDisabled, handleSave }: IEditPostButtons) => {
         style={lastButtonStyle}
       />
       <StyledButton
-        label={"Save"}
+        label={saveLabel}
         disabled={saveDisabled || saveCalled}
         onClick={() => {
           handleSave();

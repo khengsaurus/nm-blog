@@ -1,22 +1,13 @@
-import { Alert, Collapse } from "@mui/material";
-import { useCallback, useContext, useEffect, useState } from "react";
 import { CenteredMain, Input, Row, StyledButton } from "components";
-import {
-  APIAction,
-  DBService,
-  HttpRequest,
-  PageRoute,
-  Status,
-  Transition,
-} from "enums";
+import { APIAction, DBService, HttpRequest, PageRoute } from "enums";
 import { AppContext } from "hooks/context";
 import { HTTPService } from "lib/client";
-import { AlertStatus, IAlert, IUser } from "types";
+import { useCallback, useContext, useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 
 const NewUser = () => {
   const { user, handleUser, logout, routerPush } = useContext(AppContext);
   const [username, setUsername] = useState("");
-  const [alert, setAlert] = useState<IAlert>(null);
   const [toDeleteIfUnload, setToDeleteIfUnload] = useState(true);
 
   useEffect(() => {
@@ -27,7 +18,6 @@ const NewUser = () => {
   }, [JSON.stringify(user), routerPush]);
 
   const cancelRegister = useCallback(() => {
-    setAlert(null);
     setToDeleteIfUnload(false);
     HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequest.DELETE, {
       user,
@@ -64,13 +54,10 @@ const NewUser = () => {
       if (res.data?.token) {
         setToDeleteIfUnload(false);
         handleUser(res.data.token, res.data.user);
-        setAlert({
-          status: Status.SUCCESS,
-          message: "Successfully registered",
-        });
+        toast.success("Successfully registered");
         setTimeout(() => routerPush(PageRoute.HOME), 2000);
       } else {
-        setAlert({ status: Status.ERROR, message: res.data?.message });
+        toast.error(res.data?.message || "Failed to register");
       }
     });
   }
@@ -85,23 +72,15 @@ const NewUser = () => {
         inputProps={{ maxLength: 8 }}
       />
       <Row style={{ width: "170px" }}>
-        {alert?.status !== Status.SUCCESS && (
-          <>
-            <StyledButton label="Cancel" onClick={cancelRegister} />
-            <StyledButton
-              label="Submit"
-              autoFocus
-              type="submit"
-              disabled={username.trim() === ""}
-              onClick={() => registerUsername(user?.email, username)}
-            />
-          </>
-        )}
+        <StyledButton label="Cancel" onClick={cancelRegister} />
+        <StyledButton
+          label="Submit"
+          autoFocus
+          type="submit"
+          disabled={username.trim() === ""}
+          onClick={() => registerUsername(user?.email, username)}
+        />
       </Row>
-      <br />
-      <Collapse in={!!alert} timeout={Transition.FAST} unmountOnExit>
-        <Alert severity={alert?.status as AlertStatus}>{alert?.message}</Alert>
-      </Collapse>
     </CenteredMain>
   );
 };

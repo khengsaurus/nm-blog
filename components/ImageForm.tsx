@@ -1,6 +1,7 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Button, IconButton } from "@mui/material";
 import { Row, StyledText } from "components";
+import { toast } from "react-hot-toast";
 import { checkFileSize, checkFileType, checkOneFileSelected } from "utils";
 
 interface IImageForm {
@@ -16,13 +17,13 @@ const ImageForm = ({
   setNewImage,
   setImageName,
 }: IImageForm) => {
-  const errHandler = (msg: string) => console.info(msg);
+  const errorHandler = (msg: string) => toast.error(msg);
 
   async function handleAttachment(event: React.ChangeEvent<HTMLInputElement>) {
     if (
-      checkOneFileSelected(event, errHandler) &&
-      checkFileSize(event, errHandler) &&
-      checkFileType(event, errHandler)
+      checkOneFileSelected(event, errorHandler) &&
+      checkFileSize(event, errorHandler) &&
+      checkFileType(event, errorHandler)
     ) {
       const file = event.target.files[0];
       setNewImage(file);

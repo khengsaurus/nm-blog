@@ -1,9 +1,11 @@
+import { Toaster } from "react-hot-toast";
 import { Box } from "@mui/material";
 import { PageRoute } from "enums";
 import { AppContext } from "hooks";
 import { themes } from "lib/client";
 import { useContext, useEffect, useState } from "react";
 import { NavBar } from ".";
+import { ITheme } from "types";
 
 const authRoutes: string[] = [
   PageRoute.MY_POSTS,
@@ -17,13 +19,15 @@ interface ILayoutProps {
 }
 
 const Layout = ({ children }: ILayoutProps) => {
-  const { router, userSessionActive, theme, routerPush } =
-    useContext(AppContext);
-  const [bgColor, setBgColor] = useState(themes["embers"]?.background);
+  const {
+    router,
+    userSessionActive,
+    theme: _theme,
+    routerPush,
+  } = useContext(AppContext);
+  const [theme, setTheme] = useState<ITheme>(themes["embers"]);
 
-  useEffect(() => {
-    setBgColor(themes[theme || "embers"]?.background);
-  }, [theme]);
+  useEffect(() => setTheme(themes[_theme || "embers"]), [_theme]);
 
   useEffect(() => {
     if (
@@ -37,9 +41,23 @@ const Layout = ({ children }: ILayoutProps) => {
   return (
     <>
       <NavBar />
-      <Box className="background" style={{ backgroundColor: bgColor }}>
+      <Box
+        className="background"
+        style={{ backgroundColor: theme?.background }}
+      >
         {children}
       </Box>
+      <Toaster
+        position="bottom-center"
+        toastOptions={{
+          duration: 5000,
+          style: {
+            background: theme?.secondary,
+            color: theme?.mainText,
+            borderRadius: "4px",
+          },
+        }}
+      />
     </>
   );
 };

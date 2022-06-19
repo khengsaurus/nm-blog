@@ -1,7 +1,8 @@
 import { IPost } from "types";
-import { ErrorMessage } from "enums";
+import { ErrorMessage, Status } from "enums";
+import { CircleLoader } from "components";
 
-const maxFileSizeMB = 2;
+const maxFileSizeMB = 4;
 
 export function isDev() {
   return process.env.REACT_APP_FLAG?.startsWith("dev");
@@ -71,3 +72,16 @@ export function checkFileType(
   if (allowedTypes.includes(file.type)) return true;
   errorHandler("File type not supported");
 }
+
+export const getStatusLabel = (saveStatus: Status) => {
+  switch (saveStatus) {
+    case Status.IDLE:
+      return "Save";
+    case Status.PENDING:
+      return <CircleLoader />;
+    case Status.SUCCESS:
+      return "👌🏻";
+    case Status.ERROR:
+      return "⚠️";
+  }
+};

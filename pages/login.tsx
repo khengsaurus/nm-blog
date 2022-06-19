@@ -1,3 +1,4 @@
+import { toast } from "react-hot-toast";
 import { Alert, Collapse } from "@mui/material";
 import { CenteredMain, Input, Row, StyledButton } from "components";
 import {
@@ -16,7 +17,6 @@ import { AlertStatus, IAlert, IResponse } from "types";
 
 const Login = () => {
   const { user, handleUser, routerPush } = useContext(AppContext);
-  const [alert, setAlert] = useState<IAlert>(null);
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -49,7 +49,6 @@ const Login = () => {
   const cleanup = useCallback(
     (res: IResponse, route: PageRoute) => {
       routerPush(route);
-      setAlert(null);
       Promise.resolve().then(() => handleUser(res.data.token, res.data.user));
     },
     [handleUser, routerPush]
@@ -65,11 +64,11 @@ const Login = () => {
         if (res.status === 200 && res?.data?.token) {
           cleanup(res, PageRoute.HOME);
         } else {
-          setAlert({ status: Status.ERROR, message: res?.data?.message });
+          toast.error(res?.data?.message);
         }
       })
       .catch((err) => console.error(err));
-  }, [cleanup, setAlert, username, password]);
+  }, [cleanup, username, password]);
 
   const handleRegister = useCallback(() => {
     if (password === confirmPassword) {
@@ -81,13 +80,13 @@ const Login = () => {
         if (res?.data?.token) {
           cleanup(res, PageRoute.NEW_USER);
         } else {
-          setAlert({ status: Status.ERROR, message: res?.data?.message });
+          toast.error(res?.data?.message);
         }
       });
     } else {
-      setAlert({ status: Status.ERROR, message: ErrorMessage.PW_NOT_MATCHING });
+      toast.error(ErrorMessage.PW_NOT_MATCHING);
     }
-  }, [confirmPassword, email, password, cleanup, setAlert]);
+  }, [confirmPassword, email, password, cleanup]);
 
   const renderLoginButton = () => (
     <StyledButton
@@ -137,22 +136,10 @@ const Login = () => {
       <Row style={{ width: 180 }}>
         <StyledButton
           label={showRegister ? "Back" : "Register"}
-          onClick={() => {
-            setAlert(null);
-            setShowRegister(!showRegister);
-          }}
+          onClick={() => setShowRegister(!showRegister)}
         />
         {showRegister ? renderRegisterButton() : renderLoginButton()}
       </Row>
-      <Collapse
-        in={!!alert}
-        timeout={{ enter: Transition.FAST, exit: Transition.INSTANT }}
-        unmountOnExit
-      >
-        <Alert severity={alert?.status as AlertStatus}>
-          {alert?.message || ErrorMessage.TRY_AGAIN}
-        </Alert>
-      </Collapse>
     </CenteredMain>
   );
 };

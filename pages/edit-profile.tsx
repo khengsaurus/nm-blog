@@ -1,35 +1,19 @@
 import {
-  CircleLoader,
   Column,
   EditPreviewMarkdown,
   EditProfileButtons,
   ImageForm,
   StyledText,
 } from "components";
-import { DBService, ErrorMessage, HttpRequest, Status } from "enums";
+import { DBService, HttpRequest, Status, ToastMessage } from "enums";
 import { AppContext, useAsync } from "hooks";
 import { HTTPService } from "lib/client";
-import {
-  deleteImage,
-  getPresignedS3URL,
-  getUploadedImageKey,
-} from "lib/client/tasks";
+import { deleteImage, getUploadedImageKey } from "lib/client/tasks";
 import { ServerError } from "lib/server";
 import { useContext, useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 import { IResponse } from "types";
-
-const getSaveButtonLabel = (saveStatus: Status) => {
-  switch (saveStatus) {
-    case Status.IDLE:
-      return "Save";
-    case Status.PENDING:
-      return <CircleLoader />;
-    case Status.SUCCESS:
-      return "👌🏻";
-    case Status.ERROR:
-      return "⚠️";
-  }
-};
+import { getStatusLabel } from "utils";
 
 const EditProfile = () => {
   const { user, handleUser } = useContext(AppContext);
@@ -72,9 +56,13 @@ const EditProfile = () => {
             if (res.data?.token && res.data?.user) {
               handleUser(res.data.token, res.data.user);
             }
+            toast.success(ToastMessage.PROFILE_SAVE);
             resolve(res);
           })
-          .catch((err) => reject(err));
+          .catch((err) => {
+            toast.error(ToastMessage.PROFILE_SAVE_FAIL);
+            reject(err);
+          });
       }
     });
   }
@@ -111,6 +99,7 @@ const EditProfile = () => {
         />
         <EditProfileButtons
           saveDisabled={saveDisabled || saveStatus === Status.ERROR}
+          saveLabel={getStatusLabel(saveStatus)}
           handleSave={handleSave}
         />
       </Column>

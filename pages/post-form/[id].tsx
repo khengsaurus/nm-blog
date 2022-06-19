@@ -1,5 +1,4 @@
 import {
-  CircleLoader,
   Column,
   DeletePostModal,
   EditPostButtons,
@@ -7,13 +6,21 @@ import {
   ImageForm,
   Input,
 } from "components";
-import { DBService, ErrorMessage, HttpRequest, Status } from "enums";
+import {
+  DBService,
+  ErrorMessage,
+  HttpRequest,
+  Status,
+  ToastMessage,
+} from "enums";
 import { AppContext, useAsync, useRealtimePost } from "hooks";
 import { HTTPService } from "lib/client";
 import { deleteImage, getUploadedImageKey } from "lib/client/tasks";
 import { ServerError } from "lib/server";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { toast } from "react-hot-toast";
 import { IResponse } from "types";
+import { getStatusLabel } from "utils";
 
 interface IPostPage {
   id: string;
@@ -23,19 +30,6 @@ export async function getServerSideProps({ params }) {
   const { id } = params;
   return { props: { id } };
 }
-
-const getSaveButtonLabel = (saveStatus: Status) => {
-  switch (saveStatus) {
-    case Status.IDLE:
-      return "Save";
-    case Status.PENDING:
-      return <CircleLoader />;
-    case Status.SUCCESS:
-      return "👌🏻";
-    case Status.ERROR:
-      return "⚠️";
-  }
-};
 
 const EditPost = ({ id }: IPostPage) => {
   const { user, updatePostSlugs } = useContext(AppContext);
@@ -120,8 +114,22 @@ const EditPost = ({ id }: IPostPage) => {
           isNewPost ? HttpRequest.POST : HttpRequest.PATCH,
           post
         )
-          .then((res) => resolve(res))
-          .catch((err) => reject(err));
+          .then((res) => {
+            toast.success(
+              isNewPost ? ToastMessage.POST_CREATED : ToastMessage.POST_EDITED
+            );
+            resolve(res);
+          })
+          .catch((err) => {
+            toast.error(
+              isNewPost
+                ? ToastMessage.POST_CREATED_FAIL
+                : ToastMessage.POST_EDITED_FAIL
+            );
+            reject(err);
+          });
+      } else {
+        toast.error(ToastMessage.IMAGE_UPLOAD_FAIL);
       }
     });
   };
@@ -204,7 +212,7 @@ const EditPost = ({ id }: IPostPage) => {
           setIsPrivate={setIsPrivate}
           hasMarkdown={hasMarkdown}
           setHasMarkdown={setHasMarkdown}
-          saveButtonLabel={getSaveButtonLabel(saveStatus)}
+          saveButtonLabel={getStatusLabel(saveStatus)}
           saveDisabled={saveDisabled}
           handleSave={handleSave}
           isEdit={!isNewPost}

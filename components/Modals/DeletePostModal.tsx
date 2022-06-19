@@ -1,8 +1,9 @@
-import { PageRoute, Status } from "enums";
+import { PageRoute, Status, ToastMessage } from "enums";
 import { AppContext, useAsync, useKeyListener, useRefClick } from "hooks";
 import { deletePost } from "lib/client/tasks";
 import { ServerError } from "lib/server";
 import { useCallback, useContext, useRef } from "react";
+import { toast } from "react-hot-toast";
 import { IPost, IResponse } from "types";
 import ActionModal from "./ActionModal";
 
@@ -32,6 +33,7 @@ const DeletePostModal = ({
     () => {
       updatePostSlugs(user);
       routerPush(PageRoute.MY_POSTS);
+      toast.success(ToastMessage.POST_DELETED);
     },
     (r: IResponse) => r.status === 200,
     false

@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
 import { Status } from "enums";
 import { isEmpty } from "lodash.isempty";
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 
 function defaultValidation<T>(res: T) {
   return !isEmpty(res);
@@ -35,6 +36,7 @@ function useAsync<T, E extends Error>(
       })
       .catch((error: E) => {
         setStatus(Status.ERROR);
+        toast.error(error?.message);
         setError(error);
       })
       .finally(() => {

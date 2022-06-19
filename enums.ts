@@ -47,6 +47,21 @@ export enum HttpResponse {
   USERNAME_TAKEN = "Username already taken",
 }
 
+export enum ToastMessage {
+  POST_EDITED = "Post edited successfully",
+  POST_CREATED = "Post created successfully",
+  POST_DELETED = "Post deleted successfully",
+
+  POST_EDITED_FAIL = "Failed to edit post",
+  POST_CREATED_FAIL = "Failed to create post",
+  POST_DELETED_FAIL = "Failed to delete post",
+
+  PROFILE_SAVE = "Profile saved successfully",
+  PROFILE_SAVE_FAIL = "Failed to save profile",
+
+  IMAGE_UPLOAD_FAIL = "Failed to upload image",
+}
+
 export enum ServerInfo {
   EMAIL_USED = "Email already used",
   USER_LOGIN = "User logged in successfully",
