@@ -87,11 +87,11 @@ export const getStatusLabel = (saveStatus: Status) => {
 };
 
 export function getCardSrc(imageKey: string) {
-  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-280,h-80`;
+  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-280,h-80,q-90`;
 }
 
 export function getBannerSrc(imageKey: string, width: number) {
-  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-${width},h-400,q-100`;
+  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-${width},h-350,q-100`;
 }
 
 export function getAvatarSmall(imageKey: string) {

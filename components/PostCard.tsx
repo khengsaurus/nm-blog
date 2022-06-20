@@ -1,12 +1,11 @@
 import { Card, CardContent, CardMedia } from "@mui/material";
 import { AuthorLink, Row } from "components";
 import { motion } from "framer-motion";
-import { AppContext, useMarkdown, useWindowDimensions } from "hooks";
+import { AppContext, useMarkdown } from "hooks";
 import moment from "moment";
-import Head from "next/head";
 import { useContext } from "react";
 import { IPost } from "types";
-import { getBannerSrc, getCardSrc } from "utils";
+import { getCardSrc } from "utils";
 
 interface IPostCard {
   post: IPost;
@@ -23,21 +22,11 @@ const PostCard = ({
 }: IPostCard) => {
   const { theme, routerPush } = useContext(AppContext);
   const { title, slug, body, user, imageKey, updatedAt, hasMarkdown } = post;
-  const { width } = useWindowDimensions();
-  const markdown = useMarkdown(hasMarkdown, theme, body);
+  const markdown = useMarkdown(hasMarkdown, theme?.name, body);
   const date = moment(new Date(updatedAt)).format("DD/MM/YY");
 
   return (
     <Card onClick={() => routerPush(`/${user?.username}/${slug}`)}>
-      <Head>
-        {imageKey && width && (
-          <link
-            rel="prefetch"
-            href={getBannerSrc(imageKey, width)}
-            as="image"
-          />
-        )}
-      </Head>
       {imageKey && (
         <CardMedia>
           <motion.img

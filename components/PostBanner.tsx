@@ -1,8 +1,8 @@
 import { Fade } from "@mui/material";
 import { motion } from "framer-motion";
-import { useKeyListener, useWindowDimensions } from "hooks";
+import { AppContext, useKeyListener, useWindowDimensions } from "hooks";
 import Image from "next/image";
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { getBannerSrc, getCardSrc } from "utils";
 import SuspenseImage from "./SuspenseImage";
 
@@ -13,14 +13,16 @@ interface IPostBanner {
 
 const PostBanner = ({ imageKey, id }: IPostBanner) => {
   const [view, setView] = useState(false);
+  const { theme } = useContext(AppContext);
   const { width } = useWindowDimensions();
+  const highlightColor = theme?.highlightColor;
 
   const hideImage = useCallback(() => setView(false), []);
   useKeyListener("Escape", hideImage);
 
   return imageKey ? (
     <>
-      <header className="banner-image">
+      <header className="banner-image" style={{ borderColor: highlightColor }}>
         <motion.div
           layoutId={`banner-${id}`}
           style={{

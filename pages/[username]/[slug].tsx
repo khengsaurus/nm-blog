@@ -87,7 +87,7 @@ const Post = ({ post, username, slug }: IPostPage) => {
     createdAt,
     hasMarkdown,
   } = realtimePost || {};
-  const markdown = useMarkdown(hasMarkdown, theme, body);
+  const markdown = useMarkdown(hasMarkdown, theme?.name, body);
 
   const dateText = useMemo(() => {
     if (createdAt === updatedAt) {

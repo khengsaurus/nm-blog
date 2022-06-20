@@ -11,7 +11,7 @@ export const HomeTheme = (props: any) => {
   const [muiTheme, setMuiTheme] = useState(newMuiTheme(themes[DEFAULT_THEME]));
 
   useEffect(() => {
-    if (theme) setMuiTheme(newMuiTheme(themes[theme]));
+    if (theme) setMuiTheme(newMuiTheme(theme));
   }, [theme]);
 
   return <ThemeProvider theme={muiTheme} {...props} />;

@@ -2,6 +2,7 @@ import { IThemeOptions } from "types";
 
 const themes: IThemeOptions = {
   blue: {
+    name: "blue",
     background: "rgb(42, 54, 102)",
     primary: "rgb(60, 85, 144)",
     secondary: "rgb(71, 101, 176)",
@@ -11,6 +12,7 @@ const themes: IThemeOptions = {
     icon: "🔷",
   },
   cabana: {
+    name: "cabana",
     background: "rgb(32, 76, 160)",
     primary: "rgb(170, 55, 78)",
     secondary: "rgb(190, 55, 78)",
@@ -20,6 +22,7 @@ const themes: IThemeOptions = {
     icon: "🏝",
   },
   cactus: {
+    name: "cactus",
     background: "rgb(121, 97, 111)",
     primary: "rgb(99, 129, 99)",
     secondary: "rgb(180, 89, 108)",
@@ -29,6 +32,7 @@ const themes: IThemeOptions = {
     icon: "🌵",
   },
   dark: {
+    name: "dark",
     background: "rgb(40, 40, 40)",
     primary: "rgb(58, 58, 58)",
     secondary: "rgb(85, 85, 85)",
@@ -38,6 +42,7 @@ const themes: IThemeOptions = {
     icon: "🌚",
   },
   embers: {
+    name: "embers",
     background: "rgb(65, 67, 106)",
     primary: "rgb(151, 64, 99)",
     secondary: "rgb(245, 71, 104)",
@@ -47,6 +52,7 @@ const themes: IThemeOptions = {
     icon: "🔥",
   },
   lavendar: {
+    name: "lavendar",
     background: "rgb(70, 40, 118)",
     primary: "rgb(121, 68, 154)",
     secondary: "rgb(161, 54, 112)",
@@ -56,6 +62,7 @@ const themes: IThemeOptions = {
     icon: "💜",
   },
   // moss: {
+  //   name: "moss",
   //   background: "rgb(49, 90, 57)",
   //   primary: "rgb(99, 129, 99)",
   //   secondary: "rgb(49, 70, 67)",

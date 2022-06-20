@@ -32,7 +32,7 @@ const themeMenuHeight = 57 * (Object.keys(themes).length + 1) + 14;
 const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
   (props: IDropdownMenu, ref?: MutableRefObject<any>) => {
     const { open, handleClose } = props;
-    const { user, logout, routerPush, setTheme } = useContext(AppContext);
+    const { user, logout, routerPush, setThemeName } = useContext(AppContext);
     const [activeMenu, setActiveMenu] = useState("main");
     const [menuHeight, setMenuHeight] = useState(0);
     const dropdownRef = useRef(null);
@@ -119,13 +119,13 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
           <DropdownItem callback={() => setActiveMenu("main")} hasBack>
             {renderButton("Themes", 18)}
           </DropdownItem>
-          {Object.keys(themes).map((opt) => (
+          {Object.keys(themes).map((name) => (
             <DropdownItem
-              key={opt}
-              leftIcon={themes[opt].icon}
-              callback={() => setTheme(opt)}
+              key={name}
+              leftIcon={themes[name].icon}
+              callback={() => setThemeName(name)}
             >
-              {renderButton(opt)}
+              {renderButton(name)}
             </DropdownItem>
           ))}
         </div>

@@ -1,8 +1,8 @@
 import { marked } from "marked";
 import hljs from "highlight.js";
 
-function getCodeTheme(theme: string) {
-  switch (theme) {
+function getCodeTheme(themeName: string) {
+  switch (themeName) {
     case "blue":
       return "colorBrewer";
     case "dark":
@@ -16,16 +16,16 @@ function getCodeTheme(theme: string) {
     case "moss":
       return "monokaiSublime";
     default:
-      return theme;
+      return themeName;
   }
 }
 
-function markdown(text: string, theme: string) {
-  const codeTheme = getCodeTheme(theme);
+function markdown(text: string, themeName: string) {
+  const codeTheme = getCodeTheme(themeName);
   marked.setOptions({
     renderer: new marked.Renderer(),
     highlight: function (code, lang) {
-      hljs.configure(theme ? { classPrefix: `${codeTheme}-` } : null);
+      hljs.configure(themeName ? { classPrefix: `${codeTheme}-` } : null);
       const language = hljs.getLanguage(lang) ? lang : "plaintext";
       return hljs.highlight(code, { language }).value;
     },

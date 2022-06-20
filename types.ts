@@ -20,11 +20,11 @@ export interface IObject<T> {
 export interface IAppContext {
   user: IUser;
   userToken: string;
-  theme: string;
   history: string[];
   router: NextRouter;
   userSessionActive: boolean;
-  setTheme: (_?: string) => void;
+  theme: ITheme;
+  setThemeName: (theme?: string) => void;
   routerPush: (route: string) => void;
   routerBack: () => void;
   logout: () => void;
@@ -33,6 +33,7 @@ export interface IAppContext {
 }
 
 export interface ITheme {
+  name: string;
   background: string;
   primary: string;
   secondary: string;

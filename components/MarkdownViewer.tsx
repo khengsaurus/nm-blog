@@ -14,7 +14,7 @@ const MarkdownViewer = ({
   hasMarkdown,
 }: IMarkdownViewerProps) => {
   const { theme } = useContext(AppContext);
-  const markdown = useMarkdown(hasMarkdown, theme, text);
+  const markdown = useMarkdown(hasMarkdown, theme?.name, text);
 
   return (
     <Container

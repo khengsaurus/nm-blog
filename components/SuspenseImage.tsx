@@ -7,7 +7,7 @@ interface ISuspenseImage {
   fallback: string;
   priority?: boolean;
   alt?: string;
-  props?: ImageProps;
+  props?: Partial<ImageProps>;
 }
 
 /**

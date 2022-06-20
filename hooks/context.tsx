@@ -1,6 +1,6 @@
 import { DEFAULT_THEME } from "consts";
 import { PageRoute, Status } from "enums";
-import { getPostSlugs, HTTPService } from "lib/client";
+import { getPostSlugs, HTTPService, themes } from "lib/client";
 import { useRouter } from "next/router";
 import { createContext, useCallback, useEffect, useRef, useState } from "react";
 import { IAppContext, IUser } from "types";
@@ -9,8 +9,8 @@ import useLocalStorage from "./useLocalStorage";
 import useWindowListener from "./useWindowListener";
 
 const initialContext: IAppContext = {
-  theme: DEFAULT_THEME,
-  setTheme: null,
+  theme: themes[DEFAULT_THEME],
+  setThemeName: null,
   user: null,
   userToken: "",
   userSessionActive: true,
@@ -29,9 +29,12 @@ const AppContextProvider = (props: any) => {
   const [user, setUser] = useState<IUser>();
   const [userSessionActive, setUserSessionActive] = useState(true);
   const [userToken, setUserToken] = useLocalStorage("userToken", "");
-  const [theme, setTheme] = useLocalStorage("theme", DEFAULT_THEME);
+  const [themeName, setThemeName] = useLocalStorage("theme", DEFAULT_THEME);
+  const [theme, setTheme] = useState(themes[DEFAULT_THEME]);
   const historyRef = useRef([]);
   const router = useRouter();
+
+  useEffect(() => setTheme(themes[themeName]), [themeName]);
 
   /* -------------------- Start Router stuff -------------------- */
   const routerPush = useCallback(
@@ -141,7 +144,7 @@ const AppContextProvider = (props: any) => {
         theme,
         history: historyRef.current,
         router,
-        setTheme,
+        setThemeName,
         routerPush,
         routerBack,
         logout,

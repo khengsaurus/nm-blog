@@ -20,14 +20,16 @@
   }
 }
 
+$nav-bar-height: 50px;
 $main-side-margin: clamp(20px, 3vw, 80px);
 $main-width: calc(100vw - (2 * $main-side-margin));
-$speed: 350ms;
+$speed-fast: 150ms;
+$speed-medium: 350ms;
 $init-bg-color: rgb(40, 40, 40);
 
 $big-button-dim: 80px;
 $medium-button-dim: 50px;
-$banner-image-height: clamp(250px, 40vh, 400px);
+$banner-image-height: clamp(250px, 40vh, 350px);
 
 html {
   font-family: "Roboto", sans-serif;
@@ -55,10 +57,16 @@ main {
   header {
     &.banner-image {
       position: absolute;
-      top: 0;
+      top: 50;
       left: 0;
       height: $banner-image-height;
       width: 100%;
+      &:not(:hover) {
+        border-bottom: none;
+      }
+      &:hover {
+        border-bottom: 3px solid;
+      }
     }
   }
   h2 {
@@ -76,7 +84,7 @@ main {
       align-items: flex-start;
     }
     &.pad-top {
-      padding-top: calc($banner-image-height - 50px);
+      padding-top: $banner-image-height;
     }
     &.post-body {
       padding: 0px;
@@ -223,7 +231,7 @@ textarea {
     border: $border;
     padding: 4px;
     overflow: hidden;
-    transition: $speed !important;
+    transition: $speed-medium !important;
   }
   .menu {
     width: 200px;
@@ -232,7 +240,7 @@ textarea {
       @include round-border;
       height: 45px;
       align-items: center;
-      transition: background $speed;
+      transition: background $speed-medium;
       padding: $padding;
       .right {
         margin-left: auto;
@@ -286,13 +294,13 @@ textarea {
     border-bottom-right-radius: 0%;
     position: fixed;
     bottom: calc($medium-button-dim / 2);
-    transition: $speed;
+    transition: $speed-medium;
     z-index: 0;
   }
   position: fixed;
   bottom: 10px;
   right: 10px;
-  transition: $speed;
+  transition: $speed-medium;
   .edit-button {
     height: $big-button-dim;
     width: $big-button-dim;
@@ -335,7 +343,7 @@ textarea {
   width: 100vw;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 1000;
-  transition: $speed;
+  transition: $speed-medium;
 }
 
 /* CSSTransition classes  */
@@ -345,14 +353,14 @@ textarea {
 }
 .menu-primary-enter-active {
   transform: translateX(0%);
-  transition: all $speed;
+  transition: all $speed-medium;
 }
 .menu-primary-exit {
   position: absolute;
 }
 .menu-primary-exit-active {
   transform: translateX(-110%);
-  transition: all $speed;
+  transition: all $speed-medium;
 }
 
 .menu-secondary-enter {
@@ -360,11 +368,11 @@ textarea {
 }
 .menu-secondary-enter-active {
   transform: translateX(0%);
-  transition: all $speed;
+  transition: all $speed-medium;
 }
 .menu-secondary-exit-active {
   transform: translateX(110%);
-  transition: all $speed;
+  transition: all $speed-medium;
 }
 
 // Markdown styling.

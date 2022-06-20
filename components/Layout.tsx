@@ -1,12 +1,9 @@
-import { Toaster } from "react-hot-toast";
 import { Box } from "@mui/material";
 import { PageRoute } from "enums";
 import { AppContext } from "hooks";
-import { themes } from "lib/client";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
+import { Toaster } from "react-hot-toast";
 import { NavBar } from ".";
-import { ITheme } from "types";
-import { DEFAULT_THEME } from "consts";
 
 const authRoutes: string[] = [
   PageRoute.MY_POSTS,
@@ -20,15 +17,8 @@ interface ILayoutProps {
 }
 
 const Layout = ({ children }: ILayoutProps) => {
-  const {
-    router,
-    userSessionActive,
-    theme: _theme,
-    routerPush,
-  } = useContext(AppContext);
-  const [theme, setTheme] = useState<ITheme>(themes[DEFAULT_THEME]);
-
-  useEffect(() => setTheme(themes[_theme || DEFAULT_THEME]), [_theme]);
+  const { router, userSessionActive, theme, routerPush } =
+    useContext(AppContext);
 
   useEffect(() => {
     if (
