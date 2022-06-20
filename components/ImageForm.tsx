@@ -1,23 +1,25 @@
-import DeleteIcon from "@mui/icons-material/Delete";
-import { Button, IconButton } from "@mui/material";
-import { Row, StyledText } from "components";
+import { Button } from "@mui/material";
+import { Row } from "components";
 import { toast } from "react-hot-toast";
 import { checkFileSize, checkFileType, checkOneFileSelected } from "utils";
 
 interface IImageForm {
   label: string;
-  imageName?: string;
-  setImageName?: (imageName: string) => void;
-  setNewImage: (image: any) => void;
+  hasImage: boolean;
+  setImage: (newImage: any) => void;
+  setImageKey: (newImageKey: string) => void;
+  newImage?: File;
 }
 
-const ImageForm = ({
-  label,
-  imageName,
-  setNewImage,
-  setImageName,
-}: IImageForm) => {
-  const errorHandler = (msg: string) => toast.error(msg);
+const errorHandler = (msg: string) => toast.error(msg);
+
+const ImageForm = ({ label, hasImage, setImage, setImageKey }: IImageForm) => {
+  function removeImage(e: React.MouseEvent) {
+    e?.stopPropagation();
+    e?.preventDefault();
+    setImage(null);
+    setImageKey("");
+  }
 
   async function handleAttachment(event: React.ChangeEvent<HTMLInputElement>) {
     if (
@@ -26,8 +28,7 @@ const ImageForm = ({
       checkFileType(event, errorHandler)
     ) {
       const file = event.target.files[0];
-      setNewImage(file);
-      setImageName(file.name);
+      setImage(file);
     }
   }
 
@@ -44,26 +45,11 @@ const ImageForm = ({
           textTransform: "capitalize",
           marginLeft: 10,
         }}
+        onClick={hasImage ? removeImage : null}
       >
-        {label}
-        <input type="file" hidden onChange={handleAttachment} />
+        {`${hasImage ? "Remove" : "Add"} ${label}`}
+        {!hasImage && <input type="file" hidden onChange={handleAttachment} />}
       </Button>
-      {imageName && (
-        <Row style={{ justifyContent: "flex-end" }}>
-          <StyledText variant="body1" text={imageName} />
-          <IconButton
-            edge="end"
-            aria-label="delete-image"
-            onClick={() => {
-              setNewImage(null);
-              setImageName("");
-            }}
-            disableRipple
-          >
-            <DeleteIcon />
-          </IconButton>
-        </Row>
-      )}
     </Row>
   );
 };

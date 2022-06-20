@@ -8,10 +8,9 @@ import SuspenseImage from "./SuspenseImage";
 
 interface IPostBanner {
   imageKey: string;
-  id: string;
 }
 
-const PostBanner = ({ imageKey, id }: IPostBanner) => {
+const PostBanner = ({ imageKey }: IPostBanner) => {
   const [view, setView] = useState(false);
   const { theme } = useContext(AppContext);
   const { width } = useWindowDimensions();
@@ -24,7 +23,7 @@ const PostBanner = ({ imageKey, id }: IPostBanner) => {
     <>
       <header className="banner-image" style={{ borderColor: highlightColor }}>
         <motion.div
-          layoutId={`banner-${id}`}
+          layoutId={`banner-${imageKey}`}
           style={{
             height: "100%",
             width: "100%",

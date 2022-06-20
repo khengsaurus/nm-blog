@@ -10,9 +10,15 @@ interface IAuthorLinkProps {
   author?: IUser;
   username?: string;
   title?: boolean;
+  disable?: boolean;
 }
 
-const AuthorLink = ({ username, author, title = false }: IAuthorLinkProps) => {
+const AuthorLink = ({
+  username,
+  author,
+  title = false,
+  disable = false,
+}: IAuthorLinkProps) => {
   const { history, user, routerPush } = useContext(AppContext);
   const _username = username || author?.username;
   const label = `By ${_username}`;
@@ -20,9 +26,11 @@ const AuthorLink = ({ username, author, title = false }: IAuthorLinkProps) => {
   function handleClick(e: any) {
     e.preventDefault();
     e.stopPropagation();
-    routerPush(
-      _username === user?.username ? PageRoute.MY_POSTS : `/${_username}`
-    );
+    if (!disable) {
+      routerPush(
+        _username === user?.username ? PageRoute.MY_POSTS : `/${_username}`
+      );
+    }
   }
 
   const renderText = useMemo(() => {
@@ -40,12 +48,20 @@ const AuthorLink = ({ username, author, title = false }: IAuthorLinkProps) => {
     )
   ) : title ? (
     <Row>
-      <Link onClick={handleClick} underline="hover">
+      <Link
+        onClick={handleClick}
+        underline="hover"
+        style={disable ? { cursor: "default" } : null}
+      >
         <h3>{label}</h3>
       </Link>
     </Row>
   ) : (
-    <Link onClick={handleClick} underline="hover">
+    <Link
+      onClick={handleClick}
+      underline="hover"
+      style={disable ? { cursor: "default" } : null}
+    >
       <p className="author">{label}</p>
     </Link>
   );

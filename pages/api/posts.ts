@@ -1,5 +1,4 @@
-import { ONE_HOUR } from "consts";
-import { ErrorMessage, HttpRequest, ServerInfo } from "enums";
+import { Duration, ErrorMessage, HttpRequest, ServerInfo } from "enums";
 import {
   forwardResponse,
   handleAPIError,
@@ -18,7 +17,10 @@ export default async function handler(
 ) {
   switch (req.method) {
     case HttpRequest.GET:
-      res.setHeader("Cache-Control", `maxage=${ONE_HOUR}, must-revalidate`);
+      res.setHeader(
+        "Cache-Control",
+        `maxage=${Duration.HOUR}, must-revalidate`
+      );
       return handleGet(req, res);
     case HttpRequest.POST:
       return handleRequest(req, res, createDoc);

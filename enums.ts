@@ -22,6 +22,18 @@ export enum PageRoute {
   EDIT_PROFILE = "/edit-profile",
 }
 
+export enum Duration {
+  MIN = 1000 * 60,
+  HOUR = 1000 * 60 * 60,
+  DAY = 1000 * 60 * 60 * 24,
+  WEEK = 1000 * 60 * 60 * 24 * 7,
+}
+
+export enum Flag {
+  PREVIEW = "preview",
+  PREVIEW_IMG = "preview-img",
+}
+
 export enum TransitionSpeed {
   SLOW = "800ms",
   MEDIUM = "450ms",

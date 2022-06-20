@@ -19,13 +19,13 @@ const EditProfile = () => {
   const { user, handleUser } = useContext(AppContext);
   const [username, setUsername] = useState(user?.username);
   const [bio, setBio] = useState(user?.bio);
-  const [newAvatar, setNewAvatar] = useState<any>(null);
-  const [avatarName, setAvatarName] = useState("");
-  const imageUpdated = !!newAvatar || avatarName !== user?.avatar;
+  const [newImage, setNewImage] = useState<any>(null);
+  const [imageKey, setImageKey] = useState("");
+  const imageUpdated = !!newImage || imageKey !== user?.avatarKey;
 
   useEffect(() => {
     if (user) {
-      setAvatarName(user.avatar);
+      setImageKey(user.avatarKey);
       setUsername(user.username);
       setBio(user.bio);
     }
@@ -34,14 +34,12 @@ const EditProfile = () => {
   async function saveProfile() {
     return new Promise(async (resolve, reject) => {
       let imageError = false,
-        imageName = user?.avatar || "",
         imageKey = user?.avatarKey || "";
       if (imageUpdated) {
         if (user?.avatarKey)
           deleteImage(user.avatarKey).catch((err) => console.info(err));
-        await getUploadedImageKey(newAvatar)
+        await getUploadedImageKey(newImage)
           .then((key) => {
-            imageName = newAvatar?.name;
             imageKey = key;
           })
           .catch((err) => {
@@ -52,7 +50,6 @@ const EditProfile = () => {
       if (!imageError) {
         await HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequest.PATCH, {
           bio,
-          avatar: imageName,
           avatarKey: imageKey,
         })
           .then((res) => {
@@ -95,10 +92,11 @@ const EditProfile = () => {
           setBody={setBio}
         />
         <ImageForm
-          label="Add avatar"
-          imageName={avatarName}
-          setImageName={setAvatarName}
-          setNewImage={setNewAvatar}
+          label="avatar"
+          newImage={newImage}
+          hasImage={!!newImage || !!imageKey}
+          setImage={setNewImage}
+          setImageKey={setImageKey}
         />
         <EditProfileButtons
           saveDisabled={saveDisabled || saveStatus === Status.ERROR}

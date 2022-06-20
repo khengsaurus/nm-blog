@@ -68,7 +68,6 @@ interface IHasTimestamps {
 
 interface IHasImage {
   imageKey: string;
-  imageName: string;
 }
 
 export interface IPost
@@ -93,7 +92,6 @@ export interface IPostReq extends IPost, IRequest {
 
 export interface IUser extends IHasId, Partial<IHasTimestamps> {
   id: string;
-  avatar: string;
   avatarKey: string;
   bio: string;
   email: string;

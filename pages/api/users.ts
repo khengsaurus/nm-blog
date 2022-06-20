@@ -1,5 +1,4 @@
-import { ONE_HOUR } from "consts";
-import { APIAction, HttpRequest, ServerInfo } from "enums";
+import { APIAction, Duration, HttpRequest, ServerInfo } from "enums";
 import {
   createUserObject,
   decodeToken,
@@ -22,7 +21,10 @@ export default async function handler(
 ) {
   switch (req.method) {
     case HttpRequest.GET:
-      res.setHeader("Cache-Control", `maxage=${ONE_HOUR}, must-revalidate`);
+      res.setHeader(
+        "Cache-Control",
+        `maxage=${Duration.HOUR}, must-revalidate`
+      );
       return handleGet(req, res);
     case HttpRequest.POST:
       return handlePost(req, res);

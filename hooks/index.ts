@@ -8,6 +8,7 @@ import useKeyListener from "./useKeyListener";
 import useLocalStorage from "./useLocalStorage";
 import useMarkdown from "./useMarkdown";
 import usePaginatePosts from "./usePaginatePosts";
+import usePreviewImg from "./usePreviewImg";
 import useRealtimePost from "./useRealtimePost";
 import useRefClick from "./useRefClick";
 import useWindowDimensions from "./useWindowDimensions";
@@ -25,6 +26,7 @@ export {
   useLocalStorage,
   useMarkdown,
   usePaginatePosts,
+  usePreviewImg,
   useRefClick,
   useRealtimePost,
   useWindowDimensions,

@@ -1,4 +1,4 @@
-import { StyledButton } from "components";
+import { Row, StyledButton } from "components";
 import { PageRoute } from "enums";
 import { AppContext } from "hooks";
 import React, { useContext, useState } from "react";
@@ -16,8 +16,6 @@ interface IEditPostButtons {
   deleteClick?: (e: React.MouseEvent) => void;
 }
 
-const lastButtonStyle = { marginRight: -10 };
-
 const EditPostButtons = ({
   isPrivate,
   setIsPrivate,
@@ -34,7 +32,7 @@ const EditPostButtons = ({
 
   function renderCancelDelete() {
     return (
-      <div>
+      <>
         <StyledButton
           label={"Cancel"}
           disabled={cancelCalled}
@@ -42,14 +40,9 @@ const EditPostButtons = ({
             setCancelCalled(true);
             routerPush(PageRoute.MY_POSTS);
           }}
-          style={lastButtonStyle}
         />
-        <StyledButton
-          label="Delete"
-          onClick={deleteClick}
-          style={lastButtonStyle}
-        />
-      </div>
+        <StyledButton label="Delete" onClick={deleteClick} />
+      </>
     );
   }
 
@@ -59,29 +52,31 @@ const EditPostButtons = ({
         label={saveButtonLabel}
         disabled={saveDisabled}
         onClick={handleSave}
-        style={lastButtonStyle}
       />
     );
   }
 
   return (
     <>
-      <div className={`row ${isEdit ? "last-end" : ""}`}>
-        <CheckBox
-          value={isPrivate}
-          setValue={setIsPrivate}
-          label="Private post"
-        />
-        {isEdit && renderSaveButton()}
+      <div className={"row"}>
+        <CheckBox value={isPrivate} setValue={setIsPrivate} label="Private" />
       </div>
-      <div className="row last-end">
+      <div className="row">
         <CheckBox
           value={hasMarkdown}
           setValue={setHasMarkdown}
-          label="Has markdown"
+          label="Markdown"
         />
-        {isEdit ? renderCancelDelete() : renderSaveButton()}
       </div>
+      <Row
+        style={{
+          flexDirection: "row-reverse",
+          justifyContent: "space-between",
+        }}
+      >
+        {isEdit && renderSaveButton()}
+        {isEdit ? renderCancelDelete() : renderSaveButton()}
+      </Row>
     </>
   );
 };

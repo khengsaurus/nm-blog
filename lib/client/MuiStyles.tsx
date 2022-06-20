@@ -88,8 +88,6 @@ function newMuiTheme(theme: ITheme) {
       MuiCard: {
         styleOverrides: {
           root: {
-            margin: "6px",
-            width: "280px",
             backgroundColor: "transparent",
             "&:hover": {
               cursor: "pointer",
@@ -316,10 +314,12 @@ function newMuiTheme(theme: ITheme) {
           },
         },
       },
-      MuiPopover: {
-        // styleOverrides: {
-        //   paper: { backgroundColor },
-        // },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            minWidth: "280px",
+          },
+        },
       },
       MuiRadio: {
         styleOverrides: {

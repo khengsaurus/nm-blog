@@ -32,12 +32,7 @@ const MyPosts = () => {
         <>
           <PostFeed>
             {posts.map((post, index) => (
-              <PostCard
-                key={index}
-                post={post}
-                hasAuthorLink={false}
-                postTag="profile"
-              />
+              <PostCard key={index} post={post} hasAuthorLink={false} />
             ))}
           </PostFeed>
           {posts.length < user?.posts.length && (

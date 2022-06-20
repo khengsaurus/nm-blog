@@ -5,15 +5,18 @@ import {
   EditPreviewMarkdown,
   ImageForm,
   Input,
+  PostCard,
+  Row,
 } from "components";
 import {
   DBService,
   ErrorMessage,
+  Flag,
   HttpRequest,
   Status,
   ToastMessage,
 } from "enums";
-import { AppContext, useAsync, useRealtimePost } from "hooks";
+import { AppContext, useAsync, usePreviewImg, useRealtimePost } from "hooks";
 import { HTTPService } from "lib/client";
 import { deleteImage, getUploadedImageKey } from "lib/client/tasks";
 import { ServerError } from "lib/server";
@@ -39,12 +42,13 @@ const EditPost = ({ id }: IPostPage) => {
   const [body, setBody] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
   const [newImage, setNewImage] = useState<any>(null);
-  const [_imageName, setImageName] = useState("");
+  const [imageKey, setImageKey] = useState("");
   const [hasMarkdown, setHasMarkdown] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const hasEditedSlug = useRef(false);
   const isNewPost = id === "new";
-  const imageUpdated = !!newImage || _imageName !== realtimePost?.imageName;
+  const imageUpdated = !!newImage || imageKey !== realtimePost?.imageKey;
+  const today = useRef(new Date());
 
   useEffect(() => {
     if (!hasEditedSlug.current) {
@@ -59,12 +63,12 @@ const EditPost = ({ id }: IPostPage) => {
 
   useEffect(() => {
     if (!isNewPost) {
-      const { title, slug, body, imageName, isPrivate, hasMarkdown } =
+      const { title, slug, body, imageKey, isPrivate, hasMarkdown } =
         realtimePost || {};
       setTitle(title);
       setSlug(slug);
       setBody(body);
-      setImageName(imageName);
+      setImageKey(imageKey);
       setIsPrivate(isPrivate);
       setHasMarkdown(hasMarkdown);
     }
@@ -80,16 +84,16 @@ const EditPost = ({ id }: IPostPage) => {
           return;
         }
       }
-      let imageKey = realtimePost?.imageKey;
+      let _imageKey = realtimePost?.imageKey;
       let imageError = false;
       if (imageUpdated) {
         // New image -> delete old image if exists. Do not await this.
         if (realtimePost?.imageKey) {
-          imageKey = "";
+          _imageKey = "";
           deleteImage(realtimePost.imageKey).catch((err) => console.info(err));
         }
         await getUploadedImageKey(newImage)
-          .then((key) => (imageKey = key))
+          .then((key) => (_imageKey = key))
           .catch((err) => {
             reject(err);
             imageError = true;
@@ -102,10 +106,10 @@ const EditPost = ({ id }: IPostPage) => {
           title,
           slug,
           body,
-          imageKey,
-          imageName: imageUpdated
-            ? newImage?.name || ""
-            : realtimePost?.imageName,
+          imageKey: _imageKey,
+          // imageName: imageUpdated
+          //   ? newImage?.name || ""
+          //   : realtimePost?.imageName,
           isPrivate,
           hasMarkdown,
         };
@@ -140,7 +144,7 @@ const EditPost = ({ id }: IPostPage) => {
       setSlug("");
       setBody("");
       setNewImage(null);
-      setImageName("");
+      setImageKey("");
       setIsPrivate(false);
       setHasMarkdown(false);
     } else {
@@ -172,6 +176,8 @@ const EditPost = ({ id }: IPostPage) => {
     setShowDelete(true);
   }
 
+  const showingPreview = usePreviewImg(Flag.PREVIEW_IMG, newImage);
+
   return (
     <main className="left">
       <Column>
@@ -201,23 +207,43 @@ const EditPost = ({ id }: IPostPage) => {
           hasMarkdown={hasMarkdown}
           setBody={setBody}
         />
-        <ImageForm
-          label="Add banner"
-          imageName={_imageName}
-          setImageName={setImageName}
-          setNewImage={setNewImage}
-        />
-        <EditPostButtons
-          isPrivate={isPrivate}
-          setIsPrivate={setIsPrivate}
-          hasMarkdown={hasMarkdown}
-          setHasMarkdown={setHasMarkdown}
-          saveButtonLabel={getStatusLabel(saveStatus)}
-          saveDisabled={saveDisabled}
-          handleSave={handleSave}
-          isEdit={!isNewPost}
-          deleteClick={handleDeleteClick}
-        />
+        <br />
+        <Row style={{ justifyContent: "center" }}>
+          <PostCard
+            post={{
+              slug,
+              username: user?.username,
+              user,
+              title: title || "Preview title",
+              body: body || "Preview body",
+              updatedAt: today.current?.toString(),
+              imageKey: imageKey || Flag.PREVIEW_IMG,
+              hasMarkdown,
+            }}
+            showingPreview={showingPreview}
+            hasAuthorLink={true}
+            disable
+          />
+          <Column style={{ width: "280px"}}>
+            <ImageForm
+              label="banner"
+              hasImage={!!imageKey || !!newImage}
+              setImage={setNewImage}
+              setImageKey={setImageKey}
+            />
+            <EditPostButtons
+              isPrivate={isPrivate}
+              setIsPrivate={setIsPrivate}
+              hasMarkdown={hasMarkdown}
+              setHasMarkdown={setHasMarkdown}
+              saveButtonLabel={getStatusLabel(saveStatus)}
+              saveDisabled={saveDisabled}
+              handleSave={handleSave}
+              isEdit={!isNewPost}
+              deleteClick={handleDeleteClick}
+            />
+          </Column>
+        </Row>
       </Column>
       {!isNewPost && (
         <DeletePostModal

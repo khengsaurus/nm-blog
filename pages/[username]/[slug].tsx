@@ -109,7 +109,7 @@ const Post = ({ post, username, slug }: IPostPage) => {
   return realtimePost ? (
     <>
       <main className="left">
-        {imageKey && <PostBanner imageKey={imageKey} id={`${imageKey}`} />}
+        {imageKey && <PostBanner imageKey={imageKey} />}
         <section className={`header column ${imageKey ? "pad-top" : ""}`}>
           <DarkContainer>
             <StyledText text={title} variant="h2" />

@@ -84,7 +84,6 @@ const UserPage = (props: IUserPageProps) => {
             post={post}
             hasAuthorLink={false}
             hasDate={true}
-            postTag="username"
           />
         ))}
       </PostFeed>
