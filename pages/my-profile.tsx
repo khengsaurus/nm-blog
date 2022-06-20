@@ -3,8 +3,8 @@ import { Avatar, Fab } from "@mui/material";
 import { Centered, CircleLoader, DarkContainer, StyledText } from "components";
 import { PageRoute } from "enums";
 import { AppContext } from "hooks";
-import { markdown } from "lib/client";
 import { useContext } from "react";
+import { getAvatarLarge } from "utils";
 
 const MyProfile = () => {
   const { user, routerPush } = useContext(AppContext);
@@ -17,8 +17,8 @@ const MyProfile = () => {
           {avatarKey && (
             <Avatar
               alt={`${username}-avatar`}
-              src={`${process.env.ENV_IMG_SRC}${avatarKey}?tr=w-200,h-200`}
-              sx={{ width: 200, height: 200 }}
+              src={getAvatarLarge(avatarKey)}
+              sx={{ width: 140, height: 140 }}
             />
           )}
           <DarkContainer>

@@ -11,7 +11,7 @@ import { PAGINATE_LIMIT } from "consts";
 import { usePaginatePosts } from "hooks";
 import { mongoConnection } from "lib/server";
 import { IUser } from "types";
-import { postDocToObj, userDocToObj } from "utils";
+import { getAvatarLarge, postDocToObj, userDocToObj } from "utils";
 import FourOFour from "../404";
 
 interface IUserPageProps {
@@ -64,7 +64,7 @@ const UserPage = (props: IUserPageProps) => {
         {avatarKey && (
           <Avatar
             alt={`${username}-avatar`}
-            src={`${process.env.ENV_IMG_SRC}${avatarKey}?tr=w-140,h-140`}
+            src={getAvatarLarge(avatarKey)}
             sx={{ width: 140, height: 140, marginRight: "20px" }}
           />
         )}

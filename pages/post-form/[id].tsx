@@ -202,7 +202,7 @@ const EditPost = ({ id }: IPostPage) => {
           setBody={setBody}
         />
         <ImageForm
-          label="Add image"
+          label="Add banner"
           imageName={_imageName}
           setImageName={setImageName}
           setNewImage={setNewImage}

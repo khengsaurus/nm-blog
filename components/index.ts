@@ -28,6 +28,7 @@ import {
   StyledText,
   TextNavButton,
 } from "./StyledMui";
+import SuspenseImage from "./SuspenseImage";
 import { renderButton } from "./utils";
 
 export {
@@ -51,6 +52,7 @@ export {
   StyledText,
   TextNavButton,
   NavBar,
+  SuspenseImage,
   renderButton,
   ActionModal,
   Centered,

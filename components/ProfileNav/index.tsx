@@ -2,6 +2,7 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import { Avatar, IconButton } from "@mui/material";
 import { AppContext, useDocumentListener } from "hooks";
 import { useCallback, useContext, useRef, useState } from "react";
+import { getAvatarSmall } from "utils";
 import DropdownMenu from "./DropdownMenu";
 
 const ProfileNav = () => {
@@ -33,7 +34,7 @@ const ProfileNav = () => {
           {user?.avatarKey ? (
             <Avatar
               alt={`profile-icon`}
-              src={`${process.env.ENV_IMG_SRC}${user.avatarKey}?tr=w-24,h-24`}
+              src={getAvatarSmall(user.avatarKey)}
               sx={{ width: 24, height: 24 }}
             />
           ) : (

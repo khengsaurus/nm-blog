@@ -1,15 +1,15 @@
-import { useEffect } from "react";
+import { useIsoEffect } from "hooks";
 
 function useWindowListener(
   event: string,
   callback: (p?: any) => any,
   apply = true
 ) {
-  useEffect(() => {
-    apply && callback && window.addEventListener(event, callback);
+  useIsoEffect(() => {
+    if (apply && callback) callback();
+    window.addEventListener(event, callback);
 
-    return () =>
-      apply && callback && window.removeEventListener(event, callback);
+    return () => window.removeEventListener(event, callback);
   }, [apply, event, callback]);
 }
 

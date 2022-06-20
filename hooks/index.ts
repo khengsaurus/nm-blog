@@ -10,7 +10,9 @@ import useMarkdown from "./useMarkdown";
 import usePaginatePosts from "./usePaginatePosts";
 import useRealtimePost from "./useRealtimePost";
 import useRefClick from "./useRefClick";
+import useWindowDimensions from "./useWindowDimensions";
 import useWindowListener from "./useWindowListener";
+import useWindowLoaded from "./useWindowLoaded";
 
 export {
   AppContext,
@@ -25,5 +27,7 @@ export {
   usePaginatePosts,
   useRefClick,
   useRealtimePost,
+  useWindowDimensions,
+  useWindowLoaded,
   useWindowListener,
 };

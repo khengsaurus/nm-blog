@@ -18,7 +18,7 @@ import { GetStaticPropsResult } from "next";
 import FourOFour from "pages/404";
 import { useContext, useMemo, useState } from "react";
 import { IPost } from "types";
-import { postDocToObj } from "utils";
+import { getAvatarMedium, postDocToObj } from "utils";
 
 interface IPostPage {
   post: IPost;
@@ -110,7 +110,7 @@ const Post = ({ post, username, slug }: IPostPage) => {
     <>
       <main className="left">
         {imageKey && <PostBanner imageKey={imageKey} id={`${imageKey}`} />}
-        <section className="header column">
+        <section className={`header column ${imageKey ? "pad-top" : ""}`}>
           <DarkContainer>
             <StyledText text={title} variant="h2" />
           </DarkContainer>
@@ -118,11 +118,13 @@ const Post = ({ post, username, slug }: IPostPage) => {
             <DarkContainer>
               <AuthorLink username={username} title />
             </DarkContainer>
-            <Avatar
-              alt={`${author?.username}-avatar`}
-              src={`${process.env.ENV_IMG_SRC}${author?.avatarKey}?tr=w-40,h-40`}
-              sx={{ height: "40px", width: "40px", marginLeft: "10px" }}
-            />
+            {user?.avatarKey && (
+              <Avatar
+                alt={`${author?.username}-avatar`}
+                src={getAvatarMedium(user.avatarKey)}
+                sx={{ height: "40px", width: "40px", marginLeft: "10px" }}
+              />
+            )}
           </Row>
           <DarkContainer>
             <StyledText text={dateText} variant="h4" />

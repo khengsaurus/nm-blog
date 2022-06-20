@@ -20,13 +20,14 @@
   }
 }
 
-$main-side-margin: clamp(20px, 4vw, 100px);
+$main-side-margin: clamp(20px, 3vw, 80px);
 $main-width: calc(100vw - (2 * $main-side-margin));
 $speed: 350ms;
 $init-bg-color: rgb(40, 40, 40);
 
 $big-button-dim: 80px;
 $medium-button-dim: 50px;
+$banner-image-height: clamp(250px, 40vh, 400px);
 
 html {
   font-family: "Roboto", sans-serif;
@@ -41,7 +42,7 @@ main {
   @include flex-(column);
   @include orientate-contents-(center);
   font-family: "Roboto", sans-serif;
-  margin: 60px $main-side-margin;
+  margin: 50px $main-side-margin;
   &.left {
     @include orientate-contents-(flex-start);
   }
@@ -53,9 +54,11 @@ main {
   }
   header {
     &.banner-image {
-      position: relative;
-      width: $main-width;
-      height: 400px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: $banner-image-height;
+      width: 100%;
     }
   }
   h2 {
@@ -71,6 +74,9 @@ main {
     &.column {
       @include flex-(column);
       align-items: flex-start;
+    }
+    &.pad-top {
+      padding-top: calc($banner-image-height - 50px);
     }
     &.post-body {
       padding: 0px;
@@ -592,7 +598,8 @@ pre {
     color: #333;
   }
   .github-comment {
-    color: #969896;
+    // color: #969896;
+    color: #589664;
   }
   .github-tag {
     color: #e8e8e8;
@@ -655,12 +662,12 @@ pre {
   .github-keyword,
   .github-template-tag,
   .github-type {
-    color: #a71d5d;
-    // color: rgb(227, 95, 156);
+    // color: #a71d5d;
+    color: rgb(227, 95, 156);
   }
   .github-emphasis {
-    color: #a71d5d;
-    // color: rgb(227, 95, 156);
+    // color: #a71d5d;
+    color: rgb(227, 95, 156);
     font-style: italic;
   }
   .github-meta,

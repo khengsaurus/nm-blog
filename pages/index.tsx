@@ -6,7 +6,7 @@ import {
   StyledText,
 } from "components";
 import { PAGINATE_LIMIT } from "consts";
-import { usePaginatePosts } from "hooks";
+import { usePaginatePosts, useWindowLoaded } from "hooks";
 import { mongoConnection } from "lib/server";
 import { IPost } from "types";
 import { postDocToObj } from "utils";
@@ -41,6 +41,7 @@ const Home = ({ initPosts }: IHomeProps) => {
     true,
     initPosts
   );
+  const windowLoaded = useWindowLoaded();
 
   return (
     <main>
@@ -49,7 +50,7 @@ const Home = ({ initPosts }: IHomeProps) => {
           <StyledText text="Public Posts" variant="h3" />
         </DarkContainer>
       </section>
-      <PostFeed>
+      <PostFeed style={windowLoaded ? null : { width: 1000 }}>
         {posts.map((post, index) => (
           <PostCard key={index} post={post} />
         ))}

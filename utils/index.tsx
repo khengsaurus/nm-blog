@@ -85,3 +85,23 @@ export const getStatusLabel = (saveStatus: Status) => {
       return "⚠️";
   }
 };
+
+export function getCardSrc(imageKey: string) {
+  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-280,h-80`;
+}
+
+export function getBannerSrc(imageKey: string, width: number) {
+  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-${width},h-400,q-100`;
+}
+
+export function getAvatarSmall(imageKey: string) {
+  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-24,h-24`;
+}
+
+export function getAvatarMedium(imageKey: string) {
+  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-40,h-40`;
+}
+
+export function getAvatarLarge(imageKey: string) {
+  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-140,h-140`;
+}
