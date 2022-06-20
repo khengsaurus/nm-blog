@@ -33,7 +33,7 @@ const ProfileNav = () => {
           {user?.avatarKey ? (
             <Avatar
               alt={`profile-icon`}
-              src={`${process.env.ENV_IK_SRC}${user.avatarKey}?tr=w-24,h-24`}
+              src={`${process.env.ENV_IMG_SRC}${user.avatarKey}?tr=w-24,h-24`}
               sx={{ width: 24, height: 24 }}
             />
           ) : (

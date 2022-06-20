@@ -6,6 +6,7 @@ import { themes } from "lib/client";
 import { useContext, useEffect, useState } from "react";
 import { NavBar } from ".";
 import { ITheme } from "types";
+import { DEFAULT_THEME } from "consts";
 
 const authRoutes: string[] = [
   PageRoute.MY_POSTS,
@@ -25,9 +26,9 @@ const Layout = ({ children }: ILayoutProps) => {
     theme: _theme,
     routerPush,
   } = useContext(AppContext);
-  const [theme, setTheme] = useState<ITheme>(themes["embers"]);
+  const [theme, setTheme] = useState<ITheme>(themes[DEFAULT_THEME]);
 
-  useEffect(() => setTheme(themes[_theme || "embers"]), [_theme]);
+  useEffect(() => setTheme(themes[_theme || DEFAULT_THEME]), [_theme]);
 
   useEffect(() => {
     if (

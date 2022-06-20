@@ -1,4 +1,5 @@
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { DEFAULT_THEME } from "consts";
 import { TransitionSpeed } from "enums";
 import { AppContext } from "hooks";
 import { useContext, useEffect, useState } from "react";
@@ -7,7 +8,7 @@ import themes from "./themes";
 
 export const HomeTheme = (props: any) => {
   const { theme } = useContext(AppContext);
-  const [muiTheme, setMuiTheme] = useState(newMuiTheme(themes["embers"]));
+  const [muiTheme, setMuiTheme] = useState(newMuiTheme(themes[DEFAULT_THEME]));
 
   useEffect(() => {
     if (theme) setMuiTheme(newMuiTheme(themes[theme]));
@@ -237,6 +238,8 @@ function newMuiTheme(theme: ITheme) {
         styleOverrides: {
           root: {
             borderColor: mainText,
+            fontSize: "16px",
+            lineHeight: "23px",
             ".MuiOutlinedInput-notchedOutline": {
               borderColor: mainText,
               borderWidth: "1px",

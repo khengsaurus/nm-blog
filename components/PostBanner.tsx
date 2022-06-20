@@ -36,7 +36,7 @@ const PostBanner = ({ imageKey, id }: IPostBanner) => {
           onClick={() => setView(true)}
         >
           <Image
-            src={`${process.env.ENV_IK_SRC}${imageKey}?tr=w-${width},h-400`}
+            src={`${process.env.ENV_IMG_SRC}${imageKey}?tr=w-${width},h-400`}
             alt="post-banner-image"
             layout="fill"
             objectFit="cover"
@@ -48,7 +48,7 @@ const PostBanner = ({ imageKey, id }: IPostBanner) => {
         <div className={"transparent-overlay"}>
           <Image
             alt="post-full-image"
-            src={`${process.env.ENV_IK_SRC}${imageKey}`}
+            src={`${process.env.ENV_IMG_SRC}${imageKey}`}
             layout="fill"
             objectFit="contain"
           />

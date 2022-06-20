@@ -4,16 +4,11 @@ module.exports = {
   reactStrictMode: true,
   outputFileTracing: false,
   env: {
-    BEARER: "vpUnCJhmLITt3IP9F8FjWG9Y",
-    ENV_IK_SRC: "https://ik.imagekit.io/tkcodesstuff/",
+    BEARER: process.env.ENV_VERCEL_BEARER,
+    ENV_IMG_SRC: process.env.ENV_IMG_SRC,
   },
   images: {
-    domains: [
-      "localhost",
-      "localhost:3000",
-      "notes-app-1-sg.s3.ap-southeast-1.amazonaws.com",
-      "ik.imagekit.io",
-    ],
+    domains: ["localhost", "localhost:3000", process.env.ENV_IMG_HOST],
   },
   async redirects() {
     return [

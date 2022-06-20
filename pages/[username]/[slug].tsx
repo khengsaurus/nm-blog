@@ -120,7 +120,7 @@ const Post = ({ post, username, slug }: IPostPage) => {
             </DarkContainer>
             <Avatar
               alt={`${author?.username}-avatar`}
-              src={`${process.env.ENV_IK_SRC}${author?.avatarKey}?tr=w-40,h-40`}
+              src={`${process.env.ENV_IMG_SRC}${author?.avatarKey}?tr=w-40,h-40`}
               sx={{ height: "40px", width: "40px", marginLeft: "10px" }}
             />
           </Row>

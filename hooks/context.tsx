@@ -1,3 +1,4 @@
+import { DEFAULT_THEME } from "consts";
 import { PageRoute, Status } from "enums";
 import { getPostSlugs, HTTPService } from "lib/client";
 import { useRouter } from "next/router";
@@ -8,7 +9,7 @@ import useLocalStorage from "./useLocalStorage";
 import useWindowListener from "./useWindowListener";
 
 const initialContext: IAppContext = {
-  theme: "embers",
+  theme: DEFAULT_THEME,
   setTheme: null,
   user: null,
   userToken: "",
@@ -28,7 +29,7 @@ const AppContextProvider = (props: any) => {
   const [user, setUser] = useState<IUser>();
   const [userSessionActive, setUserSessionActive] = useState(true);
   const [userToken, setUserToken] = useLocalStorage("userToken", "");
-  const [theme, setTheme] = useLocalStorage("theme", "embers");
+  const [theme, setTheme] = useLocalStorage("theme", DEFAULT_THEME);
   const historyRef = useRef([]);
   const router = useRouter();
 

@@ -1,8 +1,8 @@
 import { Layout } from "components";
-import type { AppProps } from "next/app";
-import Head from "next/head";
 import AppContextProvider from "hooks/context";
 import { HomeTheme } from "lib/client/MuiStyles";
+import type { AppProps } from "next/app";
+import Head from "next/head";
 import "../styles/globals.scss";
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -14,10 +14,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             name="viewport"
             content="initial-scale=1.0, width=device-width"
           />
-          <link
-            rel="prefetch-dns preconnect"
-            href="https://notes-app-1-sg.s3.ap-southeast-1.amazonaws.com"
-          />
+          <link rel="prefetch-dns preconnect" href={process.env.ENV_IMG_HOST} />
         </Head>
         <Layout>
           <Component {...pageProps} />
