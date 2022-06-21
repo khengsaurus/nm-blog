@@ -1,6 +1,6 @@
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { DEFAULT_THEME } from "consts";
-import { TransitionSpeed } from "enums";
+import { Dimension, TransitionSpeed } from "enums";
 import { AppContext } from "hooks";
 import { useContext, useEffect, useState } from "react";
 import { ITheme } from "types";
@@ -317,7 +317,7 @@ function newMuiTheme(theme: ITheme) {
       MuiPaper: {
         styleOverrides: {
           root: {
-            minWidth: "280px",
+            minWidth: Dimension.CARD_WIDTH,
           },
         },
       },
@@ -366,82 +366,3 @@ function newMuiTheme(theme: ITheme) {
     },
   });
 }
-
-export const MuiStyles = {
-  large_dialog: {
-    maxWidth: "500px",
-    transition: TransitionSpeed.MEDIUM,
-  },
-  medium_dialog: {
-    minHeight: "80px",
-    minWidth: "200px",
-    maxWidth: "450px",
-    transition: TransitionSpeed.MEDIUM,
-  },
-  small_dialog: {
-    minHeight: "50px",
-    minWidth: "200px",
-    maxWidth: "350px",
-    transition: TransitionSpeed.MEDIUM,
-  },
-  single_action: {
-    justifyContent: "center",
-    padding: "0px 8px",
-    minHeight: "15px",
-  },
-  topRight5: {
-    position: "absolute",
-    top: 5,
-    right: 5,
-  },
-  modal: {
-    maxWidth: "385px",
-    minWidth: "385px",
-    overflow: "scroll",
-  },
-  tabs: {
-    borderRadius: 0,
-    maxWidth: "240px",
-    height: "32px",
-  },
-  tabOptions: {
-    minWidth: "67px",
-    maxWidth: "67px",
-    minHeight: "32px",
-    maxHeight: "32px",
-  },
-  tabColorOptions: {
-    minWidth: "40px",
-    maxWidth: "40px",
-    minHeight: "32px",
-    maxHeight: "32px",
-  },
-  icon_button_top_right: {
-    position: "absolute",
-    top: 5,
-    right: 5,
-  },
-  buttons_small: {
-    fontSize: 18,
-    fontWeight: 600,
-  },
-  buttons_medium: {
-    fontSize: 20,
-    fontWeight: 650,
-  },
-  buttons_large: {
-    fontSize: 26,
-    fontWeight: 800,
-  },
-  small_dropdown_select: {
-    width: "52px",
-    maxHeight: "28px",
-  },
-  small_dropdown_item: {
-    height: "28px",
-    minHeight: "28px",
-    maxHeight: "28px",
-    margin: "2px",
-    justifyContent: "center",
-  },
-};

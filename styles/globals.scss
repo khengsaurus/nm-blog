@@ -277,6 +277,9 @@ textarea {
   border: none !important;
   &.card {
     padding: 0px !important;
+    p {
+      font-size: 15px;
+    }
     h1: {
       padding: 2px 0px !important;
     }

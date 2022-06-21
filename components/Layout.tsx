@@ -23,7 +23,7 @@ const Layout = ({ children }: ILayoutProps) => {
   useEffect(() => {
     if (
       !userSessionActive &&
-      !!authRoutes.find((route) => router?.asPath.startsWith(route))
+      authRoutes.some((route) => router?.asPath.startsWith(route))
     ) {
       routerPush(PageRoute.LOGIN);
     }

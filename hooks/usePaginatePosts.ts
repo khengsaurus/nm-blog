@@ -23,9 +23,9 @@ const usePaginatePosts = (
       const createdAt =
         latestUpdated.current && posts.length > 0
           ? posts[posts.length - 1].createdAt
-          : new Date();
+          : undefined; // let server handle this + cache query
 
-      const query: IObject<any> = { createdAt, limit };
+      const query: IObject<any> = { createdAt, limit, isPrivate: true };
       if (username) query.username = username;
       if (publicPosts) query.isPrivate = false;
 

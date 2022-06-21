@@ -119,8 +119,7 @@ const AppContextProvider = (props: any) => {
     ) {
       setUserSessionActive(false);
     } else {
-      // edge case - at new-user screen, no username set yet
-      setUserSessionActive(!!user?.username);
+      setUserSessionActive(true);
     }
   }, [sessionValidation, user]);
 

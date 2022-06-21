@@ -29,9 +29,17 @@ export enum Duration {
   WEEK = 1000 * 60 * 60 * 24 * 7,
 }
 
+export enum Dimension {
+  CARD_WIDTH = 280,
+}
+
 export enum Flag {
   PREVIEW = "preview",
   PREVIEW_IMG = "preview-img",
+  USER_TAG = "&user=",
+  DATE_TAG = "&ts=",
+  LIMIT_TAG = "&limit=",
+  PRIVATE_TAG = "&isPrivate=",
 }
 
 export enum TransitionSpeed {
@@ -88,6 +96,7 @@ export enum ServerInfo {
   POST_CREATED = "Post created",
   POST_DELETED = "Post deleted",
   POST_RETRIEVED = "Post(s) retrieved",
+  POST_RETRIEVED_CACHED = "Post(s) retrieved from cache",
   POST_UPDATED = "Post updated",
   POST_SLUGS_RETRIEVED = "Post slugs retrieved",
   POST_NA = "No post(s) found",

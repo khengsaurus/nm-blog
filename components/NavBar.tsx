@@ -6,8 +6,14 @@ import { PageRoute } from "enums";
 import { AppContext } from "hooks";
 import { useContext } from "react";
 
+const preLoginRoutes = [PageRoute.LOGIN, PageRoute.NEW_USER];
+
 const NavBar = () => {
-  const { userSessionActive, routerPush } = useContext(AppContext);
+  const { userSessionActive, router, routerPush } = useContext(AppContext);
+  // edge case - at new-user screen, no username set yet
+  const isPreLogin = preLoginRoutes.some((route) =>
+    router?.asPath.startsWith(route)
+  );
 
   return (
     <AppBar position="fixed">
@@ -19,7 +25,7 @@ const NavBar = () => {
         >
           <HomeIcon />
         </IconButton>
-        {userSessionActive && (
+        {userSessionActive && !isPreLogin && (
           <IconButton
             aria-label="new-item"
             onClick={() => routerPush(PageRoute.POST_FORM + "/new")}

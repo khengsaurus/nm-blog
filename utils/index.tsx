@@ -1,5 +1,5 @@
 import { IPost } from "types";
-import { ErrorMessage, Status } from "enums";
+import { Dimension, ErrorMessage, Status } from "enums";
 import { CircleLoader } from "components";
 
 const maxFileSizeMB = 4;
@@ -87,7 +87,7 @@ export const getStatusLabel = (saveStatus: Status) => {
 };
 
 export function getCardSrc(imageKey: string) {
-  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-280,h-80,q-90`;
+  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-${Dimension.CARD_WIDTH},h-80,q-100`;
 }
 
 export function getBannerSrc(imageKey: string, width: number) {

@@ -1,3 +1,4 @@
+import { PAGINATE_LIMIT } from "consts";
 import { Duration, ErrorMessage, HttpRequest, ServerInfo } from "enums";
 import {
   forwardResponse,
@@ -10,6 +11,22 @@ import { isEmpty } from "lodash";
 import { ClientSession } from "mongoose";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { IPostReq, IResponse } from "types";
+import Memo from "utils/Memo";
+
+/**
+ * Caching system:
+ * *1: `get most recent N`
+ * *2: `get next most recent N`
+ *
+ * After post A is created:
+ *   *1 -> include A in the response & cache res *1
+ * After post B is edited/deleted, with B being the (N+1)th most recent,
+ *   *1 -> send cached res *1
+ *   *2 -> include updated B in the response & cache res *2
+ *
+ */
+
+const memo = new Memo();
 
 export default async function handler(
   req: NextApiRequest,
@@ -17,10 +34,7 @@ export default async function handler(
 ) {
   switch (req.method) {
     case HttpRequest.GET:
-      res.setHeader(
-        "Cache-Control",
-        `maxage=${Duration.HOUR}, must-revalidate`
-      );
+      res.setHeader("Cache-Control", `maxage=${Duration.MIN}, must-revalidate`);
       return handleGet(req, res);
     case HttpRequest.POST:
       return handleRequest(req, res, createDoc);
@@ -41,29 +55,43 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
 }
 
 async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
-  const { username, createdAt, limit = 2 } = params;
+  const {
+    username,
+    isPrivate,
+    createdAt = memo.current,
+    limit = PAGINATE_LIMIT,
+  } = params;
   return new Promise(async (resolve, reject) => {
     const { Post } = await mongoConnection();
-    const query: any = { createdAt: { $lt: createdAt || new Date() } };
-    if (username) query.username = username;
-    if ((params.isPrivate as unknown as string) === "false") {
-      query.isPrivate = false;
+    const cached = memo.read(username, isPrivate, createdAt, limit);
+    if (cached) {
+      resolve({
+        status: 200,
+        message: ServerInfo.POST_RETRIEVED_CACHED,
+        data: { posts: cached, updated: createdAt },
+      });
+    } else {
+      const query: any = { createdAt: { $lt: createdAt } };
+      if (username) query.username = username;
+      if (!isPrivate || (isPrivate as unknown as string) === "false")
+        query.isPrivate = false;
+      await Post.find(query)
+        .populate("user", "-createdAt -updatedAt -email -password -posts")
+        .sort({ createdAt: -1 })
+        .limit(limit)
+        .lean()
+        .then((posts) => {
+          const noPosts = isEmpty(posts);
+          if (!noPosts)
+            memo.write(posts, username, isPrivate, limit, createdAt);
+          resolve({
+            status: 200,
+            message: noPosts ? ServerInfo.POST_NA : ServerInfo.POST_RETRIEVED,
+            data: { posts, updated: createdAt },
+          });
+        })
+        .catch((err) => reject(new ServerError(500, err?.message)));
     }
-    await Post.find(query)
-      .populate("user", "-createdAt -updatedAt -email -password -posts")
-      .sort({ createdAt: -1 })
-      .limit(limit)
-      .lean()
-      .then((posts) => {
-        resolve({
-          status: 200,
-          message: isEmpty(posts)
-            ? ServerInfo.POST_NA
-            : ServerInfo.POST_RETRIEVED,
-          data: { posts },
-        });
-      })
-      .catch((err) => reject(new ServerError(500, err?.message)));
   });
 }
 
@@ -109,10 +137,14 @@ async function createDoc(req: NextApiRequest): Promise<IResponse> {
           if (exists) {
             throw new ServerError(200, ErrorMessage.POST_SLUG_USED);
           } else {
-            const newPost = new Post({ ...post, user: userId });
+            const newPost = new Post({
+              ...post,
+              user: userId,
+            });
             newPost
               .save()
               .then((res) => {
+                memo.updateCurrent();
                 if (res.id) {
                   User.findByIdAndUpdate(
                     userId,
@@ -158,6 +190,7 @@ async function patchDoc(req: NextApiRequest): Promise<IResponse> {
       await post
         .save()
         .then((postData) => {
+          memo.resetCache(postData);
           resolve({
             status: 200,
             message: ServerInfo.POST_UPDATED,
@@ -180,9 +213,10 @@ async function deleteDoc(req: NextApiRequest): Promise<IResponse> {
       await session.withTransaction(async () => {
         const { Post, User } = await mongoConnection();
         const userId = req.headers["user-id"];
-        const { id } = req.query as Partial<IPostReq>;
+        const { id, username, isPrivate } = req.query as Partial<IPostReq>;
         await Post.findByIdAndDelete(id)
           .then(() => {
+            memo.resetCache({ id, username, isPrivate });
             User.findByIdAndUpdate(
               userId,
               { $pullAll: { posts: [id] } },

@@ -91,7 +91,7 @@ const Post = ({ post, username, slug }: IPostPage) => {
 
   const dateText = useMemo(() => {
     if (createdAt === updatedAt) {
-      return moment(new Date(createdAt)).format("DD/MM/YY");
+      return `Posted on ${moment(new Date(createdAt)).format("DD/MM/YY")}`;
     } else {
       return `Updated on ${moment(new Date(updatedAt)).format("DD/MM/YY")}`;
     }

@@ -60,10 +60,13 @@ export async function deleteImage(imageKey: string): Promise<IResponse> {
 }
 
 export function deletePost(post: IPost): Promise<IResponse> {
+  const { id, username, isPrivate, imageKey } = post;
   return new Promise(async (resolve, reject) => {
-    deleteImage(post.imageKey);
+    deleteImage(imageKey);
     await HTTPService.makeAuthHttpReq(DBService.POSTS, HttpRequest.DELETE, {
-      id: post.id,
+      id,
+      username,
+      isPrivate,
     })
       .then((res) => resolve(res))
       .catch((err) => reject(err));

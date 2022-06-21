@@ -1,6 +1,6 @@
 import { Card, CardContent, CardMedia } from "@mui/material";
 import { AuthorLink, Row } from "components";
-import { Flag } from "enums";
+import { Dimension, Flag } from "enums";
 import { motion } from "framer-motion";
 import { AppContext, useMarkdown } from "hooks";
 import moment from "moment";
@@ -44,7 +44,7 @@ const PostCard = ({
     <Card
       onClick={handleClick}
       style={disable ? { cursor: "default" } : null}
-      sx={{ width: "280px", margin: "6px" }}
+      sx={{ width: Dimension.CARD_WIDTH, margin: "6px" }}
     >
       {hasRealImage && (
         <CardMedia>
