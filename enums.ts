@@ -30,7 +30,11 @@ export enum Duration {
 }
 
 export enum Dimension {
-  CARD_WIDTH = 280,
+  BANNER_H = 350,
+  CARD_W = 280,
+  AVATAR_S = 24,
+  AVATAR_M = 40,
+  AVATAR_L = 140,
 }
 
 export enum Flag {

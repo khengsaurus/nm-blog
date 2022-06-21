@@ -1,4 +1,4 @@
-import { Flag } from "enums";
+import { Duration, Flag } from "enums";
 import { IPost } from "types";
 import LRUCache from "./LRUCache";
 
@@ -22,7 +22,6 @@ class Memo {
   }
 
   deleteCallback(key: string) {
-    console.log("delete");
     const keys = key.split[Flag.DATE_TAG];
     const tsMap = this.queryMap.get(keys[0]);
     if (!tsMap) return;
@@ -31,8 +30,10 @@ class Memo {
   }
 
   updateCurrent() {
-    const now = new Date().toString();
-    this.current = now;
+    const d1 = new Date();
+    // with 2 mins delay
+    const d2 = new Date(d1.getTime() + 2 * Duration.MIN).toString();
+    this.current = d2;
   }
 
   read(username: string, isPrivate: boolean, date: string, limit: number) {

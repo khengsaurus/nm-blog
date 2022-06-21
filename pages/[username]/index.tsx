@@ -9,6 +9,7 @@ import {
 } from "components";
 import { PAGINATE_LIMIT } from "consts";
 import { usePaginatePosts } from "hooks";
+import { avatarStyles } from "lib/client";
 import { mongoConnection } from "lib/server";
 import { IUser } from "types";
 import { getAvatarLarge, postDocToObj, userDocToObj } from "utils";
@@ -65,7 +66,7 @@ const UserPage = (props: IUserPageProps) => {
           <Avatar
             alt={`${username}-avatar`}
             src={getAvatarLarge(avatarKey)}
-            sx={{ width: 140, height: 140, marginRight: "20px" }}
+            sx={{ ...avatarStyles.large, marginRight: "20px" }}
           />
         )}
         <Column style={{ alignItems: avatarKey ? "flex-start" : "center" }}>

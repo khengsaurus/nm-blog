@@ -1,6 +1,6 @@
 import { PageRoute, Status, ToastMessage } from "enums";
 import { AppContext, useAsync, useKeyListener, useRefClick } from "hooks";
-import { deletePost } from "lib/client/tasks";
+import { deletePost } from "lib/client";
 import { ServerError } from "lib/server";
 import { useCallback, useContext, useRef } from "react";
 import { toast } from "react-hot-toast";

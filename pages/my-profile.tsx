@@ -3,6 +3,7 @@ import { Avatar, Fab } from "@mui/material";
 import { Centered, CircleLoader, DarkContainer, StyledText } from "components";
 import { PageRoute } from "enums";
 import { AppContext } from "hooks";
+import { avatarStyles } from "lib/client";
 import { useContext } from "react";
 import { getAvatarLarge } from "utils";
 
@@ -18,7 +19,7 @@ const MyProfile = () => {
             <Avatar
               alt={`${username}-avatar`}
               src={getAvatarLarge(avatarKey)}
-              sx={{ width: 140, height: 140 }}
+              sx={avatarStyles.large}
             />
           )}
           <DarkContainer>

@@ -71,7 +71,7 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
         data: { posts: cached, updated: createdAt },
       });
     } else {
-      const query: any = { createdAt: { $lt: createdAt } };
+      const query: any = { createdAt: { $lte: createdAt } };
       if (username) query.username = username;
       if (!isPrivate || (isPrivate as unknown as string) === "false")
         query.isPrivate = false;

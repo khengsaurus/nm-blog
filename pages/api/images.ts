@@ -1,7 +1,6 @@
 import { APIAction } from "enums";
 import { handleRequest } from "lib/middlewares";
-import { ServerError } from "lib/server";
-import { deleteFile, generateUploadURL } from "lib/server/s3";
+import { deleteFile, generateUploadURL, ServerError } from "lib/server";
 import { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from "next-connect";
 

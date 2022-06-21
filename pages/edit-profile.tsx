@@ -3,17 +3,22 @@ import {
   EditPreviewMarkdown,
   EditProfileButtons,
   ImageForm,
+  Row,
   StyledText,
 } from "components";
-import { DBService, HttpRequest, Status, ToastMessage } from "enums";
-import { AppContext, useAsync } from "hooks";
-import { HTTPService } from "lib/client";
-import { deleteImage, getUploadedImageKey } from "lib/client/tasks";
+import { DBService, Flag, HttpRequest, Status, ToastMessage } from "enums";
+import { AppContext, useAsync, useIsoEffect, usePreviewImg } from "hooks";
+import {
+  avatarStyles,
+  deleteImage,
+  getUploadedImageKey,
+  HTTPService,
+} from "lib/client";
 import { ServerError } from "lib/server";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { toast } from "react-hot-toast";
 import { IResponse } from "types";
-import { getStatusLabel } from "utils";
+import { getAvatarLarge, getStatusLabel } from "utils";
 
 const EditProfile = () => {
   const { user, handleUser } = useContext(AppContext);
@@ -23,7 +28,8 @@ const EditProfile = () => {
   const [imageKey, setImageKey] = useState("");
   const imageUpdated = !!newImage || imageKey !== user?.avatarKey;
 
-  useEffect(() => {
+  const previewImg = usePreviewImg(Flag.PREVIEW_IMG, newImage, false, 0);
+  useIsoEffect(() => {
     if (user) {
       setImageKey(user.avatarKey);
       setUsername(user.username);
@@ -78,31 +84,47 @@ const EditProfile = () => {
 
   return (
     <main className="left">
-      <Column>
+      <section className="header">
         <StyledText
-          text={user?.username}
+          text={user?.username || "Username"}
           variant="h3"
           style={{ alignSelf: "flex-start", marginLeft: "3px" }}
         />
-        <br />
+      </section>
+      <Column>
         <EditPreviewMarkdown
           label="Bio"
           body={bio || ""}
           hasMarkdown={false}
           setBody={setBio}
         />
-        <ImageForm
-          label="avatar"
-          newImage={newImage}
-          hasImage={!!newImage || !!imageKey}
-          setImage={setNewImage}
-          setImageKey={setImageKey}
-        />
-        <EditProfileButtons
-          saveDisabled={saveDisabled || saveStatus === Status.ERROR}
-          saveLabel={getStatusLabel(saveStatus)}
-          handleSave={handleSave}
-        />
+        <Row style={{ alignItems: "flex-start" }}>
+          <Column style={{ alignItems: "flex-start" }}>
+            <ImageForm
+              label="avatar"
+              newImage={newImage}
+              hasImage={!!newImage || !!imageKey}
+              setImage={setNewImage}
+              setImageKey={setImageKey}
+            />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={getAvatarLarge(imageKey)}
+              alt={Flag.PREVIEW_IMG}
+              id={Flag.PREVIEW_IMG}
+              style={{
+                ...avatarStyles.large,
+                borderRadius: "50%",
+                display: !previewImg && !imageKey ? "none" : "block",
+              }}
+            />
+          </Column>
+          <EditProfileButtons
+            saveDisabled={saveDisabled || saveStatus === Status.ERROR}
+            saveLabel={getStatusLabel(saveStatus)}
+            handleSave={handleSave}
+          />
+        </Row>
       </Column>
     </main>
   );

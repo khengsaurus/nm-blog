@@ -1,7 +1,12 @@
 import { useState } from "react";
 import useIsoEffect from "./useIsoEffect";
 
-const usePreviewImg = (targetId: string, image: File, delay = 50) => {
+const usePreviewImg = (
+  targetId: string,
+  image: File,
+  autoHide = true,
+  delay = 50
+) => {
   const [showing, setShowing] = useState(false);
 
   useIsoEffect(() => {
@@ -10,8 +15,10 @@ const usePreviewImg = (targetId: string, image: File, delay = 50) => {
     if (!image) {
       const target = document?.getElementById(targetId) as HTMLImageElement;
       if (target) {
-        target.src = "";
-        target.style.display = "none";
+        if (autoHide) {
+          target.src = "";
+          target.style.display = "none";
+        }
         setShowing(false);
       }
     } else if (!showing) {

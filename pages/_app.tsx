@@ -1,6 +1,6 @@
 import { Layout } from "components";
 import AppContextProvider from "hooks/context";
-import { HomeTheme } from "lib/client/MuiStyles";
+import { HomeTheme } from "lib/client";
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import "../styles/globals.scss";

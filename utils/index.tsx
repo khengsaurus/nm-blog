@@ -87,21 +87,26 @@ export const getStatusLabel = (saveStatus: Status) => {
 };
 
 export function getCardSrc(imageKey: string) {
-  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-${Dimension.CARD_WIDTH},h-80,q-100`;
+  if (!imageKey) return "";
+  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-${Dimension.CARD_W},h-80,q-100`;
 }
 
 export function getBannerSrc(imageKey: string, width: number) {
-  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-${width},h-350,q-100`;
+  if (!imageKey) return "";
+  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-${width},h-${Dimension.BANNER_H},q-100`;
 }
 
 export function getAvatarSmall(imageKey: string) {
-  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-24,h-24`;
+  if (!imageKey) return "";
+  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-${Dimension.AVATAR_S},h-${Dimension.AVATAR_S}`;
 }
 
 export function getAvatarMedium(imageKey: string) {
-  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-40,h-40`;
+  if (!imageKey) return "";
+  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-${Dimension.AVATAR_M},h-${Dimension.AVATAR_M}`;
 }
 
 export function getAvatarLarge(imageKey: string) {
-  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-140,h-140`;
+  if (!imageKey) return "";
+  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-${Dimension.AVATAR_L},h-${Dimension.AVATAR_L}`;
 }

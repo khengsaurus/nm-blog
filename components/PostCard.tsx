@@ -44,7 +44,7 @@ const PostCard = ({
     <Card
       onClick={handleClick}
       style={disable ? { cursor: "default" } : null}
-      sx={{ width: Dimension.CARD_WIDTH, margin: "6px" }}
+      sx={{ width: Dimension.CARD_W, margin: "6px" }}
     >
       {hasRealImage && (
         <CardMedia>

@@ -58,6 +58,7 @@ function newMuiTheme(theme: ITheme) {
             primary: mainText,
             secondary: highlightColor,
             fontSize: 16,
+            height: 40,
             "&:hover": {
               color: highlightColor,
             },
@@ -79,6 +80,7 @@ function newMuiTheme(theme: ITheme) {
             secondary: highlightColor,
             backgroundColor: "transparent !important",
             fontSize: 16,
+            height: 40,
             "&:disabled": {
               color: mainTextDisabled,
             },
@@ -317,7 +319,7 @@ function newMuiTheme(theme: ITheme) {
       MuiPaper: {
         styleOverrides: {
           root: {
-            minWidth: Dimension.CARD_WIDTH,
+            minWidth: Dimension.CARD_W,
           },
         },
       },
@@ -366,3 +368,9 @@ function newMuiTheme(theme: ITheme) {
     },
   });
 }
+
+export const avatarStyles = {
+  small: { width: Dimension.AVATAR_S, height: Dimension.AVATAR_S },
+  medium: { width: Dimension.AVATAR_M, height: Dimension.AVATAR_M },
+  large: { width: Dimension.AVATAR_L, height: Dimension.AVATAR_L },
+};

@@ -17,8 +17,7 @@ import {
   ToastMessage,
 } from "enums";
 import { AppContext, useAsync, usePreviewImg, useRealtimePost } from "hooks";
-import { HTTPService } from "lib/client";
-import { deleteImage, getUploadedImageKey } from "lib/client/tasks";
+import { deleteImage, getUploadedImageKey, HTTPService } from "lib/client";
 import { ServerError } from "lib/server";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
@@ -224,7 +223,7 @@ const EditPost = ({ id }: IPostPage) => {
             hasAuthorLink={true}
             disable
           />
-          <Column style={{ width: "280px"}}>
+          <Column style={{ width: "280px" }}>
             <ImageForm
               label="banner"
               hasImage={!!imageKey || !!newImage}
