@@ -6,6 +6,7 @@ import { createContext, useCallback, useEffect, useRef, useState } from "react";
 import { IAppContext, IUser } from "types";
 import useFirstEffectAsync from "./useFirstEffectAsync";
 import useLocalStorage from "./useLocalStorage";
+import useTheme from "./useTheme";
 import useWindowListener from "./useWindowListener";
 
 const initialContext: IAppContext = {
@@ -29,12 +30,9 @@ const AppContextProvider = (props: any) => {
   const [user, setUser] = useState<IUser>();
   const [userSessionActive, setUserSessionActive] = useState(true);
   const [userToken, setUserToken] = useLocalStorage("userToken", "");
-  const [themeName, setThemeName] = useLocalStorage("theme", DEFAULT_THEME);
-  const [theme, setTheme] = useState(themes[DEFAULT_THEME]);
+  const [theme, setThemeName] = useTheme();
   const historyRef = useRef([]);
   const router = useRouter();
-
-  useEffect(() => setTheme(themes[themeName]), [themeName]);
 
   /* -------------------- Start Router stuff -------------------- */
   const routerPush = useCallback(

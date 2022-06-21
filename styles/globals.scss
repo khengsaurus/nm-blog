@@ -50,6 +50,9 @@ main {
   }
   &.pad-top {
     margin-top: 80px;
+    &-small {
+      margin-top: 60px;
+    }
   }
   &.transparent {
     background-color: transparent;
@@ -97,8 +100,8 @@ main {
   }
 }
 
-a {
-  color: gainsboro;
+a:-webkit-any-link {
+  color: inherit; // let this be handled by jquery
 }
 
 h1 {
@@ -390,24 +393,30 @@ pre {
       color: rgb(235, 235, 235);
       background: rgb(32, 34, 36);
       &.dracula {
-        color: #e9e9f4;
         background: #282936;
+        color: #e9e9f4;
       }
       &.colorBrewer {
-        color: #e9e9f4;
-        background: rgb(32, 34, 36);
+        background: #1a1b26;
+        color: #9aa5ce;
+        // background: rgb(32, 34, 36);
+        // color: #e9e9f4;
       }
       &.github {
-        color: rgb(225, 225, 225);
         background: rgb(32, 34, 36);
+        color: rgb(225, 225, 225);
       }
       &.atomOneDark {
-        color: #abb2bf;
         background: #282c34;
+        color: #abb2bf;
       }
       &.monokaiSublime {
         background: #282828;
         color: #f8f8f2;
+      }
+      &.solarLight {
+        background: #d0cec2;
+        color: #3e4446;
       }
     }
   }
@@ -421,6 +430,7 @@ pre {
   .atomOneDark-formula,
   .atomOneDark-keyword {
     color: #c678dd;
+    font-weight: 600;
   }
   .atomOneDark-deletion,
   .atomOneDark-name,
@@ -496,15 +506,18 @@ pre {
   .colorBrewer-variable {
     color: #88f;
   }
+  .colorBrewer-strong,
+  .colorBrewer-keyword {
+    font-weight: 600;
+    color: #3182bd;
+  }
   .colorBrewer-built_in,
   .colorBrewer-doctag,
-  .colorBrewer-keyword,
   .colorBrewer-name,
   .colorBrewer-section,
   .colorBrewer-selector-class,
   .colorBrewer-selector-id,
   .colorBrewer-selector-tag,
-  .colorBrewer-strong,
   .colorBrewer-tag,
   .colorBrewer-title,
   .colorBrewer-type {
@@ -586,6 +599,7 @@ pre {
   .dracula-keyword,
   .dracula-template-tag,
   .dracula-type {
+    font-weight: 700;
     color: #b45bcf;
   }
   .dracula-emphasis {
@@ -673,6 +687,7 @@ pre {
   .github-keyword,
   .github-template-tag,
   .github-type {
+    font-weight: 600;
     // color: #a71d5d;
     color: rgb(227, 95, 156);
   }
@@ -724,6 +739,7 @@ pre {
   .monokaiSublime-keyword,
   .monokaiSublime-name,
   .monokaiSublime-selector-tag {
+    font-weight: 600;
     color: #f92672;
   }
   .monokaiSublime-attribute,
@@ -750,5 +766,91 @@ pre {
   .monokaiSublime-deletion,
   .monokaiSublime-meta {
     color: #75715e;
+  }
+
+  // Solarized light
+  .solarLight ::selection,
+  .solarLight::selection {
+    background-color: #93a1a1;
+    color: #586e75;
+  }
+  .solarLight-comment {
+    color: #839496;
+  }
+  .solarLight-tag {
+    color: #657b83;
+  }
+  .solarLight-operator,
+  .solarLight-punctuation,
+  .solarLight-subst {
+    color: #586e75;
+  }
+  .solarLight-operator {
+    opacity: 0.7;
+  }
+  .solarLight-bullet,
+  .solarLight-deletion,
+  .solarLight-name,
+  .solarLight-selector-tag,
+  .solarLight-template-variable,
+  .solarLight-variable {
+    color: #dc322f;
+  }
+  .solarLight-attr,
+  .solarLight-link,
+  .solarLight-literal,
+  .solarLight-number,
+  .solarLight-symbol,
+  .solarLight-variable.constant_ {
+    color: #cb4b16;
+  }
+  .solarLight-class .solarLight-title,
+  .solarLight-title,
+  .solarLight-title.class_ {
+    color: #b58900;
+  }
+  .solarLight-strong {
+    font-weight: 700;
+    color: #b58900;
+  }
+  .solarLight-addition,
+  .solarLight-code,
+  .solarLight-string,
+  .solarLight-title.class_.inherited__ {
+    color: #859900;
+  }
+  .solarLight-built_in,
+  .solarLight-doctag,
+  .solarLight-keyword.solarLight-atrule,
+  .solarLight-quote,
+  .solarLight-regexp {
+    color: #2aa198;
+  }
+  .solarLight-attribute,
+  .solarLight-function .solarLight-title,
+  .solarLight-section,
+  .solarLight-title.function_,
+  .ruby .solarLight-property {
+    color: #268bd2;
+  }
+  .diff .solarLight-meta,
+  .solarLight-keyword,
+  .solarLight-template-tag,
+  .solarLight-type {
+    font-weight: 600;
+    color: #6c71c4;
+  }
+  .solarLight-emphasis {
+    color: #6c71c4;
+    font-style: italic;
+  }
+  .solarLight-meta,
+  .solarLight-meta .solarLight-keyword,
+  .solarLight-meta .solarLight-string {
+    color: #d33682;
+  }
+  .solarLight-meta .solarLight-keyword,
+  .solarLight-meta-keyword {
+    font-weight: 700;
   }
 }

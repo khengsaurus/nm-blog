@@ -11,6 +11,7 @@ import usePaginatePosts from "./usePaginatePosts";
 import usePreviewImg from "./usePreviewImg";
 import useRealtimePost from "./useRealtimePost";
 import useRefClick from "./useRefClick";
+import useTheme from "./useTheme";
 import useWindowDimensions from "./useWindowDimensions";
 import useWindowListener from "./useWindowListener";
 import useWindowLoaded from "./useWindowLoaded";
@@ -29,6 +30,7 @@ export {
   usePreviewImg,
   useRefClick,
   useRealtimePost,
+  useTheme,
   useWindowDimensions,
   useWindowLoaded,
   useWindowListener,

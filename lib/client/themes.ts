@@ -61,6 +61,16 @@ const themes: IThemeOptions = {
     mainTextDisabled: "rgba(234, 235, 237, 0.5)",
     icon: "💜",
   },
+  light: {
+    name: "light",
+    background: "rgb(186, 186, 186)",
+    primary: "rgb(202, 190, 181)",
+    secondary: "rgb(148, 168, 179)",
+    highlightColor: "rgb(222, 220, 222)",
+    mainText: "rgb(40, 40, 40)",
+    mainTextDisabled: "rgba(104, 105, 107, 0.5)",
+    icon: "🌞",
+  },
   // moss: {
   //   name: "moss",
   //   background: "rgb(49, 90, 57)",

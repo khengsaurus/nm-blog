@@ -10,6 +10,8 @@ function getCodeTheme(themeName: string) {
       return "github";
     case "lavendar":
       return "dracula";
+    case "light":
+      return "solarLight";
     case "cactus":
       return "atomOneDark";
     case "cabana":

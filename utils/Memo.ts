@@ -66,15 +66,24 @@ class Memo {
   }
 
   resetCache(post: Partial<IPost>) {
-    const postId = post.id;
-    if (!postId) return;
-    const keyPrivate = this.getParentKey(post.username, post.isPrivate);
-    const keyPublic = this.getParentKey("", false);
-    const map1 = this.queryMap.get(keyPrivate);
-    const map2 = this.queryMap.get(keyPublic);
+    const { id, isPrivate, username } = post;
+    if (!id) return;
+    let key1; // private queries for user's posts
+    let key2; // public queries for user's posts
+    let key3; // public queries for recent posts
+    if (isPrivate) {
+      key1 = this.getParentKey(username, true);
+    } else {
+      key2 = this.getParentKey(username, false);
+      key3 = this.getParentKey("", false);
+    }
+    const map1 = this.queryMap.get(key1);
+    const map2 = this.queryMap.get(key2);
+    const map3 = this.queryMap.get(key3);
 
-    if (this.resetHelper(map1, postId)) this.queryMap.delete(keyPrivate);
-    if (this.resetHelper(map2, postId)) this.queryMap.delete(keyPublic);
+    if (this.resetHelper(map1, id)) this.queryMap.delete(key1);
+    if (this.resetHelper(map2, id)) this.queryMap.delete(key2);
+    if (this.resetHelper(map3, id)) this.queryMap.delete(key3);
   }
 
   resetHelper(map: Map<string, string[]>, postId: string) {

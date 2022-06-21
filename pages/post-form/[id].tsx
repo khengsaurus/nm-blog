@@ -178,7 +178,7 @@ const EditPost = ({ id }: IPostPage) => {
   const showingPreview = usePreviewImg(Flag.PREVIEW_IMG, newImage);
 
   return (
-    <main className="left">
+    <main className="left pad-top-small">
       <Column>
         <Input
           label="Title"
