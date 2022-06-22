@@ -10,10 +10,12 @@ export function isDev() {
 
 export function postDocToObj(data: any): IPost {
   if (!data) return null;
-  const { _id, user, createdAt, updatedAt, ...post } = data._doc || data;
+  const { _id, user, createdAt, updatedAt, isPrivate, ...post } =
+    data._doc || data;
   post.id = _id?.toString() || post.id;
   post.createdAt = createdAt?.toString();
   post.updatedAt = updatedAt?.toString();
+  post.isPrivate = castAsBoolean(isPrivate);
   if (user?._id) {
     const { _id, updatedAt, createdAt, ..._user } = user;
     _user.id = _id.toString();
@@ -109,4 +111,9 @@ export function getAvatarMedium(imageKey: string) {
 export function getAvatarLarge(imageKey: string) {
   if (!imageKey) return "";
   return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-${Dimension.AVATAR_L},h-${Dimension.AVATAR_L}`;
+}
+
+export function castAsBoolean(str: string | boolean) {
+  if (typeof str === "boolean") return str;
+  return !(str === "false" || !str);
 }

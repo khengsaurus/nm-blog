@@ -23,7 +23,7 @@ export default async function handler(
     case HttpRequest.GET:
       res.setHeader(
         "Cache-Control",
-        `maxage=${Duration.HOUR}, must-revalidate`
+        `maxage=${5 * Duration.MIN}, must-revalidate`
       );
       return handleGet(req, res);
     case HttpRequest.POST:

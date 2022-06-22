@@ -22,7 +22,7 @@ export async function getServerSideProps({ params, res }) {
   const { username } = params;
   res.setHeader(
     "Cache-Control",
-    "public, max-age=300, s-maxage=600, stale-while-revalidate=30"
+    "public, s-maxage=30, stale-while-revalidate=300" // s-maxage & swr in seconds
   );
 
   const { Post, User } = await mongoConnection();

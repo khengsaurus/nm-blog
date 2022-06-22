@@ -26,11 +26,12 @@ import LRUCache from "./LRUCache";
  * `privateUserKey`: `get most recent <limit> posts by user`
  */
 class Memo {
+  private current: string;
   private cache: LRUCache;
   private queryMap: Map<string, Map<string, string[]>>;
-  public current: string;
 
   constructor(LRUCacheLimit = 50) {
+    console.info("-> Memo.constructor(): " + LRUCacheLimit);
     this.updateCurrent();
     this.cache = new LRUCache(LRUCacheLimit, this.deleteCallback);
     this.queryMap = new Map();
@@ -48,6 +49,7 @@ class Memo {
     const d1 = new Date();
     const d2 = new Date(d1.getTime() + 2 * Duration.MIN).toString(); // 2 mins delay
     this.current = d2;
+    console.info("-> Memo.updatedCurrent()");
   }
 
   read(username: string, isPrivate: boolean, date: string, limit: number) {
@@ -55,7 +57,9 @@ class Memo {
     const childKey = this.getChildKey(date, limit);
     const map = this.queryMap.get(parentKey);
     if (!map || !map.get(childKey)) return null;
-    return this.cache.read(parentKey + childKey);
+    const fullKey = parentKey + childKey;
+    console.info("-> Memo.read(): " + fullKey);
+    return this.cache.read(fullKey);
   }
 
   write(
@@ -76,6 +80,7 @@ class Memo {
       console.info(err);
     }
     const fullKey = parentKey + childKey;
+    console.info("-> Memo.write(): " + fullKey);
     this.cache.write(fullKey, posts);
   }
 
@@ -92,15 +97,12 @@ class Memo {
     const puUserMap = this.queryMap.get(puUserKey);
     const homeMap = this.queryMap.get(homeKey);
 
-    // console.info("////------ map key: " + prUserKey + " ------\\\\ ");
+    console.info(
+      `-> Memo.resetCache(): + [${prUserKey}, ${puUserKey}, ${homeKey}]`
+    );
     if (this.resetHelper(prUserMap, id)) this.queryMap.delete(prUserKey);
-    // console.info("\\\\-----------------------------------------------//// ");
-    // console.info("////------ map key: " + puUserKey + " ------\\\\ ");
     if (this.resetHelper(puUserMap, id)) this.queryMap.delete(puUserKey);
-    // console.info("\\\\-----------------------------------------------//// ");
-    // console.info("////------ map key: " + homeKey + " ------\\\\ ");
     if (this.resetHelper(homeMap, id)) this.queryMap.delete(homeKey);
-    // console.info("\\\\-----------------------------------------------//// ");
   }
 
   resetHelper(map: Map<string, string[]>, postId: string) {
@@ -113,9 +115,16 @@ class Memo {
     return map.size === 0;
   }
 
-  resetHomeQuery() {
-    const homeKey = this.getParentKey("", false);
-    this.queryMap.delete(homeKey);
+  newPostCreated(post: IPost) {
+    const { username, isPrivate } = post;
+    let key = this.getParentKey(username, isPrivate);
+    this.queryMap.delete(key);
+    if (!isPrivate) {
+      key = this.getParentKey("", false);
+      this.queryMap.delete(key);
+      this.updateCurrent();
+    }
+    console.info("-> Memo.newPostCreated(): " + key);
   }
 
   getParentKey(username: string, isPrivate: boolean) {
@@ -138,6 +147,11 @@ class Memo {
     return (
       this.getParentKey(username, isPrivate) + this.getChildKey(date, limit)
     );
+  }
+
+  getCurrent() {
+    if (!this.current) this.updateCurrent();
+    return this.current;
   }
 }
 

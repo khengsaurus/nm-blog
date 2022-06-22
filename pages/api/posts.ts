@@ -11,7 +11,7 @@ import { isEmpty } from "lodash";
 import { ClientSession } from "mongoose";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { IPostReq, IResponse } from "types";
-import { postDocToObj } from "utils";
+import { castAsBoolean, postDocToObj } from "utils";
 import Memo from "utils/Memo";
 
 /**
@@ -35,7 +35,10 @@ export default async function handler(
 ) {
   switch (req.method) {
     case HttpRequest.GET:
-      res.setHeader("Cache-Control", `maxage=${Duration.MIN}, must-revalidate`);
+      res.setHeader(
+        "Cache-Control",
+        `maxage=${5 * Duration.MIN}, must-revalidate`
+      );
       return handleGet(req, res);
     case HttpRequest.POST:
       return handleRequest(req, res, createDoc);
@@ -58,10 +61,11 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
 async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
   const {
     username,
-    isPrivate,
-    createdAt = memo.current,
+    isPrivate: _isPrivate,
+    createdAt = memo.getCurrent(),
     limit = PAGINATE_LIMIT,
   } = params;
+  const isPrivate = castAsBoolean(_isPrivate);
   return new Promise(async (resolve, reject) => {
     const { Post } = await mongoConnection();
     const cached = memo.read(username, isPrivate, createdAt, limit);
@@ -74,8 +78,8 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
     } else {
       const query: any = { createdAt: { $lt: createdAt } };
       if (username) query.username = username;
-      if (!isPrivate || (isPrivate as unknown as string) === "false")
-        query.isPrivate = false;
+      // filter if user queries public posts
+      if (!isPrivate) query.isPrivate = false;
       await Post.find(query)
         .populate("user", "-createdAt -updatedAt -email -password -posts")
         .sort({ createdAt: -1 })
@@ -134,20 +138,22 @@ async function createDoc(req: NextApiRequest): Promise<IResponse> {
         const { Post, User } = await mongoConnection();
         const userId = req.headers["user-id"];
         const post: Partial<IPostReq> = req.body;
-        await Post.exists({ slug: post.slug, user: userId }).then((exists) => {
+        const { isPrivate: _isPrivate, slug } = post;
+        const isPrivate = castAsBoolean(_isPrivate);
+        await Post.exists({ slug, user: userId }).then((exists) => {
           if (exists) {
             throw new ServerError(200, ErrorMessage.POST_SLUG_USED);
           } else {
             const newPost = new Post({
               ...post,
+              isPrivate,
               user: userId,
             });
             newPost
               .save()
               .then((res) => {
-                memo.updateCurrent();
-                memo.resetHomeQuery();
                 if (res.id) {
+                  memo.newPostCreated(newPost);
                   User.findByIdAndUpdate(
                     userId,
                     { $push: { posts: { $each: [res.id], $position: 0 } } },
@@ -184,6 +190,7 @@ async function patchDoc(req: NextApiRequest): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     try {
       const { id, ..._set } = req.body as Partial<IPostReq>;
+      _set.isPrivate = castAsBoolean(req.body?.isPrivate);
       const { Post } = await mongoConnection();
       const post = await Post.findById(id);
       for (const key of Object.keys(_set)) {
@@ -193,7 +200,6 @@ async function patchDoc(req: NextApiRequest): Promise<IResponse> {
         .save()
         .then((postData) => {
           const post = postDocToObj(postData);
-          // isPrivate boolean here
           memo.resetCache(post);
           resolve({
             status: 200,
@@ -222,7 +228,7 @@ async function deleteDoc(req: NextApiRequest): Promise<IResponse> {
           username,
           isPrivate: _isPrivate, // string
         } = req.query as Partial<IPostReq>;
-        const isPrivate = !((_isPrivate as unknown) === "false" || !_isPrivate);
+        const isPrivate = castAsBoolean(_isPrivate);
         await Post.findByIdAndDelete(id)
           .then(() => {
             memo.resetCache({ id, username, isPrivate });
