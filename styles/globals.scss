@@ -403,7 +403,7 @@ pre {
         // color: #e9e9f4;
       }
       &.github {
-        background: rgb(32, 34, 36);
+        background: rgb(24, 26, 28);
         color: rgb(225, 225, 225);
       }
       &.atomOneDark {
@@ -644,7 +644,8 @@ pre {
   .github-selector-tag,
   .github-template-variable,
   .github-variable {
-    color: #ed6a43;
+    // color: #ed6a43;
+    color: rgb(250, 100, 70);
   }
   .github-attr,
   .github-link,
@@ -657,12 +658,11 @@ pre {
   }
   .github-class .github-title,
   .github-title,
-  .github-title.class_ {
-    color: #795da3;
-  }
+  .github-title.class_,
   .github-strong {
-    font-weight: 700;
-    color: #795da3;
+    font-weight: 550;
+    color: rgb(155, 115, 200);
+    // color: #795da3;
   }
   .github-addition,
   .github-built_in,
@@ -674,14 +674,15 @@ pre {
   .github-string,
   .github-title.class_.inherited__ {
     // color: #183691;
-    color: rgb(124, 174, 233);
+    color: rgb(124, 174, 255);
   }
   .github-attribute,
   .github-function .github-title,
   .github-section,
   .github-title.function_,
   .ruby .github-property {
-    color: #795da3;
+    color: rgb(155, 115, 200);
+    // color: #795da3;
   }
   .diff .github-meta,
   .github-keyword,

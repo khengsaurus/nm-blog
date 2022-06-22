@@ -1,11 +1,5 @@
 import { Avatar } from "@mui/material";
-import {
-  Column,
-  DarkContainer,
-  PostFeed,
-  StyledButton,
-  StyledText,
-} from "components";
+import { Column, DarkText, PostFeed, StyledButton } from "components";
 import { PAGINATE_LIMIT } from "consts";
 import { usePaginatePosts } from "hooks";
 import { avatarStyles } from "lib/client";
@@ -69,12 +63,8 @@ const UserPage = (props: IUserPageProps) => {
           />
         )}
         <Column style={{ alignItems: avatarKey ? "flex-start" : "center" }}>
-          <DarkContainer>
-            <StyledText text={username} variant="h2" />
-          </DarkContainer>
-          <DarkContainer>
-            <StyledText text={bio} variant="body1" paragraph />
-          </DarkContainer>
+          <DarkText text={username} variant="h2" />
+          <DarkText text={bio} variant="body1" paragraph />
         </Column>
       </section>
       <PostFeed posts={posts} />

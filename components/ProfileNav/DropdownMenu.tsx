@@ -1,5 +1,5 @@
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import DynamicFeedIcon from "@mui/icons-material/DynamicFeed";
+import DoneIcon from "@mui/icons-material/Done";
 import KeyIcon from "@mui/icons-material/Key";
 import LogoutIcon from "@mui/icons-material/Logout";
 import PaletteIcon from "@mui/icons-material/Palette";
@@ -27,12 +27,15 @@ interface IDropdownMenu {
   handleClose: () => void;
 }
 
-const themeMenuHeight = 57 * (Object.keys(themes).length + 1) + 14;
+function getHeight(items: number) {
+  return 57 * items + 14;
+}
 
 const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
   (props: IDropdownMenu, ref?: MutableRefObject<any>) => {
     const { open, handleClose } = props;
-    const { user, logout, routerPush, setThemeName } = useContext(AppContext);
+    const { theme, user, logout, routerPush, setThemeName } =
+      useContext(AppContext);
     const [activeMenu, setActiveMenu] = useState("main");
     const [menuHeight, setMenuHeight] = useState(0);
     const dropdownRef = useRef(null);
@@ -98,12 +101,6 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
             {renderButton("Profile", 18)}
           </DropdownItem>
           <DropdownItem
-            leftIcon={<DynamicFeedIcon />}
-            callback={() => handleNav(PageRoute.MY_POSTS)}
-          >
-            {renderButton("Posts")}
-          </DropdownItem>
-          <DropdownItem
             leftIcon={<PersonOutlineIcon />}
             callback={() => handleNav(PageRoute.MY_PROFILE)}
           >
@@ -123,6 +120,11 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
             <DropdownItem
               key={name}
               leftIcon={themes[name].icon}
+              rightIcon={
+                name === theme.name && (
+                  <DoneIcon style={{ color: theme.highlightColor }} />
+                )
+              }
               callback={() => setThemeName(name)}
             >
               {renderButton(name)}
@@ -140,7 +142,6 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
             classNames="menu-primary"
             timeout={350}
             onEnter={setDefaultMenuHeight}
-            // fn calcHeight(el) => setMenuHeight(el.offsetHeight + 8)
             unmountOnExit
           >
             {renderMainMenu()}
@@ -150,7 +151,7 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
             in={activeMenu === "profile"}
             classNames="menu-secondary"
             timeout={350}
-            onEnter={setDefaultMenuHeight}
+            onEnter={() => setMenuHeight(getHeight(2))}
             unmountOnExit
           >
             {renderProfileMenu()}
@@ -160,7 +161,9 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
             in={activeMenu === "theme"}
             classNames="menu-secondary"
             timeout={350}
-            onEnter={() => setMenuHeight(themeMenuHeight)}
+            onEnter={() =>
+              setMenuHeight(getHeight(Object.keys(themes).length + 1))
+            }
             unmountOnExit
           >
             {renderThemeMenu()}

@@ -1,10 +1,4 @@
-import {
-  DarkContainer,
-  PostFeed,
-  StyledButton,
-  StyledText,
-  WindowLoaded,
-} from "components";
+import { DarkText, PostFeed, StyledButton, WindowLoaded } from "components";
 import { AppContext } from "hooks";
 import usePaginatePosts from "hooks/usePaginatePosts";
 import { useContext } from "react";
@@ -22,9 +16,7 @@ const MyPosts = () => {
   return (
     <main>
       <section className="header">
-        <DarkContainer>
-          <StyledText text="My Posts" variant="h3" />
-        </DarkContainer>
+        <DarkText text="My Posts" variant="h3" />
       </section>
       <WindowLoaded ready={!!user}>
         <PostFeed posts={posts} hasAuthorLink={false} />

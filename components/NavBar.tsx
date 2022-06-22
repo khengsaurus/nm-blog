@@ -1,7 +1,8 @@
 import AddIcon from "@mui/icons-material/Add";
+import DynamicFeedIcon from "@mui/icons-material/DynamicFeed";
 import HomeIcon from "@mui/icons-material/Home";
-import { AppBar, IconButton, Toolbar } from "@mui/material";
-import { ProfileNav } from "components";
+import { AppBar, Toolbar } from "@mui/material";
+import { NavButton, ProfileNav } from "components";
 import { PageRoute } from "enums";
 import { AppContext } from "hooks";
 import { useContext } from "react";
@@ -18,21 +19,20 @@ const NavBar = () => {
   return (
     <AppBar position="fixed">
       <Toolbar variant="dense">
-        <IconButton
-          aria-label="home"
-          onClick={() => routerPush(PageRoute.HOME)}
-          disableRipple
-        >
-          <HomeIcon />
-        </IconButton>
+        <NavButton label="home" icon={<HomeIcon />} path={PageRoute.HOME} />
         {userSessionActive && !isPreLogin && (
-          <IconButton
-            aria-label="new-item"
-            onClick={() => routerPush(PageRoute.POST_FORM + "/new")}
-            disableRipple
-          >
-            <AddIcon />
-          </IconButton>
+          <>
+            <NavButton
+              label="my-posts"
+              icon={<DynamicFeedIcon />}
+              path={PageRoute.MY_POSTS}
+            />
+            <NavButton
+              label="new-item"
+              icon={<AddIcon />}
+              path={PageRoute.POST_FORM + "/new"}
+            />
+          </>
         )}
         <ProfileNav />
       </Toolbar>

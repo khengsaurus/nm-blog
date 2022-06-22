@@ -1,5 +1,6 @@
 import AuthorLink from "./AuthorLink";
 import DarkContainer from "./DarkContainer";
+import DarkText from "./DarkText";
 import EditPostButtons from "./EditPostButtons";
 import EditPreviewMarkdown from "./EditPreviewMarkdown";
 import EditProfileButtons from "./EditProfileButtons";
@@ -11,6 +12,7 @@ import MarkdownEditor from "./MarkdownEditor";
 import MarkdownViewer from "./MarkdownViewer";
 import { ActionModal, DeletePostModal } from "./Modals";
 import NavBar from "./NavBar";
+import NavButton from "./NavButton";
 import PostBanner from "./PostBanner";
 import PostCard from "./PostCard";
 import PostFeed from "./PostFeed";
@@ -31,6 +33,7 @@ export {
   AuthorLink,
   CircleLoader,
   DarkContainer,
+  DarkText,
   DeletePostModal,
   EditPreviewMarkdown,
   EditProfileButtons,
@@ -41,6 +44,7 @@ export {
   Layout,
   MarkdownViewer,
   NavBar,
+  NavButton,
   PostBanner,
   PostCard,
   PostFeed,

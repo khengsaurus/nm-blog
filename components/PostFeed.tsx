@@ -1,3 +1,4 @@
+import { DarkText } from "components";
 import { Dimension } from "enums";
 import { useWindowLoaded } from "hooks";
 import { CSSProperties } from "react";
@@ -30,6 +31,7 @@ const PostFeed = ({
           hasDate={hasDate}
         />
       ))}
+      {posts.length === 0 && <DarkText text="No posts yet" variant="h5" />}
     </PostFeedDiv>
   );
 };

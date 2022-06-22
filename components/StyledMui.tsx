@@ -3,7 +3,7 @@ import { PageRoute } from "enums";
 import { AppContext } from "hooks";
 import React, { useContext } from "react";
 
-interface IStyledTextProps {
+export interface IStyledTextProps {
   text: string;
   color?: string;
   padding?: string;

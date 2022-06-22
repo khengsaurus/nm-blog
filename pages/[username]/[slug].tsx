@@ -5,6 +5,7 @@ import Container from "@mui/system/Container";
 import {
   AuthorLink,
   DarkContainer,
+  DarkText,
   DeletePostModal,
   PostBanner,
   Row,
@@ -33,9 +34,7 @@ export async function getStaticProps({
   let _post: IPost = null;
   try {
     const { Post } = await mongoConnection();
-    _post = await Post.findOne({ username, slug })
-      .populate("user", "-createdAt -email -password -posts")
-      .lean();
+    _post = await Post.findOne({ username, slug }).select(["-user"]).lean();
   } catch (err) {
     console.info(
       `Error in [${username}]/[${slug}] getStaticProps: ` + err.message
@@ -111,9 +110,7 @@ const Post = ({ post, username, slug }: IPostPage) => {
       <main className="left">
         {imageKey && <PostBanner imageKey={imageKey} />}
         <section className={`header column ${imageKey ? "pad-top" : ""}`}>
-          <DarkContainer>
-            <StyledText text={title} variant="h2" />
-          </DarkContainer>
+          <DarkText text={title} variant="h2" />
           <Row style={{ justifyContent: "flex-start", alignItems: "flex-end" }}>
             <DarkContainer>
               <AuthorLink username={username} title />
@@ -126,9 +123,7 @@ const Post = ({ post, username, slug }: IPostPage) => {
               />
             )}
           </Row>
-          <DarkContainer>
-            <StyledText text={dateText} variant="h4" />
-          </DarkContainer>
+          <DarkText text={dateText} variant="h4" />
         </section>
         {realtimePost?.hasMarkdown ? (
           <Container

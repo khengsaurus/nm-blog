@@ -1,10 +1,4 @@
-import {
-  DarkContainer,
-  PostFeed,
-  StyledButton,
-  StyledText,
-  WindowLoaded,
-} from "components";
+import { DarkText, PostFeed, StyledButton, WindowLoaded } from "components";
 import { PAGINATE_LIMIT } from "consts";
 import { usePaginatePosts } from "hooks";
 import { mongoConnection } from "lib/server";
@@ -45,9 +39,7 @@ const Home = ({ initPosts }: IHomeProps) => {
   return (
     <main>
       <section className="header">
-        <DarkContainer>
-          <StyledText text="Public Posts" variant="h3" />
-        </DarkContainer>
+        <DarkText text="Public Posts" variant="h3" />
       </section>
       <WindowLoaded>
         <PostFeed posts={posts} />

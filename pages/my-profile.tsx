@@ -1,6 +1,6 @@
 import EditIcon from "@mui/icons-material/Edit";
 import { Avatar, Fab } from "@mui/material";
-import { Centered, CircleLoader, DarkContainer, StyledText } from "components";
+import { Centered, CircleLoader, DarkText } from "components";
 import { PageRoute } from "enums";
 import { AppContext } from "hooks";
 import { avatarStyles } from "lib/client";
@@ -22,12 +22,8 @@ const MyProfile = () => {
               sx={avatarStyles.large}
             />
           )}
-          <DarkContainer>
-            <StyledText text={username} variant="h2" />
-          </DarkContainer>
-          <DarkContainer>
-            <StyledText text={bio || "(No bio)"} variant="h4" paragraph />
-          </DarkContainer>
+          <DarkText text={username} variant="h2" />
+          <DarkText text={bio || "(No bio)"} variant="h4" paragraph />
           <div className="edit-container">
             <Fab
               className="edit-button"

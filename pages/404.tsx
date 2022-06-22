@@ -1,16 +1,11 @@
-import { Centered, DarkContainer, Row, StyledText } from "../components";
+import { DarkText } from "../components";
 
 const FourOFour = () => {
   return (
     <main className="left pad-top">
-      <DarkContainer>
-        <StyledText text="Whoops!" variant="h2" />
-      </DarkContainer>
+      <DarkText text="Whoops!" variant="h2" />
       <br />
-      <DarkContainer>
-        <StyledText text="We are unable to find that page :(" variant="h3" />
-      </DarkContainer>
-      ;
+      <DarkText text="We are unable to find that page :(" variant="h3" />;
     </main>
   );
 };
