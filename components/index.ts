@@ -13,14 +13,9 @@ import { ActionModal, DeletePostModal } from "./Modals";
 import NavBar from "./NavBar";
 import PostBanner from "./PostBanner";
 import PostCard from "./PostCard";
+import PostFeed from "./PostFeed";
 import ProfileNav from "./ProfileNav";
-import {
-  Centered,
-  CenteredMain,
-  Column,
-  PostFeed,
-  Row,
-} from "./StyledComponents";
+import { Centered, CenteredMain, Column, Row } from "./StyledComponents";
 import {
   HomeButton,
   StyledButton,
@@ -30,6 +25,7 @@ import {
 } from "./StyledMui";
 import SuspenseImage from "./SuspenseImage";
 import { renderButton } from "./utils";
+import WindowLoaded from "./WindowLoaded";
 
 export {
   AuthorLink,
@@ -44,21 +40,22 @@ export {
   Input,
   Layout,
   MarkdownViewer,
+  NavBar,
   PostBanner,
   PostCard,
+  PostFeed,
   ProfileNav,
+  renderButton,
   StyledButton,
   StyledCenterText,
   StyledText,
-  TextNavButton,
-  NavBar,
   SuspenseImage,
-  renderButton,
+  TextNavButton,
+  WindowLoaded,
   ActionModal,
   Centered,
   CenteredMain,
   Column,
   MarkdownEditor,
-  PostFeed,
   Row,
 };

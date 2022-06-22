@@ -1,12 +1,12 @@
 import {
   DarkContainer,
-  PostCard,
   PostFeed,
   StyledButton,
   StyledText,
+  WindowLoaded,
 } from "components";
 import { PAGINATE_LIMIT } from "consts";
-import { usePaginatePosts, useWindowLoaded } from "hooks";
+import { usePaginatePosts } from "hooks";
 import { mongoConnection } from "lib/server";
 import { IPost } from "types";
 import { postDocToObj } from "utils";
@@ -41,7 +41,6 @@ const Home = ({ initPosts }: IHomeProps) => {
     true,
     initPosts
   );
-  const windowLoaded = useWindowLoaded();
 
   return (
     <main>
@@ -50,13 +49,11 @@ const Home = ({ initPosts }: IHomeProps) => {
           <StyledText text="Public Posts" variant="h3" />
         </DarkContainer>
       </section>
-      <PostFeed style={windowLoaded ? null : { width: 1000 }}>
-        {posts.map((post, index) => (
-          <PostCard key={index} post={post} />
-        ))}
-      </PostFeed>
-      <br />
-      {!limitReached && <StyledButton label="Load more" onClick={loadMore} />}
+      <WindowLoaded>
+        <PostFeed posts={posts} />
+        <br />
+        {!limitReached && <StyledButton label="Load more" onClick={loadMore} />}
+      </WindowLoaded>
     </main>
   );
 };

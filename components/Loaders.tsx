@@ -1,4 +1,5 @@
-import React from "react";
+import { AppContext } from "hooks";
+import { useContext } from "react";
 import { Oval } from "react-loader-spinner";
 
 interface ILoader {
@@ -14,8 +15,9 @@ export const CircleLoader = ({
   height = 22,
   width = 22,
   strokeWidth = 6,
-  color = "rgb(230, 230, 230)",
 }: ILoader) => {
+  const { theme } = useContext(AppContext);
+
   return (
     <Oval
       ariaLabel={id}
@@ -23,7 +25,7 @@ export const CircleLoader = ({
       width={width}
       strokeWidth={strokeWidth}
       strokeWidthSecondary={strokeWidth}
-      color={color}
+      color={theme?.highlightColor || "rgb(230, 230, 230)"}
       secondaryColor="transparent"
     />
   );

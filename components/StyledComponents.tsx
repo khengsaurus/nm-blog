@@ -22,7 +22,7 @@ export const RowCentered = styled(Row)`
   justify-content: center;
 `;
 
-export const PostFeed = styled(Row)`
+export const PostFeedDiv = styled(Row)`
   flex-wrap: wrap;
   justify-content: center;
 `;

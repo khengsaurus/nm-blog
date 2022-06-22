@@ -2,7 +2,6 @@ import { Avatar } from "@mui/material";
 import {
   Column,
   DarkContainer,
-  PostCard,
   PostFeed,
   StyledButton,
   StyledText,
@@ -78,16 +77,7 @@ const UserPage = (props: IUserPageProps) => {
           </DarkContainer>
         </Column>
       </section>
-      <PostFeed>
-        {posts.map((post, index) => (
-          <PostCard
-            key={index}
-            post={post}
-            hasAuthorLink={false}
-            hasDate={true}
-          />
-        ))}
-      </PostFeed>
+      <PostFeed posts={posts} />
       {!limitReached && <StyledButton label="Load more" onClick={loadMore} />}
     </main>
   ) : (

@@ -1,11 +1,9 @@
 import {
-  Centered,
-  CircleLoader,
   DarkContainer,
-  PostCard,
   PostFeed,
   StyledButton,
   StyledText,
+  WindowLoaded,
 } from "components";
 import { AppContext } from "hooks";
 import usePaginatePosts from "hooks/usePaginatePosts";
@@ -28,22 +26,12 @@ const MyPosts = () => {
           <StyledText text="My Posts" variant="h3" />
         </DarkContainer>
       </section>
-      {user ? (
-        <>
-          <PostFeed>
-            {posts.map((post, index) => (
-              <PostCard key={index} post={post} hasAuthorLink={false} />
-            ))}
-          </PostFeed>
-          {posts.length < user?.posts.length && (
-            <StyledButton label="Load more" onClick={loadMore} />
-          )}
-        </>
-      ) : (
-        <Centered style={{ marginTop: "calc(50vh - 120px)" }}>
-          <CircleLoader height={100} width={100} strokeWidth={2} />
-        </Centered>
-      )}
+      <WindowLoaded ready={!!user}>
+        <PostFeed posts={posts} hasAuthorLink={false} />
+        {posts.length < user?.posts.length && (
+          <StyledButton label="Load more" onClick={loadMore} />
+        )}
+      </WindowLoaded>
     </main>
   );
 };
