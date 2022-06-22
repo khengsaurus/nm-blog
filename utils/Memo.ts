@@ -3,12 +3,27 @@ import { IPost } from "types";
 import LRUCache from "./LRUCache";
 
 /**
- * LRUCache: cache `key-date` -> IPost[] response
- * queryMap: Map<parentKey, Map<childKey, postId[]>>: track existing keys in LRUCache
+ * LRUCache schema: Map<parentKey-childKey, Array<Post>>
+ * queryMap schema: Map<parentKey, Map<childKey, Array<postId>>>: track existing keys in LRUCache
+ *
+ * On read
+ * -> generate parentKey, childKey
+ * -> if queryMap.get(parentKey).get(childKey), return LRUCache.read(parentKey-childKey)
+ * -> else, get posts from DB, cache in LRUCache and write parentKey & childKey to queryMap
+ *
+ * On create post A, if post A is not private
+ * -> delete `publicHomeKey` from queryMap
+ * -> delete `publicUserKey` from queryMap
+ * -> delete `privateUserKey` from queryMap
  *
  * On edit/delete post A
- * -> delete child keys in queryMap where A.id in postId[]
- * -> delete from LRUCache
+ * -> delete all child keys in queryMap where A's postId is in postId[]
+ * -> if queryMap.get(parentKey) is empty, delete key from queryMap
+ *
+ * parentKey-childKey ref:
+ * `publicHomeKey`: `get most recent <limit> public posts`
+ * `publicUserKey`: `get most recent <limit> public posts by user`
+ * `privateUserKey`: `get most recent <limit> posts by user`
  */
 class Memo {
   private cache: LRUCache;
@@ -31,8 +46,7 @@ class Memo {
 
   updateCurrent() {
     const d1 = new Date();
-    // with 2 mins delay
-    const d2 = new Date(d1.getTime() + 2 * Duration.MIN).toString();
+    const d2 = new Date(d1.getTime() + 2 * Duration.MIN).toString(); // 2 mins delay
     this.current = d2;
   }
 
@@ -68,22 +82,25 @@ class Memo {
   resetCache(post: Partial<IPost>) {
     const { id, isPrivate, username } = post;
     if (!id) return;
-    let key1; // private queries for user's posts
-    let key2; // public queries for user's posts
-    let key3; // public queries for recent posts
-    if (isPrivate) {
-      key1 = this.getParentKey(username, true);
-    } else {
-      key2 = this.getParentKey(username, false);
-      key3 = this.getParentKey("", false);
-    }
-    const map1 = this.queryMap.get(key1);
-    const map2 = this.queryMap.get(key2);
-    const map3 = this.queryMap.get(key3);
+    let prUserKey; // private queries for user's posts
+    let puUserKey; // public queries for user's posts
+    let homeKey; // public queries for recent posts
+    prUserKey = this.getParentKey(username, true);
+    puUserKey = this.getParentKey(username, false);
+    homeKey = isPrivate ? "" : this.getParentKey("", false);
+    const prUserMap = this.queryMap.get(prUserKey);
+    const puUserMap = this.queryMap.get(puUserKey);
+    const homeMap = this.queryMap.get(homeKey);
 
-    if (this.resetHelper(map1, id)) this.queryMap.delete(key1);
-    if (this.resetHelper(map2, id)) this.queryMap.delete(key2);
-    if (this.resetHelper(map3, id)) this.queryMap.delete(key3);
+    // console.info("////------ map key: " + prUserKey + " ------\\\\ ");
+    if (this.resetHelper(prUserMap, id)) this.queryMap.delete(prUserKey);
+    // console.info("\\\\-----------------------------------------------//// ");
+    // console.info("////------ map key: " + puUserKey + " ------\\\\ ");
+    if (this.resetHelper(puUserMap, id)) this.queryMap.delete(puUserKey);
+    // console.info("\\\\-----------------------------------------------//// ");
+    // console.info("////------ map key: " + homeKey + " ------\\\\ ");
+    if (this.resetHelper(homeMap, id)) this.queryMap.delete(homeKey);
+    // console.info("\\\\-----------------------------------------------//// ");
   }
 
   resetHelper(map: Map<string, string[]>, postId: string) {
@@ -94,6 +111,11 @@ class Memo {
     }
     toDelete.forEach((key) => map.delete(key));
     return map.size === 0;
+  }
+
+  resetHomeQuery() {
+    const homeKey = this.getParentKey("", false);
+    this.queryMap.delete(homeKey);
   }
 
   getParentKey(username: string, isPrivate: boolean) {

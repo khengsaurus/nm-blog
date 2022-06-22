@@ -11,6 +11,7 @@ import { isEmpty } from "lodash";
 import { ClientSession } from "mongoose";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { IPostReq, IResponse } from "types";
+import { postDocToObj } from "utils";
 import Memo from "utils/Memo";
 
 /**
@@ -71,7 +72,7 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
         data: { posts: cached, updated: createdAt },
       });
     } else {
-      const query: any = { createdAt: { $lte: createdAt } };
+      const query: any = { createdAt: { $lt: createdAt } };
       if (username) query.username = username;
       if (!isPrivate || (isPrivate as unknown as string) === "false")
         query.isPrivate = false;
@@ -145,6 +146,7 @@ async function createDoc(req: NextApiRequest): Promise<IResponse> {
               .save()
               .then((res) => {
                 memo.updateCurrent();
+                memo.resetHomeQuery();
                 if (res.id) {
                   User.findByIdAndUpdate(
                     userId,
@@ -190,11 +192,13 @@ async function patchDoc(req: NextApiRequest): Promise<IResponse> {
       await post
         .save()
         .then((postData) => {
-          memo.resetCache(postData);
+          const post = postDocToObj(postData);
+          // isPrivate boolean here
+          memo.resetCache(post);
           resolve({
             status: 200,
             message: ServerInfo.POST_UPDATED,
-            data: postData,
+            data: { post },
           });
         })
         .catch((err) => reject(new ServerError(500, err?.message)));
@@ -213,7 +217,12 @@ async function deleteDoc(req: NextApiRequest): Promise<IResponse> {
       await session.withTransaction(async () => {
         const { Post, User } = await mongoConnection();
         const userId = req.headers["user-id"];
-        const { id, username, isPrivate } = req.query as Partial<IPostReq>;
+        const {
+          id,
+          username,
+          isPrivate: _isPrivate, // string
+        } = req.query as Partial<IPostReq>;
+        const isPrivate = !((_isPrivate as unknown) === "false" || !_isPrivate);
         await Post.findByIdAndDelete(id)
           .then(() => {
             memo.resetCache({ id, username, isPrivate });

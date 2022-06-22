@@ -10,8 +10,8 @@ export function isDev() {
 
 export function postDocToObj(data: any): IPost {
   if (!data) return null;
-  const { _id, user, createdAt, updatedAt, ...post } = data;
-  post.id = _id?.toString();
+  const { _id, user, createdAt, updatedAt, ...post } = data._doc || data;
+  post.id = _id?.toString() || post.id;
   post.createdAt = createdAt?.toString();
   post.updatedAt = updatedAt?.toString();
   if (user?._id) {

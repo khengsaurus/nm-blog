@@ -1,7 +1,7 @@
 import { PAGINATE_LIMIT } from "consts";
 import { DBService, ServerInfo } from "enums";
 import { HTTPService } from "lib/client";
-import { useCallback, useRef, useState } from "react";
+import { MutableRefObject, useCallback, useRef, useState } from "react";
 import { IObject, IPost } from "types";
 import useIsoEffect from "./useIsoEffect";
 
@@ -14,47 +14,48 @@ const usePaginatePosts = (
 ) => {
   const [posts, setPosts] = useState(initPosts || []);
   const [limitReached, setLimitReached] = useState(false);
-  const latestUpdated = useRef(false);
   const isLoading = useRef(false);
+  const oldest = useRef("");
 
-  const loadMore = useCallback(async () => {
-    if (!isLoading.current) {
-      isLoading.current = true;
-      const createdAt =
-        latestUpdated.current && posts.length > 0
-          ? posts[posts.length - 1].createdAt
-          : undefined; // let server handle this + cache query
+  const loadMoreFn = useCallback(
+    async (dateRef: MutableRefObject<string>, existingPosts: IPost[]) => {
+      if (!isLoading.current) {
+        isLoading.current = true;
 
-      const query: IObject<any> = { createdAt, limit, isPrivate: true };
-      if (username) query.username = username;
-      if (publicPosts) query.isPrivate = false;
+        const query: IObject<any> = {
+          limit,
+          isPrivate: true,
+        };
+        if (dateRef.current) query.createdAt = dateRef.current;
+        if (username) query.username = username;
+        if (publicPosts) query.isPrivate = false;
 
-      HTTPService.makeGetReq(DBService.POSTS, query).then((res) => {
-        if (res.status === 200) {
-          if (res.data?.posts?.length > 0) {
-            const _posts = latestUpdated.current
-              ? [...posts, ...res.data.posts]
-              : res.data.posts;
-            setPosts(_posts);
-            latestUpdated.current = true;
+        HTTPService.makeGetReq(DBService.POSTS, query).then((res) => {
+          const { posts: newPosts, message } = res?.data || {};
+          if (res.status === 200) {
+            if (newPosts?.length > 0) {
+              const _posts = dateRef.current
+                ? [...existingPosts, ...newPosts]
+                : newPosts;
+              dateRef.current = newPosts[newPosts.length - 1].createdAt;
+              setPosts(_posts);
+            }
+            if (newPosts?.length < limit || message === ServerInfo.POST_NA) {
+              setLimitReached(true);
+            }
           }
-          if (
-            res.data?.posts?.length < limit ||
-            res.data?.message === ServerInfo.POST_NA
-          ) {
-            setLimitReached(true);
-          }
-        }
-        isLoading.current = false;
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [posts?.length, limit, username, setPosts]);
+          isLoading.current = false;
+        });
+      }
+    },
+    [limit, username, publicPosts]
+  );
 
   useIsoEffect(() => {
-    if (ready) loadMore();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready]);
+    if (ready) loadMoreFn(oldest, posts);
+  }, [ready, loadMoreFn]);
+
+  const loadMore = () => loadMoreFn(oldest, posts);
 
   return { posts, limitReached, loadMore };
 };
