@@ -22,7 +22,7 @@ export enum PageRoute {
   EDIT_PROFILE = "/edit-profile",
 }
 
-export enum Duration {
+export enum DurationMS {
   MIN = 1000 * 60,
   HOUR = 1000 * 60 * 60,
   DAY = 1000 * 60 * 60 * 24,
@@ -40,10 +40,10 @@ export enum Dimension {
 export enum Flag {
   PREVIEW = "preview",
   PREVIEW_IMG = "preview-img",
-  USER_TAG = "&user=",
-  DATE_TAG = "&ts=",
-  LIMIT_TAG = "&limit=",
-  PRIVATE_TAG = "&isPrivate=",
+  USER_TAG = "u=",
+  DATE_TAG = "d=",
+  LIMIT_TAG = "l=",
+  PRIVATE_TAG = "p=",
 }
 
 export enum TransitionSpeed {
@@ -107,6 +107,14 @@ export enum ServerInfo {
 
   FILE_DELETED = "File deleted",
   REQUEST_FAILED = "Server request failed",
+
+  REDIS_SET_SUCCESS = "Successfully saved to redis",
+  REDIS_GET_SUCCESS = "Successfully retrieved from redis",
+  REDIS_DEL_SUCCESS = "Successfully deleted key from redis",
+
+  REDIS_SET_FAIL = "Failed to save to redis",
+  REDIS_GET_FAIL = "Failed to retrieve from redis",
+  REDIS_DEL_FAIL = "Failed to delete key from redis",
 }
 
 export enum ErrorMessage {
@@ -114,10 +122,12 @@ export enum ErrorMessage {
   TRY_AGAIN = "Please try again",
   PW_NOT_MATCHING = "Passwords do not match",
   ONE_IMAGE_ONLY = "Only 1 image can be uploaded",
+
   POST_CREATE_FAIL = "Failed to create post",
   POST_DELETE_FAIL = "Failed to delete post",
   POST_RETRIEVE_FAIL = "Failed to retrieve post",
   POST_UPDATE_FAIL = "Failed to update post",
+
   IMAGE_DELETE_FAIL = "Failed to delete image",
   IMAGE_UPLOAD_FAIL = "Failed to upload image",
   IMAGE_DOWNLOAD_FAIL = "Failed to download image",

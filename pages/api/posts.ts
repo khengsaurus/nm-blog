@@ -1,18 +1,22 @@
 import { PAGINATE_LIMIT } from "consts";
-import { Duration, ErrorMessage, HttpRequest, ServerInfo } from "enums";
+import { DurationMS, ErrorMessage, HttpRequest, ServerInfo } from "enums";
 import {
   forwardResponse,
   handleAPIError,
   handleBadRequest,
   handleRequest,
 } from "lib/middlewares";
-import { mongoConnection, ServerError } from "lib/server";
+import { MemoRedis, mongoConnection, ServerError } from "lib/server";
 import { isEmpty } from "lodash";
 import { ClientSession } from "mongoose";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { IPostReq, IResponse } from "types";
-import { castAsBoolean, postDocToObj } from "utils";
-import Memo from "utils/Memo";
+import {
+  castAsBoolean,
+  processPostsWithoutUser,
+  processPostWithoutUser,
+  processPostWithUser,
+} from "utils";
 
 /**
  * Caching system:
@@ -27,7 +31,8 @@ import Memo from "utils/Memo";
  *
  */
 
-const memo = new Memo();
+// const memo = new Memo();
+const memoRedis = MemoRedis.getInstance();
 
 export default async function handler(
   req: NextApiRequest,
@@ -37,7 +42,7 @@ export default async function handler(
     case HttpRequest.GET:
       res.setHeader(
         "Cache-Control",
-        `maxage=${5 * Duration.MIN}, must-revalidate`
+        `maxage=${5 * DurationMS.MIN}, must-revalidate`
       );
       return handleGet(req, res);
     case HttpRequest.POST:
@@ -62,13 +67,16 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
   const {
     username,
     isPrivate: _isPrivate,
-    createdAt = memo.getCurrent(),
+    // createdAt = memo.getCurrent(),
     limit = PAGINATE_LIMIT,
+    createdAt = "",
   } = params;
   const isPrivate = castAsBoolean(_isPrivate);
+
   return new Promise(async (resolve, reject) => {
     const { Post } = await mongoConnection();
-    const cached = memo.read(username, isPrivate, createdAt, limit);
+    // const cached = memo.read(username, isPrivate, createdAt, limit);
+    const cached = await memoRedis.read(username, isPrivate, limit, createdAt);
     if (cached) {
       resolve({
         status: 200,
@@ -76,22 +84,27 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
         data: { posts: cached, updated: createdAt },
       });
     } else {
-      const query: any = { createdAt: { $lt: createdAt } };
+      const query: any = createdAt ? { createdAt: { $lt: createdAt } } : {};
       if (username) query.username = username;
-      // filter if user queries public posts
       if (!isPrivate) query.isPrivate = false;
       await Post.find(query)
-        .populate("user", "-createdAt -updatedAt -email -password -posts")
+        .select(["-user"])
         .sort({ createdAt: -1 })
         .limit(limit)
         .lean()
-        .then((posts) => {
-          const noPosts = isEmpty(posts);
-          if (!noPosts)
-            memo.write(posts, username, isPrivate, limit, createdAt);
+        .then((_posts) => {
+          let posts = [];
+          if (_posts?.length) {
+            posts = processPostsWithoutUser(_posts);
+            // memo.write(posts, username, isPrivate, limit, createdAt);
+            memoRedis.write(posts, username, isPrivate, limit, createdAt);
+          }
           resolve({
             status: 200,
-            message: noPosts ? ServerInfo.POST_NA : ServerInfo.POST_RETRIEVED,
+            message:
+              posts.length === 0
+                ? ServerInfo.POST_NA
+                : ServerInfo.POST_RETRIEVED,
             data: { posts, updated: createdAt },
           });
         })
@@ -110,10 +123,11 @@ async function getPost(params: Partial<IPostReq>): Promise<IResponse> {
         await (id ? Post.findById(id) : Post.findOne({ username, slug }))
           .select(["-user"])
           .lean()
-          .then((post) => {
-            if (isEmpty(post)) {
+          .then((_post) => {
+            if (isEmpty(_post)) {
               reject(new ServerError(400, ServerInfo.POST_NA));
             } else {
+              const post = processPostWithoutUser(_post);
               resolve({
                 status: 200,
                 message: ServerInfo.POST_RETRIEVED,
@@ -153,7 +167,8 @@ async function createDoc(req: NextApiRequest): Promise<IResponse> {
               .save()
               .then((res) => {
                 if (res.id) {
-                  memo.newPostCreated(newPost);
+                  // memo.newPostCreated(newPost);
+                  memoRedis.resetCache(newPost);
                   User.findByIdAndUpdate(
                     userId,
                     { $push: { posts: { $each: [res.id], $position: 0 } } },
@@ -198,9 +213,9 @@ async function patchDoc(req: NextApiRequest): Promise<IResponse> {
       }
       await post
         .save()
-        .then((postData) => {
-          const post = postDocToObj(postData);
-          memo.resetCache(post);
+        .then((_post) => {
+          const post = processPostWithUser(_post);
+          // memo.resetCache(post);
           resolve({
             status: 200,
             message: ServerInfo.POST_UPDATED,
@@ -231,7 +246,8 @@ async function deleteDoc(req: NextApiRequest): Promise<IResponse> {
         const isPrivate = castAsBoolean(_isPrivate);
         await Post.findByIdAndDelete(id)
           .then(() => {
-            memo.resetCache({ id, username, isPrivate });
+            // memo.resetCache({ id, username, isPrivate });
+            memoRedis.resetCache({ id, username, isPrivate });
             User.findByIdAndUpdate(
               userId,
               { $pullAll: { posts: [id] } },

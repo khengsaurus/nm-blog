@@ -1,6 +1,8 @@
+import Memo from "./Memo";
+import MemoRedis from "./MemoRedis";
 import mongoConnection from "./mongoConnection";
-import { deleteFile, generateUploadURL, getFileStream } from "./s3";
-import { PostSchema, UserSchema } from "./schemas";
+import { redisGet, redisSet } from "./redisConenction";
+import { deleteFile, generateUploadURL, getFileStream } from "./s3Connection";
 import ServerError from "./ServerError";
 import { hashPassword, verifyPassword } from "./validation";
 
@@ -9,9 +11,11 @@ export {
   generateUploadURL,
   getFileStream,
   hashPassword,
+  Memo,
+  MemoRedis,
   mongoConnection,
-  PostSchema,
+  redisGet,
+  redisSet,
   ServerError,
-  UserSchema,
   verifyPassword,
 };

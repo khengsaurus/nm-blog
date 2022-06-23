@@ -3,7 +3,7 @@ import { PAGINATE_LIMIT } from "consts";
 import { usePaginatePosts } from "hooks";
 import { mongoConnection } from "lib/server";
 import { IPost } from "types";
-import { postDocToObj } from "utils";
+import { processPostWithUser } from "utils";
 
 interface IHomeProps {
   initPosts: IPost[];
@@ -22,7 +22,7 @@ export async function getServerSideProps({ res }) {
     .limit(PAGINATE_LIMIT)
     .populate("user", "-createdAt -updatedAt -email -password -posts")
     .lean();
-  const initPosts = postQuery.map((post) => postDocToObj(post));
+  const initPosts = postQuery.map((post) => processPostWithUser(post));
 
   return {
     props: { initPosts },

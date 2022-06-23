@@ -3,11 +3,9 @@ import { Row } from "components";
 import { PageRoute } from "enums";
 import { AppContext } from "hooks";
 import { useContext, useMemo } from "react";
-import { IUser } from "types";
 import { StyledText } from "./StyledMui";
 
 interface IAuthorLinkProps {
-  author?: IUser;
   username?: string;
   title?: boolean;
   disable?: boolean;
@@ -15,30 +13,26 @@ interface IAuthorLinkProps {
 
 const AuthorLink = ({
   username,
-  author,
   title = false,
   disable = false,
 }: IAuthorLinkProps) => {
   const { history, user, routerPush } = useContext(AppContext);
-  const _username = username || author?.username;
-  const label = `By ${_username}`;
+  const label = `By ${username}`;
 
   function handleClick(e: any) {
     e.preventDefault();
     e.stopPropagation();
     if (!disable) {
       routerPush(
-        _username === user?.username ? PageRoute.MY_POSTS : `/${_username}`
+        username === user?.username ? PageRoute.MY_POSTS : `/${username}`
       );
     }
   }
 
   const renderText = useMemo(() => {
-    return (
-      history.length > 0 && history[history.length - 1] === `/${_username}`
-    );
+    return history.length > 0 && history[history.length - 1] === `/${username}`;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [_username, JSON.stringify(history)]);
+  }, [username, JSON.stringify(history)]);
 
   return renderText ? (
     title ? (

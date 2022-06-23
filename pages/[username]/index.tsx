@@ -5,7 +5,7 @@ import { usePaginatePosts } from "hooks";
 import { avatarStyles } from "lib/client";
 import { mongoConnection } from "lib/server";
 import { IUser } from "types";
-import { getAvatarLarge, postDocToObj, userDocToObj } from "utils";
+import { getAvatarLarge, processPostWithUser, userDocToObj } from "utils";
 import FourOFour from "../404";
 
 interface IUserPageProps {
@@ -31,7 +31,7 @@ export async function getServerSideProps({ params, res }) {
     .populate("user", "-createdAt -updatedAt -email -password -posts")
     .lean()
     .then((posts) => {
-      const _posts = posts.map((post) => postDocToObj(post));
+      const _posts = posts.map((post) => processPostWithUser(post));
       if (user) user.posts = _posts;
     });
 

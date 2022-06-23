@@ -37,7 +37,9 @@ const usePaginatePosts = (
               const _posts = dateRef.current
                 ? [...existingPosts, ...newPosts]
                 : newPosts;
-              dateRef.current = newPosts[newPosts.length - 1].createdAt;
+              let dateVal = newPosts[newPosts.length - 1].createdAt;
+              dateVal = new Date(dateVal).valueOf();
+              dateRef.current = dateVal;
               setPosts(_posts);
             }
             if (newPosts?.length < limit || message === ServerInfo.POST_NA) {

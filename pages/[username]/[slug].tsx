@@ -19,7 +19,7 @@ import { GetStaticPropsResult } from "next";
 import FourOFour from "pages/404";
 import { useContext, useMemo, useState } from "react";
 import { IPost } from "types";
-import { getAvatarMedium, postDocToObj } from "utils";
+import { getAvatarMedium, processPostWithUser } from "utils";
 
 interface IPostPage {
   post: IPost;
@@ -45,7 +45,7 @@ export async function getStaticProps({
     props: {
       username,
       slug,
-      post: postDocToObj(_post),
+      post: processPostWithUser(_post),
     },
     revalidate: 30,
   };

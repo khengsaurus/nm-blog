@@ -8,7 +8,7 @@ export function isDev() {
   return process.env.REACT_APP_FLAG?.startsWith("dev");
 }
 
-export function postDocToObj(data: any): IPost {
+export function processPostWithUser(data: any): IPost {
   if (!data) return null;
   const { _id, user, createdAt, updatedAt, isPrivate, ...post } =
     data._doc || data;
@@ -24,6 +24,20 @@ export function postDocToObj(data: any): IPost {
   return post;
 }
 
+export function processPostWithoutUser(_post: any): IPost {
+  const { _id, __v, createdAt, updatedAt, isPrivate, ...post } = _post;
+  post.id = _id?.toString() || post.id;
+  post.createdAt = createdAt?.toString();
+  post.updatedAt = updatedAt?.toString();
+  post.isPrivate = castAsBoolean(isPrivate);
+  return post;
+}
+
+// each post coming in as { ...IPost, _id, __v } -> this will give a POJO IPost without user
+export function processPostsWithoutUser(_posts: any[]): IPost[] {
+  return _posts.map((_post) => processPostWithoutUser(_post));
+}
+
 export function userDocToObj(data: any) {
   if (data === null) return data;
   const { _id, posts, createdAt, updatedAt, ...user } = data;
@@ -32,7 +46,7 @@ export function userDocToObj(data: any) {
   }
   const processedPosts: IPost[] = [];
   for (let i = 0; i < posts.length; i++) {
-    processedPosts.push(postDocToObj(posts[i]));
+    processedPosts.push(processPostWithUser(posts[i]));
   }
   user.posts = processedPosts;
   return user;

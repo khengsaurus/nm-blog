@@ -30,15 +30,16 @@ const PostCard = ({
   showingPreview = false,
 }: IPostCard) => {
   const { theme, routerPush } = useContext(AppContext);
-  const { title, slug, body, user, imageKey, updatedAt, hasMarkdown } = post;
+  const { title, slug, body, username, imageKey, updatedAt, hasMarkdown } =
+    post;
   const markdown = useMarkdown(hasMarkdown, theme?.name, body);
   const date = moment(new Date(updatedAt)).format("DD/MM/YY");
   const hasRealImage = !!imageKey && imageKey !== Flag.PREVIEW_IMG;
   const hasImage = showingPreview || hasRealImage;
 
   const handleClick = useCallback(() => {
-    disable ? null : routerPush(`/${user?.username}/${slug}`);
-  }, [disable, user?.username, slug, routerPush]);
+    disable ? null : routerPush(`/${username}/${slug}`);
+  }, [disable, username, slug, routerPush]);
 
   return (
     <Card
@@ -73,7 +74,9 @@ const PostCard = ({
         <div className={`card-content ${hasImage ? "has-image" : ""}`}>
           <h6>{title}</h6>
           <Row style={{ justifyContent: "flex-start" }}>
-            {hasAuthorLink && <AuthorLink author={user} disable={disable} />}
+            {hasAuthorLink && (
+              <AuthorLink username={username} disable={disable} />
+            )}
             {hasDate && <p className="date">{date}</p>}
           </Row>
           {hasMarkdown ? (

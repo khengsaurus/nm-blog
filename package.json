@@ -35,6 +35,7 @@
     "react-scripts": "^5.0.0",
     "react-singleton-hook": "^3.4.0",
     "react-transition-group": "^4.4.2",
+    "redis": "^4.1.0",
     "sass": "^1.49.7",
     "sass-loader": "^12.4.0",
     "sharp": "^0.30.6",

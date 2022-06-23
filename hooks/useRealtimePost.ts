@@ -2,7 +2,7 @@ import { DBService, ErrorMessage } from "enums";
 import { HTTPService } from "lib/client";
 import { useCallback, useRef, useState } from "react";
 import { IPost, IUser } from "types";
-import { postDocToObj } from "utils";
+import { processPostWithUser } from "utils";
 import useIsoEffect from "./useIsoEffect";
 
 const useRealtimePost = (post: IPost) => {
@@ -28,7 +28,7 @@ const useRealtimePost = (post: IPost) => {
       HTTPService.makeGetReq(DBService.POSTS, { id, slug, username })
         .then((res) => {
           if (res.status === 200 && res.data?.post) {
-            const updatedPost = postDocToObj(res.data?.post) as IPost;
+            const updatedPost = processPostWithUser(res.data?.post) as IPost;
             resolve(updatedPost);
           } else throw new Error(ErrorMessage.POST_RETRIEVE_FAIL);
         })

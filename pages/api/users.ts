@@ -1,4 +1,4 @@
-import { APIAction, Duration, HttpRequest, ServerInfo } from "enums";
+import { APIAction, DurationMS, HttpRequest, ServerInfo } from "enums";
 import {
   createUserObject,
   decodeToken,
@@ -23,7 +23,7 @@ export default async function handler(
     case HttpRequest.GET:
       res.setHeader(
         "Cache-Control",
-        `maxage=${5 * Duration.MIN}, must-revalidate`
+        `maxage=${5 * DurationMS.MIN}, must-revalidate`
       );
       return handleGet(req, res);
     case HttpRequest.POST:

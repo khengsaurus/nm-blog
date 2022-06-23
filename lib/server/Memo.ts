@@ -1,4 +1,4 @@
-import { Duration, Flag } from "enums";
+import { DurationMS, Flag } from "enums";
 import { IPost } from "types";
 import LRUCache from "./LRUCache";
 
@@ -47,7 +47,7 @@ class Memo {
 
   updateCurrent() {
     const d1 = new Date();
-    const d2 = new Date(d1.getTime() + 2 * Duration.MIN).toString(); // 2 mins delay
+    const d2 = new Date(d1.getTime() + 2 * DurationMS.MIN).toString(); // 2 mins delay
     this.current = d2;
     console.info("-> Memo.updatedCurrent()");
   }
