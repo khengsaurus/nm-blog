@@ -108,13 +108,21 @@ export enum ServerInfo {
   FILE_DELETED = "File deleted",
   REQUEST_FAILED = "Server request failed",
 
-  REDIS_SET_SUCCESS = "Successfully saved to redis",
-  REDIS_GET_SUCCESS = "Successfully retrieved from redis",
-  REDIS_DEL_SUCCESS = "Successfully deleted key from redis",
+  REDIS_SET_SUCCESS = "Redis - successful set",
+  REDIS_GET_SUCCESS = "Redis - successful get",
+  REDIS_DEL_SUCCESS = "Redis - successful del",
 
-  REDIS_SET_FAIL = "Failed to save to redis",
-  REDIS_GET_FAIL = "Failed to retrieve from redis",
-  REDIS_DEL_FAIL = "Failed to delete key from redis",
+  REDIS_SET_FAIL = "Redis - failed set",
+  REDIS_GET_FAIL = "Redis - failed get",
+  REDIS_DEL_FAIL = "Redis - failed del",
+
+  REDIS_HSET_SUCCESS = "Redis - successful hset",
+  REDIS_HGET_SUCCESS = "Redis - successful hget",
+  REDIS_HDEL_SUCCESS = "Redis - successful hdel",
+
+  REDIS_HSET_FAIL = "Redis - failed hset",
+  REDIS_HGET_FAIL = "Redis - failed hget",
+  REDIS_HDEL_FAIL = "Redis - failed hdel",
 }
 
 export enum ErrorMessage {

@@ -44,7 +44,7 @@ main {
   @include flex-(column);
   @include orientate-contents-(center);
   font-family: "Roboto", sans-serif;
-  margin: 50px $main-side-margin;
+  margin: 50px $main-side-margin 120px;
   &.left {
     @include orientate-contents-(flex-start);
   }

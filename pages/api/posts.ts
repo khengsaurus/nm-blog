@@ -31,8 +31,7 @@ import {
  *
  */
 
-// const memo = new Memo();
-const memoRedis = MemoRedis.getInstance();
+const memoRedis = new MemoRedis();
 
 export default async function handler(
   req: NextApiRequest,
@@ -67,16 +66,14 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
   const {
     username,
     isPrivate: _isPrivate,
-    // createdAt = memo.getCurrent(),
-    limit = PAGINATE_LIMIT,
     createdAt = "",
+    limit = PAGINATE_LIMIT,
   } = params;
   const isPrivate = castAsBoolean(_isPrivate);
 
   return new Promise(async (resolve, reject) => {
     const { Post } = await mongoConnection();
-    // const cached = memo.read(username, isPrivate, createdAt, limit);
-    const cached = await memoRedis.read(username, isPrivate, limit, createdAt);
+    const cached = await memoRedis.read(username, isPrivate, createdAt, limit);
     if (cached) {
       resolve({
         status: 200,
@@ -96,8 +93,7 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
           let posts = [];
           if (_posts?.length) {
             posts = processPostsWithoutUser(_posts);
-            // memo.write(posts, username, isPrivate, limit, createdAt);
-            memoRedis.write(posts, username, isPrivate, limit, createdAt);
+            memoRedis.write(posts, username, isPrivate, createdAt, limit);
           }
           resolve({
             status: 200,
@@ -167,8 +163,7 @@ async function createDoc(req: NextApiRequest): Promise<IResponse> {
               .save()
               .then((res) => {
                 if (res.id) {
-                  // memo.newPostCreated(newPost);
-                  memoRedis.resetCache(newPost);
+                  memoRedis.newPostCreated(newPost);
                   User.findByIdAndUpdate(
                     userId,
                     { $push: { posts: { $each: [res.id], $position: 0 } } },
@@ -215,7 +210,7 @@ async function patchDoc(req: NextApiRequest): Promise<IResponse> {
         .save()
         .then((_post) => {
           const post = processPostWithUser(_post);
-          // memo.resetCache(post);
+          memoRedis.resetCache(post);
           resolve({
             status: 200,
             message: ServerInfo.POST_UPDATED,
@@ -246,7 +241,6 @@ async function deleteDoc(req: NextApiRequest): Promise<IResponse> {
         const isPrivate = castAsBoolean(_isPrivate);
         await Post.findByIdAndDelete(id)
           .then(() => {
-            // memo.resetCache({ id, username, isPrivate });
             memoRedis.resetCache({ id, username, isPrivate });
             User.findByIdAndUpdate(
               userId,

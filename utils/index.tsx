@@ -1,6 +1,6 @@
-import { IPost } from "types";
-import { Dimension, ErrorMessage, Status } from "enums";
 import { CircleLoader } from "components";
+import { Dimension, ErrorMessage, Status } from "enums";
+import { IPost } from "types";
 
 const maxFileSizeMB = 4;
 

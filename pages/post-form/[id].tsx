@@ -106,9 +106,6 @@ const EditPost = ({ id }: IPostPage) => {
           slug,
           body,
           imageKey: _imageKey,
-          // imageName: imageUpdated
-          //   ? newImage?.name || ""
-          //   : realtimePost?.imageName,
           isPrivate,
           hasMarkdown,
         };

@@ -1,6 +1,7 @@
 import { Button } from "@mui/material";
 import { Row } from "components";
-import { toast } from "react-hot-toast";
+import { useCallback } from "react";
+import toast from "react-hot-toast";
 import { checkFileSize, checkFileType, checkOneFileSelected } from "utils";
 
 interface IImageForm {
@@ -11,9 +12,8 @@ interface IImageForm {
   newImage?: File;
 }
 
-const errorHandler = (msg: string) => toast.error(msg);
-
 const ImageForm = ({ label, hasImage, setImage, setImageKey }: IImageForm) => {
+  const toastError = useCallback((msg: string) => toast.error(msg), []);
   function removeImage(e: React.MouseEvent) {
     e?.stopPropagation();
     e?.preventDefault();
@@ -23,9 +23,9 @@ const ImageForm = ({ label, hasImage, setImage, setImageKey }: IImageForm) => {
 
   async function handleAttachment(event: React.ChangeEvent<HTMLInputElement>) {
     if (
-      checkOneFileSelected(event, errorHandler) &&
-      checkFileSize(event, errorHandler) &&
-      checkFileType(event, errorHandler)
+      checkOneFileSelected(event, toastError) &&
+      checkFileSize(event, toastError) &&
+      checkFileType(event, toastError)
     ) {
       const file = event.target.files[0];
       setImage(file);
