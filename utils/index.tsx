@@ -4,10 +4,6 @@ import { IPost } from "types";
 
 const maxFileSizeMB = 4;
 
-export function isDev() {
-  return process.env.REACT_APP_FLAG?.startsWith("dev");
-}
-
 export function processPostWithUser(data: any): IPost {
   if (!data) return null;
   const { _id, user, createdAt, updatedAt, isPrivate, ...post } =

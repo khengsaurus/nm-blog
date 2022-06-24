@@ -4,10 +4,10 @@ import { createClient } from "redis";
 const client = createClient({ url: process.env.ENV_REDIS_URL });
 
 function openClient(): Promise<void> {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     if (client.isOpen) resolve();
     else {
-      client
+      await client
         .connect()
         .then(() => resolve())
         .catch((err) => reject(err));
@@ -27,11 +27,11 @@ export function redisSet(key: string, user: boolean, value: any) {
       client.expire(key, user ? 240 : 480);
     })
     .then(() => console.info(`${ServerInfo.REDIS_SET_SUCCESS}: ${key}`))
-    .finally(closeClient)
     .catch((err) => {
       console.info(`${ServerInfo.REDIS_SET_FAIL}: ${key}`);
       console.info(`Error message: ${err?.message}`);
-    });
+    })
+    .finally(closeClient);
 }
 
 export async function redisGet(key: string) {
@@ -40,12 +40,12 @@ export async function redisGet(key: string) {
       .then(() => client.get(key))
       .then((val) => resolve(JSON.parse(val)))
       .then(() => console.info(`${ServerInfo.REDIS_GET_SUCCESS}: ${key}`))
-      .finally(closeClient)
       .catch((err) => {
         console.info(`${ServerInfo.REDIS_GET_FAIL}: ${key}`);
         console.info(`Error message: ${err?.message}`);
         resolve([]);
-      });
+      })
+      .finally(closeClient);
   });
 }
 

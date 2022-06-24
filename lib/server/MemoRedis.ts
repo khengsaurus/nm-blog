@@ -8,6 +8,7 @@ class MemoRedis {
   private queryMap: Map<string, Map<string, string[]>>;
 
   constructor(queryMap = new Map()) {
+    console.info("MemoRedis - init instance");
     this.queryMap = queryMap;
   }
 
@@ -52,9 +53,9 @@ class MemoRedis {
         this.queryMap.set(parentKey, new Map());
       const postIds = posts.map((post) => post.id || post._id?.toString());
       this.queryMap.get(parentKey).set(childKey, postIds);
-      console.log("---------------- UPDATED QUERY MAP ----------------");
-      console.log(this.queryMap);
-      console.log("---------------------------------------------------");
+      // console.log("---------------- UPDATED QUERY MAP ----------------");
+      // console.log(this.queryMap);
+      // console.log("---------------------------------------------------");
     } catch (err) {
       console.info(err);
     }
@@ -79,9 +80,9 @@ class MemoRedis {
       ...this.resetHelper(puMap, puKey, id),
       ...this.resetHelper(hMap, hKey, id),
     ];
-    console.log("---------------- UPDATED QUERY MAP ----------------");
-    console.log(this.queryMap);
-    console.log("---------------------------------------------------");
+    // console.log("---------------- UPDATED QUERY MAP ----------------");
+    // console.log(this.queryMap);
+    // console.log("---------------------------------------------------");
     redisDel(toDelete);
   }
 

@@ -30,10 +30,10 @@ const PostCard = ({
   showingPreview = false,
 }: IPostCard) => {
   const { theme, routerPush } = useContext(AppContext);
-  const { title, slug, body, username, imageKey, updatedAt, hasMarkdown } =
+  const { title, slug, body, username, imageKey, createdAt, hasMarkdown } =
     post;
   const markdown = useMarkdown(hasMarkdown, theme?.name, body);
-  const date = moment(new Date(updatedAt)).format("DD/MM/YY");
+  const date = moment(new Date(createdAt)).format("DD/MM/YY");
   const hasRealImage = !!imageKey && imageKey !== Flag.PREVIEW_IMG;
   const hasImage = showingPreview || hasRealImage;
 
