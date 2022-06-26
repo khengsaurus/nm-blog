@@ -6,7 +6,7 @@ import {
   handleBadRequest,
   handleRequest,
 } from "lib/middlewares";
-import { MemoRedis, mongoConnection, ServerError } from "lib/server";
+import { mongoConnection, RedisConnection, ServerError } from "lib/server";
 import { isEmpty } from "lodash";
 import { ClientSession } from "mongoose";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -17,21 +17,6 @@ import {
   processPostWithoutUser,
   processPostWithUser,
 } from "utils";
-
-/**
- * Caching system:
- * *1: `get most recent N`
- * *2: `get next most recent N`
- *
- * After post A is created:
- *   *1 -> include A in the response & cache res *1
- * After post B is edited/deleted, with B being the (N+1)th most recent,
- *   *1 -> send cached res *1
- *   *2 -> include updated B in the response & cache res *2
- *
- */
-
-const memoRedis = new MemoRedis();
 
 export default async function handler(
   req: NextApiRequest,
@@ -73,12 +58,14 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
 
   return new Promise(async (resolve, reject) => {
     const { Post } = await mongoConnection();
-    const cached = await memoRedis.read(username, isPrivate, createdAt, limit);
-    if (cached) {
+    const client = new RedisConnection();
+    let posts = await client.read(username, isPrivate, createdAt, limit);
+    if (posts?.length) {
+      client.close();
       resolve({
         status: 200,
         message: ServerInfo.POST_RETRIEVED_CACHED,
-        data: { posts: cached, updated: createdAt },
+        data: { posts },
       });
     } else {
       const query: any = createdAt ? { createdAt: { $lt: createdAt } } : {};
@@ -90,21 +77,20 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
         .limit(limit)
         .lean()
         .then((_posts) => {
-          let posts = [];
           if (_posts?.length) {
             posts = processPostsWithoutUser(_posts);
-            memoRedis.write(posts, username, isPrivate, createdAt, limit);
+            client.write(posts, username, isPrivate, createdAt, limit);
           }
           resolve({
             status: 200,
-            message:
-              posts.length === 0
-                ? ServerInfo.POST_NA
-                : ServerInfo.POST_RETRIEVED,
-            data: { posts, updated: createdAt },
+            message: posts?.length
+              ? ServerInfo.POST_RETRIEVED
+              : ServerInfo.POST_NA,
+            data: { posts },
           });
         })
-        .catch((err) => reject(new ServerError(500, err?.message)));
+        .catch((err) => reject(new ServerError(500, err?.message)))
+        .finally(client.close);
     }
   });
 }
@@ -163,7 +149,8 @@ async function createDoc(req: NextApiRequest): Promise<IResponse> {
               .save()
               .then((res) => {
                 if (res.id) {
-                  memoRedis.newPostCreated(newPost);
+                  const client = new RedisConnection();
+                  client.newPostCreated(newPost, true);
                   User.findByIdAndUpdate(
                     userId,
                     { $push: { posts: { $each: [res.id], $position: 0 } } },
@@ -210,7 +197,8 @@ async function patchDoc(req: NextApiRequest): Promise<IResponse> {
         .save()
         .then((_post) => {
           const post = processPostWithUser(_post);
-          memoRedis.resetCache(post);
+          const client = new RedisConnection();
+          client.resetCache(post, true);
           resolve({
             status: 200,
             message: ServerInfo.POST_UPDATED,
@@ -241,7 +229,8 @@ async function deleteDoc(req: NextApiRequest): Promise<IResponse> {
         const isPrivate = castAsBoolean(_isPrivate);
         await Post.findByIdAndDelete(id)
           .then(() => {
-            memoRedis.resetCache({ id, username, isPrivate });
+            const client = new RedisConnection();
+            client.resetCache({ id, username, isPrivate }, true);
             User.findByIdAndUpdate(
               userId,
               { $pullAll: { posts: [id] } },

@@ -1,14 +1,15 @@
 import { NextRouter } from "next/router";
+import { RedisClientType } from "redis";
 import { APIAction, Status } from "./enums";
 
 export type AlertStatus = "success" | "info" | "warning" | "error";
 
 /*------------------------------ API ------------------------------*/
 
-export interface IResponse {
+export interface IResponse<T = any> {
   status?: number;
   message?: string;
-  data?: any;
+  data?: T;
 }
 
 /*------------------------------ . ------------------------------*/

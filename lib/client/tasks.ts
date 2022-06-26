@@ -10,7 +10,7 @@ export async function getPostSlugs(username: string): Promise<IResponse> {
       HTTPService.makeGetReq(DBService.USERS, {
         username,
         action: APIAction.GET_POST_SLUGS,
-      }).then((res) => resolve(res));
+      }).then(resolve);
     } catch (err) {
       console.info(err);
       reject(new Error(err.message));
@@ -41,7 +41,7 @@ export async function getUploadedImageKey(image: any): Promise<string> {
     if (uploadURL && imageKey) {
       await HTTPService.uploadFile(uploadURL, image)
         .then(() => resolve(imageKey))
-        .catch((err) => reject(err));
+        .catch(reject);
     } else {
       reject(new Error(ErrorMessage.IMAGE_UPLOAD_500));
     }
@@ -54,8 +54,8 @@ export async function deleteImage(imageKey: string): Promise<IResponse> {
     HTTPService.makeAuthHttpReq(DBService.IMAGES, HttpRequest.DELETE, {
       imageKey,
     })
-      .then((res) => resolve(res))
-      .catch((err) => reject(err));
+      .then(resolve)
+      .catch(reject);
   });
 }
 
@@ -68,7 +68,7 @@ export function deletePost(post: IPost): Promise<IResponse> {
       username,
       isPrivate,
     })
-      .then((res) => resolve(res))
-      .catch((err) => reject(err));
+      .then(resolve)
+      .catch(reject);
   });
 }

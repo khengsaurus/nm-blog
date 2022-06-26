@@ -1,8 +1,43 @@
 import { CircleLoader } from "components";
 import { Dimension, ErrorMessage, Status } from "enums";
-import { IPost } from "types";
+import { IPost, IResponse } from "types";
 
 const maxFileSizeMB = 4;
+
+export function parse(val: any) {
+  return typeof val === "string" ? JSON.stringify(val) : val;
+}
+
+export function promiseTimeout(
+  msg: string,
+  ms = 1000,
+  callback?: any
+): Promise<IResponse> {
+  return new Promise((_, reject) =>
+    setTimeout(() => {
+      if (callback) callback();
+      reject(new Error(msg));
+    }, ms)
+  );
+}
+
+export async function setPromiseTimeout<T>(
+  promiseCallback: () => Promise<IResponse>,
+  val: T,
+  ms = 2000
+): Promise<T> {
+  return new Promise((resolve) => {
+    Promise.race([
+      promiseTimeout(`Timeout of ${ms}ms reached`, ms),
+      promiseCallback(),
+    ])
+      .then((res) => resolve(res.data || val))
+      .catch((err) => {
+        console.info(err.message);
+        resolve(val);
+      });
+  });
+}
 
 export function processPostWithUser(data: any): IPost {
   if (!data) return null;
@@ -31,6 +66,7 @@ export function processPostWithoutUser(_post: any): IPost {
 
 // each post coming in as { ...IPost, _id, __v } -> this will give a POJO IPost without user
 export function processPostsWithoutUser(_posts: any[]): IPost[] {
+  if (!_posts) return [];
   return _posts.map((_post) => processPostWithoutUser(_post));
 }
 
@@ -41,7 +77,7 @@ export function userDocToObj(data: any) {
     user.id = _id.toString();
   }
   const processedPosts: IPost[] = [];
-  for (let i = 0; i < posts.length; i++) {
+  for (let i = 0; i < posts?.length; i++) {
     processedPosts.push(processPostWithUser(posts[i]));
   }
   user.posts = processedPosts;

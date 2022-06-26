@@ -34,8 +34,8 @@ async function deleteImage(req) {
     const { imageKey } = req.query;
     if (!imageKey) reject(new ServerError(400));
     await deleteFile(imageKey)
-      .then((res) => resolve(res))
-      .catch((err) => reject(err));
+      .then(resolve)
+      .catch(reject);
   });
 }
 

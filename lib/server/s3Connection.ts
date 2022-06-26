@@ -24,7 +24,7 @@ export const generateUploadURL = async (): Promise<IObject<String>> => {
     await s3
       .getSignedUrlPromise("putObject", params)
       .then((uploadURL) => resolve({ uploadURL, imageKey }))
-      .catch((err) => reject(err));
+      .catch(reject);
   });
 };
 
