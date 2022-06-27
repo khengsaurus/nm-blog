@@ -1,7 +1,6 @@
-import { DarkText, PostFeed, StyledButton, WindowLoaded } from "components";
+import { DarkText, PostFeed, WindowLoaded } from "components";
 import { PAGINATE_LIMIT } from "consts";
-import { usePaginatePosts } from "hooks";
-import { mongoConnection } from "lib/server";
+import { MongoConnection } from "lib/server";
 import { IPost } from "types";
 import { processPostWithUser } from "utils";
 
@@ -16,7 +15,7 @@ export async function getServerSideProps({ res }) {
     "public, s-maxage=30, stale-while-revalidate=300" // s-maxage & swr in seconds
   );
 
-  const { Post } = await mongoConnection();
+  const { Post } = await MongoConnection();
   const postQuery = await Post.find({ isPrivate: false })
     .sort({ createdAt: -1 })
     .limit(PAGINATE_LIMIT)
@@ -30,21 +29,13 @@ export async function getServerSideProps({ res }) {
 }
 
 const Home = ({ initPosts }: IHomeProps) => {
-  const { posts, limitReached, loadMore } = usePaginatePosts(
-    typeof window !== undefined,
-    true,
-    initPosts
-  );
-
   return (
     <main>
       <section className="header">
         <DarkText text="Public Posts" variant="h3" />
       </section>
       <WindowLoaded>
-        <PostFeed posts={posts} />
-        <br />
-        {!limitReached && <StyledButton label="Load more" onClick={loadMore} />}
+        <PostFeed initPosts={initPosts} />
       </WindowLoaded>
     </main>
   );

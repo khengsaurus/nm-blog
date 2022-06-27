@@ -43,19 +43,19 @@ MongoUserSchema.set("timestamps", true);
 MongoPostSchema.set("timestamps", true);
 MongoPostSchema.set("toObject", { getters: true, flattenMaps: true });
 
-const mongoConnection = async () => {
-  let MongoConnection: Connection;
+const MongoConnection = async () => {
+  let mongoConnection: Connection;
   if (mongoose.connection?.readyState === 0 || 3) {
     await mongoose
       .connect(MONGODB_URI as string)
-      .then((conn) => (MongoConnection = conn.connection))
-      .catch((err) => console.error(err));
+      .then((conn) => (mongoConnection = conn.connection))
+      .catch(console.error);
   }
 
   const User = mongoose.models.User || mongoose.model("User", MongoUserSchema);
   const Post = mongoose.models.Post || mongoose.model("Post", MongoPostSchema);
 
-  return { Post, User, MongoConnection };
+  return { Post, User, mongoConnection };
 };
 
-export default mongoConnection;
+export default MongoConnection;

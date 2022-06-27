@@ -10,19 +10,24 @@ class RedisConnection {
 
   constructor() {
     this.client = createClient({ url: process.env.ENV_REDIS_URL });
-    this.client
-      .connect()
-      // .then(() => console.info("Redis client connection opened"))
-      .catch((err) => console.info(err?.message));
+    this.connect();
+    // .then(() => console.info("Redis client connection opened"));
+  }
+
+  async connect() {
+    return new Promise(async (resolve) => {
+      await this.client.connect().then(resolve).catch(console.error);
+    });
   }
 
   close() {
     if (this?.client?.isOpen) {
-      this.client.quit().catch((err) => console.info(err?.message));
+      this.client.quit().catch(console.info);
     }
   }
 
   async getCurrent(): Promise<string> {
+    if (!this.client.isOpen) await this.connect();
     return new Promise((resolve) => {
       this.client
         .get(CURR_STAMP)
@@ -34,29 +39,39 @@ class RedisConnection {
     });
   }
 
-  updateCurrent() {
-    const d1 = new Date();
-    const d2 = new Date(d1.getTime() + 2 * DurationMS.MIN).valueOf(); // 2 mins delay
-    this.client.set(CURR_STAMP, d2).catch((err) => {
-      console.info(`${ServerInfo.REDIS_SET_FAIL}: ${CURR_STAMP}`);
-      console.info(`Error: ${err?.message}`);
+  async updateCurrent() {
+    return new Promise(async (resolve) => {
+      if (!this.client.isOpen) await this.connect();
+      const d1 = new Date();
+      const d2 = new Date(d1.getTime() + 2 * DurationMS.MIN).valueOf(); // 2 mins delay
+      this.client
+        .set(CURR_STAMP, d2)
+        .catch((err) => {
+          console.info(`${ServerInfo.REDIS_SET_FAIL}: ${CURR_STAMP}`);
+          console.info(`Error: ${err?.message}`);
+        })
+        .then(resolve);
     });
   }
 
-  set(key: string, value: any, extend = true) {
+  async set(key: string, value: any, extend = true) {
     const val = typeof value === "string" ? value : JSON.stringify(value);
-    this.client
-      .set(key, val)
-      .then(() => this.client.expire(key, extend ? 600 : 300))
-      // .then(() => console.info(`${ServerInfo.REDIS_SET_SUCCESS}: ${key}`))
-      .catch((err) => {
-        console.info(`${ServerInfo.REDIS_SET_FAIL}: ${key}`);
-        console.info(`Error: ${err?.message}`);
-      });
+    return new Promise(async (resolve) => {
+      if (!this.client.isOpen) await this.connect();
+      this.client
+        .set(key, val)
+        .then(() => this.client.expire(key, extend ? 600 : 300))
+        .then(resolve)
+        .catch((err) => {
+          console.info(`${ServerInfo.REDIS_SET_FAIL}: ${key}`);
+          console.info(`Error: ${err?.message}`);
+        });
+    });
   }
 
   _get<T>(key: string, defaultVal: T): Promise<IResponse<T>> {
     return new Promise(async (resolve) => {
+      if (!this.client.isOpen) await this.connect();
       await this.client
         .get(key)
         .then((val) => {
@@ -79,14 +94,17 @@ class RedisConnection {
     return setPromiseTimeout<T>(() => this._get(key, defaultVal), defaultVal);
   }
 
-  async del(keys: string[]) {
+  async del(keys: string[]): Promise<void> {
     if (!keys?.length) return;
-    return new Promise(() => {
+    if (!this.client.isOpen) await this.connect();
+    return new Promise((resolve) => {
       try {
         keys.forEach((key) => this.client.del(key));
       } catch (err) {
         console.info(`${ServerInfo.REDIS_DEL_FAIL}: ${JSON.stringify(keys)}`);
         console.info(`Error: ${err?.message}`);
+      } finally {
+        resolve();
       }
     });
   }
@@ -103,7 +121,7 @@ class RedisConnection {
     await this.get<object>(QUERY_MAP, {}).then((pMap) => {
       if (!pMap?.[pKey]?.[sKey]) fetchFresh = true;
     });
-    return fetchFresh ? null : this.get<IPost[]>(fullKey, []);
+    return fetchFresh ? Promise.resolve([]) : this.get<IPost[]>(fullKey, []);
   }
 
   write(
@@ -119,14 +137,14 @@ class RedisConnection {
       const postIds = posts.map((post) => post.id || post._id?.toString());
       if (isEmpty(postIds)) return;
       this.get<object>(QUERY_MAP, {})
-        .then((pMap) => {
+        .then(async (pMap) => {
           if (!pMap[pKey]) pMap[pKey] = {};
           pMap[pKey][sKey] = postIds;
-          this.set(QUERY_MAP, pMap);
-          this.set(fullKey, posts);
+          await this.set(QUERY_MAP, pMap);
+          await this.set(fullKey, posts);
           resolve();
         })
-        .catch((err) => console.info(err?.message));
+        .catch(console.info);
     });
   }
 
@@ -148,14 +166,16 @@ class RedisConnection {
             ...this.resetHelper(pMap, puKey, id),
             ...this.resetHelper(pMap, hKey, id),
           ];
-          this.set(QUERY_MAP, pMap);
+          await this.set(QUERY_MAP, pMap);
         })
-        .then(() => this.del(toDelete))
+        .then(async () => await this.del(toDelete))
         .then(() => {
-          if (close) this.close();
+          if (close) {
+            this.close();
+          }
           resolve();
         })
-        .catch((err) => console.info(err?.message));
+        .catch(console.info);
     });
   }
 
@@ -195,14 +215,14 @@ class RedisConnection {
               publicQHome + S_KEY,
             ];
           }
-          this.del(toDelete);
+          await this.del(toDelete);
           await this.set(QUERY_MAP, pMap);
         })
         .then(() => {
           if (close) this.close();
           resolve();
         })
-        .catch((err) => console.info(err?.message));
+        .catch(console.info);
     });
   }
 

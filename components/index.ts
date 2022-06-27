@@ -17,7 +17,13 @@ import PostBanner from "./PostBanner";
 import PostCard from "./PostCard";
 import PostFeed from "./PostFeed";
 import ProfileNav from "./ProfileNav";
-import { Centered, CenteredMain, Column, Row } from "./StyledComponents";
+import {
+  Centered,
+  CenteredMain,
+  Column,
+  PostFeedDiv,
+  Row,
+} from "./StyledComponents";
 import {
   HomeButton,
   StyledButton,
@@ -60,6 +66,7 @@ export {
   Centered,
   CenteredMain,
   Column,
+  PostFeedDiv,
   MarkdownEditor,
   Row,
 };

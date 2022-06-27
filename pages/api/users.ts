@@ -10,7 +10,7 @@ import {
   processUserData,
   verify,
 } from "lib/middlewares";
-import { hashPassword, mongoConnection, ServerError } from "lib/server";
+import { hashPassword, MongoConnection, ServerError } from "lib/server";
 import { isEmpty } from "lodash";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { IResponse, IUser, IUserReq } from "types";
@@ -82,7 +82,7 @@ async function handleRegister(reqBody: Partial<IUserReq>): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     const { email, password } = reqBody;
     try {
-      const { User } = await mongoConnection();
+      const { User } = await MongoConnection();
       await User.exists({ email }).then((exists) => {
         if (exists) {
           resolve({ status: 200, message: ServerInfo.EMAIL_USED });
@@ -115,7 +115,7 @@ async function handleRegister(reqBody: Partial<IUserReq>): Promise<IResponse> {
 async function getDoc(params: Partial<IUserReq>): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     try {
-      const { User } = await mongoConnection();
+      const { User } = await MongoConnection();
       await (params?.id ? User.findById(params.id) : User.findOne(params)).then(
         (userData) => {
           if (isEmpty(userData)) {
@@ -146,7 +146,7 @@ async function handleLogin(reqBody: Partial<IUserReq>): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     const { username, password } = reqBody;
     try {
-      const { User } = await mongoConnection();
+      const { User } = await MongoConnection();
       await User.findOne({ username }).then((userData) => {
         if (isEmpty(userData) || !verify({ username, password }, userData)) {
           resolve({
@@ -176,7 +176,7 @@ async function getPostSlugs(reqBody: Partial<IUserReq>): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     const { username } = reqBody;
     try {
-      const { User } = await mongoConnection();
+      const { User } = await MongoConnection();
       await User.findOne({ username })
         .populate(
           "posts",
@@ -221,7 +221,7 @@ async function patchDoc(req: NextApiRequest): Promise<IResponse> {
     const { email, username } = _existingUser;
     try {
       let user;
-      const { User } = await mongoConnection();
+      const { User } = await MongoConnection();
       if (action === APIAction.USER_SET_USERNAME) {
         await User.exists({ username }).then(async (exists) => {
           if (exists) {
@@ -264,7 +264,7 @@ async function deleteDoc(req: NextApiRequest) {
   const userId = req.headers["user-id"];
   return new Promise(async (resolve, reject) => {
     try {
-      const { User } = await mongoConnection();
+      const { User } = await MongoConnection();
       User.findByIdAndDelete(userId, (err, _, __) => {
         if (!!err) {
           reject(new ServerError(500, err.message));

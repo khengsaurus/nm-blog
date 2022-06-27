@@ -1,3 +1,11 @@
+export enum Status {
+  ERROR,
+  IDLE,
+  INFO,
+  PENDING,
+  SUCCESS,
+}
+
 export enum DBService {
   POSTS = "posts",
   USERS = "users",
@@ -151,12 +159,4 @@ export enum APIAction {
   GET_POST_SLUGS = "get-post-slugs",
   GET_UPLOAD_KEY = "get-upload-key",
   READ = "read",
-}
-
-export enum Status {
-  ERROR = "error",
-  IDLE = "idle",
-  INFO = "info",
-  PENDING = "pending",
-  SUCCESS = "success",
 }

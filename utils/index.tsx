@@ -39,6 +39,10 @@ export async function setPromiseTimeout<T>(
   });
 }
 
+export async function sleepSync(ms = 1000): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export function processPostWithUser(data: any): IPost {
   if (!data) return null;
   const { _id, user, createdAt, updatedAt, isPrivate, ...post } =

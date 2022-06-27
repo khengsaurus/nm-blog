@@ -13,7 +13,7 @@ import {
 } from "components";
 import { PageRoute } from "enums";
 import { AppContext, useMarkdown, useRealtimePost } from "hooks";
-import { mongoConnection } from "lib/server";
+import { MongoConnection } from "lib/server";
 import moment from "moment";
 import { GetStaticPropsResult } from "next";
 import FourOFour from "pages/404";
@@ -33,7 +33,7 @@ export async function getStaticProps({
   const { username, slug } = params;
   let _post: IPost = null;
   try {
-    const { Post } = await mongoConnection();
+    const { Post } = await MongoConnection();
     _post = await Post.findOne({ username, slug }).select(["-user"]).lean();
   } catch (err) {
     console.info(
@@ -52,7 +52,7 @@ export async function getStaticProps({
 }
 
 export async function getStaticPaths() {
-  const { Post } = await mongoConnection();
+  const { Post } = await MongoConnection();
   const posts = await Post.find()
     .sort({ createdAt: -1 })
     .limit(100)

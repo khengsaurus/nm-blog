@@ -1,17 +1,9 @@
-import { DarkText, PostFeed, StyledButton, WindowLoaded } from "components";
+import { DarkText, PostFeed, WindowLoaded } from "components";
 import { AppContext } from "hooks";
-import usePaginatePosts from "hooks/usePaginatePosts";
 import { useContext } from "react";
 
 const MyPosts = () => {
   const { user } = useContext(AppContext);
-
-  const { posts, loadMore } = usePaginatePosts(
-    !!user?.username,
-    false,
-    [],
-    user?.username
-  );
 
   return (
     <main>
@@ -19,10 +11,12 @@ const MyPosts = () => {
         <DarkText text="My Posts" variant="h3" />
       </section>
       <WindowLoaded ready={!!user}>
-        <PostFeed posts={posts} hasAuthorLink={false} />
-        {posts.length < user?.posts.length && (
-          <StyledButton label="Load more" onClick={loadMore} />
-        )}
+        <PostFeed
+          hasAuthorLink={false}
+          limitPosts={user?.posts.length}
+          username={user?.username}
+          publicPosts={false}
+        />
       </WindowLoaded>
     </main>
   );

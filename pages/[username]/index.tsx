@@ -1,9 +1,8 @@
 import { Avatar } from "@mui/material";
-import { Column, DarkText, PostFeed, StyledButton } from "components";
+import { Column, DarkText, PostFeed } from "components";
 import { PAGINATE_LIMIT } from "consts";
-import { usePaginatePosts } from "hooks";
 import { avatarStyles } from "lib/client";
-import { mongoConnection } from "lib/server";
+import { MongoConnection } from "lib/server";
 import { IUser } from "types";
 import { getAvatarLarge, processPostWithUser, userDocToObj } from "utils";
 import FourOFour from "../404";
@@ -19,7 +18,7 @@ export async function getServerSideProps({ params, res }) {
     "public, s-maxage=30, stale-while-revalidate=300" // s-maxage & swr in seconds
   );
 
-  const { Post, User } = await mongoConnection();
+  const { Post, User } = await MongoConnection();
 
   const userQuery = await User.findOne({ username })
     .select(["-password -posts"])
@@ -44,13 +43,7 @@ export async function getServerSideProps({ params, res }) {
 
 const UserPage = (props: IUserPageProps) => {
   const { visitingUser } = props;
-  const { avatarKey, bio, username } = visitingUser || {};
-  const { posts, limitReached, loadMore } = usePaginatePosts(
-    !!visitingUser?.username,
-    true,
-    visitingUser?.posts,
-    visitingUser?.username
-  );
+  const { avatarKey, bio, posts, username } = visitingUser || {};
 
   return visitingUser ? (
     <main>
@@ -67,8 +60,7 @@ const UserPage = (props: IUserPageProps) => {
           <DarkText text={bio} variant="body1" paragraph />
         </Column>
       </section>
-      <PostFeed posts={posts} />
-      {!limitReached && <StyledButton label="Load more" onClick={loadMore} />}
+      <PostFeed initPosts={posts} username={username} />
     </main>
   ) : (
     <FourOFour />

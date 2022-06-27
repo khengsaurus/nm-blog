@@ -6,7 +6,7 @@ import {
   handleBadRequest,
   handleRequest,
 } from "lib/middlewares";
-import { mongoConnection, RedisConnection, ServerError } from "lib/server";
+import { MongoConnection, RedisConnection, ServerError } from "lib/server";
 import { isEmpty } from "lodash";
 import { ClientSession } from "mongoose";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -57,7 +57,7 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
   const isPrivate = castAsBoolean(_isPrivate);
 
   return new Promise(async (resolve, reject) => {
-    const { Post } = await mongoConnection();
+    const { Post } = await MongoConnection();
     const client = new RedisConnection();
     let posts = await client.read(username, isPrivate, createdAt, limit);
     if (posts?.length) {
@@ -101,7 +101,7 @@ async function getPost(params: Partial<IPostReq>): Promise<IResponse> {
     if (!id && !username && !slug) reject(new ServerError(400));
     else {
       try {
-        const { Post } = await mongoConnection();
+        const { Post } = await MongoConnection();
         await (id ? Post.findById(id) : Post.findOne({ username, slug }))
           .select(["-user"])
           .lean()
@@ -128,10 +128,9 @@ async function createDoc(req: NextApiRequest): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     let session: ClientSession = null;
     try {
-      const { MongoConnection } = await mongoConnection();
-      session = await MongoConnection.startSession();
+      const { Post, User, mongoConnection } = await MongoConnection();
+      session = await mongoConnection.startSession();
       await session.withTransaction(async () => {
-        const { Post, User } = await mongoConnection();
         const userId = req.headers["user-id"];
         const post: Partial<IPostReq> = req.body;
         const { isPrivate: _isPrivate, slug } = post;
@@ -188,7 +187,7 @@ async function patchDoc(req: NextApiRequest): Promise<IResponse> {
     try {
       const { id, ..._set } = req.body as Partial<IPostReq>;
       _set.isPrivate = castAsBoolean(req.body?.isPrivate);
-      const { Post } = await mongoConnection();
+      const { Post } = await MongoConnection();
       const post = await Post.findById(id);
       for (const key of Object.keys(_set)) {
         post[key] = _set[key];
@@ -216,10 +215,9 @@ async function deleteDoc(req: NextApiRequest): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     let session: ClientSession = null;
     try {
-      const { MongoConnection } = await mongoConnection();
-      session = await MongoConnection.startSession();
+      const { Post, User, mongoConnection } = await MongoConnection();
+      session = await mongoConnection.startSession();
       await session.withTransaction(async () => {
-        const { Post, User } = await mongoConnection();
         const userId = req.headers["user-id"];
         const {
           id,
