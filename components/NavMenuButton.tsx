@@ -1,6 +1,11 @@
 import { StyledButton } from "components";
 
-export function renderButton(label: string, fontSize = 16) {
+interface INavMenuButton {
+  label: string;
+  fontSize?: number;
+}
+
+const NavMenuButton = ({ label, fontSize = 16 }: INavMenuButton) => {
   return (
     <StyledButton
       label={label}
@@ -13,4 +18,6 @@ export function renderButton(label: string, fontSize = 16) {
       sx={{ fontSize: fontSize }}
     />
   );
-}
+};
+
+export default NavMenuButton;

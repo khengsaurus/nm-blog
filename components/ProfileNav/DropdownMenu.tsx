@@ -6,7 +6,7 @@ import PaletteIcon from "@mui/icons-material/Palette";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import { Fade } from "@mui/material";
 import { Container } from "@mui/system";
-import { renderButton } from "components";
+import { NavMenuButton } from "components";
 import { PageRoute } from "enums";
 import { AppContext } from "hooks";
 import { themes } from "lib/client";
@@ -68,7 +68,7 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
               rightIcon={<ChevronRightIcon />}
               callback={() => setActiveMenu("profile")}
             >
-              {renderButton("Profile")}
+              {<NavMenuButton label="Profile" />}
             </DropdownItem>
           )}
           <DropdownItem
@@ -76,18 +76,18 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
             rightIcon={<ChevronRightIcon />}
             callback={() => setActiveMenu("theme")}
           >
-            {renderButton("Theme")}
+            {<NavMenuButton label="Theme" />}
           </DropdownItem>
           {user ? (
             <DropdownItem leftIcon={<LogoutIcon />} callback={handleLogout}>
-              {renderButton("Logout")}
+              {<NavMenuButton label="Logout" />}
             </DropdownItem>
           ) : (
             <DropdownItem
               leftIcon={<KeyIcon />}
               callback={() => handleNav(PageRoute.LOGIN)}
             >
-              {renderButton("Login")}
+              {<NavMenuButton label="Login" />}
             </DropdownItem>
           )}
         </div>
@@ -98,13 +98,13 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
       return (
         <div className="menu">
           <DropdownItem callback={() => setActiveMenu("main")} hasBack>
-            {renderButton("Profile", 18)}
+            {<NavMenuButton label="Profile" fontSize={18} />}
           </DropdownItem>
           <DropdownItem
             leftIcon={<PersonOutlineIcon />}
             callback={() => handleNav(PageRoute.MY_PROFILE)}
           >
-            {renderButton("Details")}
+            {<NavMenuButton label="Details" />}
           </DropdownItem>
         </div>
       );
@@ -114,7 +114,7 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
       return (
         <div className="menu">
           <DropdownItem callback={() => setActiveMenu("main")} hasBack>
-            {renderButton("Themes", 18)}
+            {<NavMenuButton label="Themes" fontSize={18} />}
           </DropdownItem>
           {Object.keys(themes).map((name) => (
             <DropdownItem
@@ -127,7 +127,7 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
               }
               callback={() => setThemeName(name)}
             >
-              {renderButton(name)}
+              <NavMenuButton label={name} />
             </DropdownItem>
           ))}
         </div>

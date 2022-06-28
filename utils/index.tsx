@@ -1,8 +1,7 @@
 import { CircleLoader } from "components";
+import { MAX_FILE_SIZE } from "consts";
 import { Dimension, ErrorMessage, Status } from "enums";
 import { IPost, IResponse } from "types";
-
-const maxFileSizeMB = 4;
 
 export function parse(val: any) {
   return typeof val === "string" ? JSON.stringify(val) : val;
@@ -107,8 +106,8 @@ export function checkFileSize(
   errorHandler: (msg?: string) => void
 ) {
   let file = event.target.files[0];
-  if (file.size > maxFileSizeMB * 1000 * 1000) {
-    errorHandler(`The maximum file size is ${maxFileSizeMB}MB\n`);
+  if (file.size > MAX_FILE_SIZE * 1000 * 1000) {
+    errorHandler(`The maximum file size is ${MAX_FILE_SIZE}MB\n`);
     event.target.value = null;
     return false;
   }
@@ -118,7 +117,7 @@ export function checkFileSize(
 export function checkFileType(
   event: React.ChangeEvent<HTMLInputElement>,
   errorHandler: (msg?: string) => void,
-  allowedTypes = ["image/jpeg", "image/png"]
+  allowedTypes = ["image/jpeg", "image/png", "image/heic", "image/heif"]
 ) {
   let file = event.target.files[0];
   if (allowedTypes.includes(file.type)) return true;

@@ -1,12 +1,12 @@
 import {
   Column,
   DeletePostModal,
+  DynamicFlex,
   EditPostButtons,
   EditPreviewMarkdown,
   ImageForm,
   Input,
   PostCard,
-  Row,
 } from "components";
 import {
   DBService,
@@ -89,7 +89,9 @@ const EditPost = ({ id }: IPostPage) => {
         // New image -> delete old image if exists. Do not await this.
         if (realtimePost?.imageKey) {
           _imageKey = "";
-          deleteImage(realtimePost.imageKey).catch((err) => console.info(err?.message));
+          deleteImage(realtimePost.imageKey).catch((err) =>
+            console.info(err?.message)
+          );
         }
         await getUploadedImageKey(newImage)
           .then((key) => (_imageKey = key))
@@ -204,7 +206,7 @@ const EditPost = ({ id }: IPostPage) => {
           setBody={setBody}
         />
         <br />
-        <Row style={{ justifyContent: "center" }}>
+        <DynamicFlex>
           <PostCard
             post={{
               slug,
@@ -239,7 +241,7 @@ const EditPost = ({ id }: IPostPage) => {
               deleteClick={handleDeleteClick}
             />
           </Column>
-        </Row>
+        </DynamicFlex>
       </Column>
       {!isNewPost && (
         <DeletePostModal

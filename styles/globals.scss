@@ -194,6 +194,84 @@ textarea {
   }
 }
 
+.dynamic-flex {
+  @include flex-(row);
+  align-items: center;
+  justify-content: center;
+  @media only screen and (max-width: 520px) {
+    @include flex-(column);
+  }
+}
+
+.edit-container {
+  @mixin delete-button {
+    height: $medium-button-dim;
+    width: $medium-button-dim;
+    border-top-right-radius: 0%;
+    border-bottom-right-radius: 0%;
+    position: fixed;
+    bottom: calc($medium-button-dim / 2);
+    transition: $speed-medium;
+    z-index: 0;
+  }
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  transition: $speed-medium;
+  .edit-button {
+    height: $big-button-dim;
+    width: $big-button-dim;
+    z-index: 1;
+  }
+  .delete-button {
+    @include delete-button;
+    right: calc($medium-button-dim/2);
+  }
+  &:hover {
+    .delete-button {
+      @include delete-button;
+      right: 80px;
+    }
+  }
+}
+
+.markdown-preview {
+  @include round-border;
+  @include no-scroll;
+  position: relative;
+  background-color: transparent !important;
+  border: 1px solid transparent;
+  overflow-y: scroll;
+  transition: 400ms;
+  &.hide {
+    border: none !important;
+    padding: 0px !important;
+    width: 0px;
+  }
+  &.show {
+    border-color: inherit;
+    padding-left: 10px;
+    width: calc(50% - 6px);
+  }
+}
+
+.markdown-view {
+  background-color: transparent !important;
+  border: none !important;
+  &.card {
+    padding: 0px !important;
+    p {
+      font-size: 15px;
+    }
+    h1: {
+      padding: 2px 0px !important;
+    }
+    pre code {
+      overflow: hidden;
+    }
+  }
+}
+
 .profile-nav {
   $nav-size: 60px;
   $border: 1px solid inherit;
@@ -251,75 +329,6 @@ textarea {
       &:hover {
         background-color: rgba(0, 0, 0, 0.12);
       }
-    }
-  }
-}
-
-.markdown-preview {
-  @include round-border;
-  @include no-scroll;
-  position: relative;
-  background-color: transparent !important;
-  border: 1px solid transparent;
-  overflow-y: scroll;
-  transition: 400ms;
-  &.hide {
-    border: none !important;
-    padding: 0px !important;
-    width: 0px;
-  }
-  &.show {
-    border-color: inherit;
-    padding-left: 10px;
-    width: calc(50% - 6px);
-  }
-}
-
-.markdown-view {
-  background-color: transparent !important;
-  border: none !important;
-  &.card {
-    padding: 0px !important;
-    p {
-      font-size: 15px;
-    }
-    h1: {
-      padding: 2px 0px !important;
-    }
-    pre code {
-      overflow: hidden;
-    }
-  }
-}
-
-.edit-container {
-  @mixin delete-button {
-    height: $medium-button-dim;
-    width: $medium-button-dim;
-    border-top-right-radius: 0%;
-    border-bottom-right-radius: 0%;
-    position: fixed;
-    bottom: calc($medium-button-dim / 2);
-    transition: $speed-medium;
-    z-index: 0;
-  }
-  position: fixed;
-  bottom: 10px;
-  right: 10px;
-  transition: $speed-medium;
-  .edit-button {
-    height: $big-button-dim;
-    width: $big-button-dim;
-    z-index: 1;
-  }
-  .delete-button {
-    @include delete-button;
-    right: calc($medium-button-dim/2);
-  }
-  &:hover {
-    .delete-button {
-      @include delete-button;
-      right: 80px;
     }
   }
 }

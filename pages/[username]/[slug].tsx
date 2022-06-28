@@ -136,7 +136,8 @@ const Post = ({ post, username, slug }: IPostPage) => {
           </section>
         )}
       </main>
-      {user?.id === author?.id && (
+      {/* Check for user to prevent showing on mount */}
+      {user && user?.id === author?.id && (
         <div className="edit-container">
           <Fab className="edit-button" onClick={handleEdit} disableRipple>
             <EditIcon style={{ width: 40, height: 40 }} />
