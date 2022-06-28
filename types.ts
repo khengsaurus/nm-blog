@@ -14,7 +14,7 @@ export interface IResponse<T = any> {
 
 /*------------------------------ . ------------------------------*/
 
-export interface IObject<T> {
+export interface IObject<T = any> {
   [key: string]: T;
 }
 

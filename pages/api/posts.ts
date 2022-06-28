@@ -57,7 +57,6 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
   const isPrivate = castAsBoolean(_isPrivate);
 
   return new Promise(async (resolve, reject) => {
-    const { Post } = await MongoConnection();
     const client = new RedisConnection();
     let posts = await client.read(username, isPrivate, createdAt, limit);
     if (posts?.length) {
@@ -71,6 +70,7 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
       const query: any = createdAt ? { createdAt: { $lt: createdAt } } : {};
       if (username) query.username = username;
       if (!isPrivate) query.isPrivate = false;
+      const { Post } = await MongoConnection();
       await Post.find(query)
         .select(["-user"])
         .sort({ createdAt: -1 })
@@ -149,7 +149,7 @@ async function createDoc(req: NextApiRequest): Promise<IResponse> {
               .then((res) => {
                 if (res.id) {
                   const client = new RedisConnection();
-                  client.newPostCreated(newPost, true);
+                  client.newPostCreated(newPost, false);
                   User.findByIdAndUpdate(
                     userId,
                     { $push: { posts: { $each: [res.id], $position: 0 } } },
@@ -197,7 +197,7 @@ async function patchDoc(req: NextApiRequest): Promise<IResponse> {
         .then((_post) => {
           const post = processPostWithUser(_post);
           const client = new RedisConnection();
-          client.resetCache(post, true);
+          client.resetCache(post, false);
           resolve({
             status: 200,
             message: ServerInfo.POST_UPDATED,
@@ -228,7 +228,7 @@ async function deleteDoc(req: NextApiRequest): Promise<IResponse> {
         await Post.findByIdAndDelete(id)
           .then(() => {
             const client = new RedisConnection();
-            client.resetCache({ id, username, isPrivate }, true);
+            client.resetCache({ id, username, isPrivate }, false);
             User.findByIdAndUpdate(
               userId,
               { $pullAll: { posts: [id] } },

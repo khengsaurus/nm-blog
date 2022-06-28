@@ -7,11 +7,11 @@ export function parse(val: any) {
   return typeof val === "string" ? JSON.stringify(val) : val;
 }
 
-export function promiseTimeout(
+export function promiseTimeout<T = any>(
   msg: string,
   ms = 1000,
   callback?: any
-): Promise<IResponse> {
+): Promise<T> {
   return new Promise((_, reject) =>
     setTimeout(() => {
       if (callback) callback();
@@ -21,7 +21,7 @@ export function promiseTimeout(
 }
 
 export async function setPromiseTimeout<T>(
-  promiseCallback: () => Promise<IResponse>,
+  promiseCallback: () => Promise<T>,
   val: T,
   ms = 2000
 ): Promise<T> {
@@ -30,7 +30,7 @@ export async function setPromiseTimeout<T>(
       promiseTimeout(`Timeout of ${ms}ms reached`, ms),
       promiseCallback(),
     ])
-      .then((res) => resolve(res.data || val))
+      .then((res) => resolve(res || val))
       .catch((err) => {
         console.info(err.message);
         resolve(val);

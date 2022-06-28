@@ -67,7 +67,7 @@ const Login = () => {
           toast.error(res?.data?.message);
         }
       })
-      .catch((err) => console.error(err));
+      .catch(console.error);
   }, [cleanup, username, password]);
 
   const handleRegister = useCallback(() => {

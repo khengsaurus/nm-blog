@@ -30,7 +30,7 @@ const NewUser = () => {
           console.info(res);
         }
       })
-      .catch((err) => console.error(err));
+      .catch(console.error);
   }, [user, logout, routerPush]);
 
   // If user ends session before setting username, delete records of email from DB to preserve email availability

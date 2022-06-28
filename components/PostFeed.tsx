@@ -4,6 +4,7 @@ import {
   PostCard,
   PostFeedDiv,
   StyledButton,
+  WindowLoaded,
 } from "components";
 import { PAGINATE_LIMIT } from "consts";
 import { Dimension, Status } from "enums";
@@ -20,6 +21,7 @@ interface IPostFeed {
   publicPosts?: boolean;
   ready?: boolean;
   username?: string;
+  windowReady?: boolean;
 }
 
 export const initFeedWidth: CSSProperties = { width: 4 * Dimension.CARD_W };
@@ -33,6 +35,7 @@ const PostFeed = ({
   publicPosts = true,
   ready = true,
   username = "",
+  windowReady = true,
 }: IPostFeed) => {
   const windowLoaded = useWindowLoaded();
   const { posts, limitReached, status, loadMore } = usePaginatePosts(
@@ -54,7 +57,7 @@ const PostFeed = ({
   }
 
   return (
-    <>
+    <WindowLoaded ready={windowReady}>
       <PostFeedDiv style={windowLoaded ? null : initFeedWidth}>
         {posts.map((post, index) => (
           <PostCard
@@ -70,7 +73,7 @@ const PostFeed = ({
       </PostFeedDiv>
       <br />
       {renderLoadMore()}
-    </>
+    </WindowLoaded>
   );
 };
 

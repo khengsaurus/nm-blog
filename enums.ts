@@ -126,10 +126,11 @@ export enum ServerInfo {
 
   REDIS_HSET_SUCCESS = "Redis - successful hset",
   REDIS_HGET_SUCCESS = "Redis - successful hget",
+  REDIS_HGETALL_SUCCESS = "Redis - successful hgetall",
   REDIS_HDEL_SUCCESS = "Redis - successful hdel",
 
   REDIS_HSET_FAIL = "Redis - failed hset",
-  REDIS_HGET_FAIL = "Redis - failed hget",
+  REDIS_HGETALL_FAIL = "Redis - failed hgetall",
   REDIS_HDEL_FAIL = "Redis - failed hdel",
 }
 

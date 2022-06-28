@@ -49,7 +49,7 @@ const MongoConnection = async () => {
     await mongoose
       .connect(MONGODB_URI as string)
       .then((conn) => (mongoConnection = conn.connection))
-      .catch(console.error);
+      .catch(console.info);
   }
 
   const User = mongoose.models.User || mongoose.model("User", MongoUserSchema);

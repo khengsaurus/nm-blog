@@ -1,4 +1,4 @@
-import { DarkText, PostFeed, WindowLoaded } from "components";
+import { DarkText, PostFeed } from "components";
 import { PAGINATE_LIMIT } from "consts";
 import { MongoConnection } from "lib/server";
 import { IPost } from "types";
@@ -6,7 +6,6 @@ import { processPostWithUser } from "utils";
 
 interface IHomeProps {
   initPosts: IPost[];
-  cursor: string;
 }
 
 export async function getServerSideProps({ res }) {
@@ -34,9 +33,7 @@ const Home = ({ initPosts }: IHomeProps) => {
       <section className="header">
         <DarkText text="Public Posts" variant="h3" />
       </section>
-      <WindowLoaded>
-        <PostFeed initPosts={initPosts} />
-      </WindowLoaded>
+      <PostFeed initPosts={initPosts} />
     </main>
   );
 };
