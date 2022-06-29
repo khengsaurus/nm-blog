@@ -1,5 +1,5 @@
-import { PAGINATE_LIMIT } from "consts";
-import { DurationMS, ErrorMessage, HttpRequest, ServerInfo } from "enums";
+import { CACHE_HEADER_DEFAULT, PAGINATE_LIMIT } from "consts";
+import { ErrorMessage, HttpRequest, ServerInfo } from "enums";
 import {
   forwardResponse,
   handleAPIError,
@@ -24,10 +24,7 @@ export default async function handler(
 ) {
   switch (req.method) {
     case HttpRequest.GET:
-      res.setHeader(
-        "Cache-Control",
-        `maxage=${5 * DurationMS.MIN}, must-revalidate`
-      );
+      res.setHeader("Cache-Control", CACHE_HEADER_DEFAULT);
       return handleGet(req, res);
     case HttpRequest.POST:
       return handleRequest(req, res, createDoc);

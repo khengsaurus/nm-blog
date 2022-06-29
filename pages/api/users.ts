@@ -1,4 +1,5 @@
-import { APIAction, DurationMS, HttpRequest, ServerInfo } from "enums";
+import { CACHE_HEADER_DEFAULT } from "consts";
+import { APIAction, HttpRequest, ServerInfo } from "enums";
 import {
   createUserObject,
   decodeToken,
@@ -21,10 +22,6 @@ export default async function handler(
 ) {
   switch (req.method) {
     case HttpRequest.GET:
-      res.setHeader(
-        "Cache-Control",
-        `maxage=${5 * DurationMS.MIN}, must-revalidate`
-      );
       return handleGet(req, res);
     case HttpRequest.POST:
       return handlePost(req, res);
@@ -46,11 +43,9 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
       data: { user: {} },
     });
   } else {
-    return (
-      reqQuery.action === APIAction.GET_POST_SLUGS
-        ? getPostSlugs(reqQuery)
-        : getDoc(reqQuery)
-    )
+    const isGetSlugs = reqQuery.action === APIAction.GET_POST_SLUGS;
+    if (!isGetSlugs) res.setHeader("Cache-Control", CACHE_HEADER_DEFAULT);
+    return (isGetSlugs ? getPostSlugs(reqQuery) : getDoc(reqQuery))
       .then((payload) => forwardResponse(res, payload))
       .catch((err) => handleAPIError(res, err));
   }

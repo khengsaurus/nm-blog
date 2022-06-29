@@ -47,7 +47,7 @@ export async function getStaticProps({
       slug,
       post: processPostWithUser(_post),
     },
-    revalidate: 30,
+    revalidate: 60,
   };
 }
 

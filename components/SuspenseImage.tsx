@@ -1,6 +1,5 @@
-import { useIsoEffect } from "hooks";
+import { useDynamicSrc } from "hooks";
 import NextImage, { ImageProps } from "next/image";
-import { useState } from "react";
 
 interface ISuspenseImage {
   src: string;
@@ -20,15 +19,7 @@ const SuspenseImage = ({
   priority = true,
   alt = "#",
 }: ISuspenseImage) => {
-  const [readySrc, setReadySrc] = useState(fallback);
-
-  useIsoEffect(() => {
-    const _img = new Image();
-    _img.src = src;
-    _img.onload = () => setReadySrc(src);
-
-    return () => (_img.onload = null);
-  }, []);
+  const readySrc = useDynamicSrc(fallback, src);
 
   return (
     <NextImage

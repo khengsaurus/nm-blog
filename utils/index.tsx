@@ -1,7 +1,7 @@
 import { CircleLoader } from "components";
 import { MAX_FILE_SIZE } from "consts";
 import { Dimension, ErrorMessage, Status } from "enums";
-import { IPost, IResponse } from "types";
+import { IPost } from "types";
 
 export function parse(val: any) {
   return typeof val === "string" ? JSON.stringify(val) : val;
@@ -116,11 +116,10 @@ export function checkFileSize(
 
 export function checkFileType(
   event: React.ChangeEvent<HTMLInputElement>,
-  errorHandler: (msg?: string) => void,
-  allowedTypes = ["image/jpeg", "image/png", "image/heic", "image/heif"]
+  errorHandler: (msg?: string) => void
 ) {
   let file = event.target.files[0];
-  if (allowedTypes.includes(file.type)) return true;
+  if (file.type?.startsWith("image")) return true;
   errorHandler("File type not supported");
 }
 
@@ -139,12 +138,12 @@ export const getStatusLabel = (saveStatus: Status) => {
 
 export function getCardSrc(imageKey: string) {
   if (!imageKey) return "";
-  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-${Dimension.CARD_W},h-80,q-100`;
+  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-${Dimension.CARD_W},h-80,q-70`;
 }
 
-export function getBannerSrc(imageKey: string, width: number) {
+export function getBannerSrc(imageKey: string) {
   if (!imageKey) return "";
-  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-${width},h-${Dimension.BANNER_H},q-100`;
+  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=q-100`;
 }
 
 export function getAvatarSmall(imageKey: string) {

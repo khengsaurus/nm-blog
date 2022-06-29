@@ -1,6 +1,7 @@
 import { AppContext } from "./context";
 import useAsync from "./useAsync";
 import useDocumentListener from "./useDocumentListener";
+import useDynamicSrc from "./useDynamicSrc";
 import useFirstEffect from "./useFirstEffect";
 import useFirstEffectAsync from "./useFirstEffectAsync";
 import useIsoEffect from "./useIsoEffect";
@@ -20,6 +21,7 @@ export {
   AppContext,
   useAsync,
   useDocumentListener,
+  useDynamicSrc,
   useFirstEffect,
   useFirstEffectAsync,
   useIsoEffect,

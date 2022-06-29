@@ -1,6 +1,6 @@
 import { Fade } from "@mui/material";
 import { motion } from "framer-motion";
-import { AppContext, useKeyListener, useWindowDimensions } from "hooks";
+import { AppContext, useKeyListener } from "hooks";
 import Image from "next/image";
 import { useCallback, useContext, useState } from "react";
 import { getBannerSrc, getCardSrc } from "utils";
@@ -13,7 +13,6 @@ interface IPostBanner {
 const PostBanner = ({ imageKey }: IPostBanner) => {
   const [view, setView] = useState(false);
   const { theme } = useContext(AppContext);
-  const { width } = useWindowDimensions();
   const highlightColor = theme?.highlightColor;
 
   const hideImage = useCallback(() => setView(false), []);
@@ -33,7 +32,7 @@ const PostBanner = ({ imageKey }: IPostBanner) => {
         >
           <SuspenseImage
             fallback={getCardSrc(imageKey)}
-            src={imageKey && width ? getBannerSrc(imageKey, width) : ""}
+            src={getBannerSrc(imageKey)}
             alt="post-banner-image"
             priority
           />
