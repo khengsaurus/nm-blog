@@ -1,6 +1,6 @@
 import { Avatar } from "@mui/material";
 import { Column, DarkText, PostFeed } from "components";
-import { CACHE_HEADER_DEFAULT, PAGINATE_LIMIT } from "consts";
+import { CACHE_DEFAULT, PAGINATE_LIMIT } from "consts";
 import { avatarStyles } from "lib/client";
 import { MongoConnection } from "lib/server";
 import { IUser } from "types";
@@ -13,7 +13,7 @@ interface IUserPageProps {
 
 export async function getServerSideProps({ params, res }) {
   const { username } = params;
-  res.setHeader("Cache-Control", CACHE_HEADER_DEFAULT);
+  res.setHeader("Cache-Control", CACHE_DEFAULT);
 
   const { Post, User } = await MongoConnection();
 

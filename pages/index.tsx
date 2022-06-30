@@ -1,5 +1,5 @@
 import { DarkText, PostFeed } from "components";
-import { CACHE_HEADER_DEFAULT, PAGINATE_LIMIT } from "consts";
+import { CACHE_DEFAULT, PAGINATE_LIMIT } from "consts";
 import { MongoConnection } from "lib/server";
 import { IPost } from "types";
 import { processPostWithUser } from "utils";
@@ -9,7 +9,7 @@ interface IHomeProps {
 }
 
 export async function getServerSideProps({ res }) {
-  res.setHeader("Cache-Control", CACHE_HEADER_DEFAULT);
+  res.setHeader("Cache-Control", CACHE_DEFAULT);
 
   const { Post } = await MongoConnection();
   const postQuery = await Post.find({ isPrivate: false })

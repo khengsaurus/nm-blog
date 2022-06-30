@@ -1,4 +1,4 @@
-import { CACHE_HEADER_DEFAULT, PAGINATE_LIMIT } from "consts";
+import { CACHE_DEFAULT, PAGINATE_LIMIT } from "consts";
 import { ErrorMessage, HttpRequest, ServerInfo } from "enums";
 import {
   forwardResponse,
@@ -24,7 +24,6 @@ export default async function handler(
 ) {
   switch (req.method) {
     case HttpRequest.GET:
-      res.setHeader("Cache-Control", CACHE_HEADER_DEFAULT);
       return handleGet(req, res);
     case HttpRequest.POST:
       return handleRequest(req, res, createDoc);
@@ -39,8 +38,14 @@ export default async function handler(
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse) {
   const reqQuery = req.query as Partial<IPostReq>;
-  await (reqQuery?.limit > 1 ? getPosts(reqQuery) : getPost(reqQuery))
-    .then((payload) => forwardResponse(res, payload))
+  const singlePost = (reqQuery?.limit || 1) <= 1;
+  await (singlePost ? getPost(reqQuery) : getPosts(reqQuery))
+    .then((payload) => {
+      if (payload.status === 200) {
+        res.setHeader("Cache-Control", singlePost ? "no-cache" : CACHE_DEFAULT);
+      }
+      forwardResponse(res, payload);
+    })
     .catch((err) => handleAPIError(res, err));
 }
 
@@ -186,9 +191,7 @@ async function patchDoc(req: NextApiRequest): Promise<IResponse> {
       _set.isPrivate = castAsBoolean(req.body?.isPrivate);
       const { Post } = await MongoConnection();
       const post = await Post.findById(id);
-      for (const key of Object.keys(_set)) {
-        post[key] = _set[key];
-      }
+      for (const key of Object.keys(_set)) post[key] = _set[key];
       await post
         .save()
         .then((_post) => {

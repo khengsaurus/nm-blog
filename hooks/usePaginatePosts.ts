@@ -21,7 +21,7 @@ const usePaginatePosts = (
 
   const loadMoreFn = useCallback(
     async (dateRef: MutableRefObject<string>, existingPosts: IPost[]) => {
-      if (isLoading.current) return;
+      if ((!publicPosts && !username) || isLoading.current) return;
       isLoading.current = true;
       setStatus(Status.PENDING);
 
@@ -50,7 +50,7 @@ const usePaginatePosts = (
             setLimitReached(true);
           }
         }
-        isLoading.current = false;
+        setTimeout(() => (isLoading.current = false), 1000);
         setStatus(Status.IDLE);
       });
     },

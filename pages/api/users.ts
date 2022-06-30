@@ -1,4 +1,4 @@
-import { CACHE_HEADER_DEFAULT } from "consts";
+import { CACHE_DEFAULT } from "consts";
 import { APIAction, HttpRequest, ServerInfo } from "enums";
 import {
   createUserObject,
@@ -44,7 +44,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
     });
   } else {
     const isGetSlugs = reqQuery.action === APIAction.GET_POST_SLUGS;
-    if (!isGetSlugs) res.setHeader("Cache-Control", CACHE_HEADER_DEFAULT);
+    res.setHeader("Cache-Control", isGetSlugs ? "no-cache" : CACHE_DEFAULT);
     return (isGetSlugs ? getPostSlugs(reqQuery) : getDoc(reqQuery))
       .then((payload) => forwardResponse(res, payload))
       .catch((err) => handleAPIError(res, err));

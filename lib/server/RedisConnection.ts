@@ -1,5 +1,6 @@
 import { CURR_STAMP, DEFAULT_EXPIRE, PAGINATE_LIMIT } from "consts";
 import { DurationMS, Flag, ServerInfo } from "enums";
+import { isEmpty } from "lodash";
 import { createClient, RedisClientType } from "redis";
 import { IObject, IPost } from "types";
 import { setPromiseTimeout } from "utils";
@@ -16,7 +17,10 @@ class RedisConnection {
     return new Promise(async (resolve) => {
       if (this.client?.isOpen) resolve(1);
       else {
-        await this.client.connect().then(resolve).catch(console.info);
+        await this.client
+          .connect()
+          .then(() => resolve(1))
+          .catch(console.info);
       }
     });
   }
@@ -95,17 +99,32 @@ class RedisConnection {
     });
   }
 
-  _hgetall(defaultVal: IObject, key: string): Promise<IObject> {
+  _hget<T = any>(key: string): Promise<T> {
+    return new Promise((resolve) => {
+      this.client
+        .HGETALL(key)
+        .then((res) => resolve(res as unknown as T))
+        .catch((err) => {
+          console.info(err);
+          resolve(null);
+        });
+    });
+  }
+
+  _hgetall<T = any>(
+    defaultVal: IObject<T>[],
+    keys: string[]
+  ): Promise<IObject<T>[]> {
     return new Promise(async (resolve) => {
       this.connect()
-        .then(() => this.client.HGETALL(key))
-        .then((map) => {
-          // for (const key of Object.keys(map)) map[key] = JSON.parse(map[key]);
-          this.client.expire(key, DEFAULT_EXPIRE);
-          resolve(map);
+        .then(() => {
+          const queries = keys.map((key) => this._hget<IObject<T>>(key));
+          Promise.all(queries).then((maps) => resolve(maps));
         })
         .catch((err) => {
-          console.info(`${ServerInfo.REDIS_HGETALL_FAIL}: ${key}`);
+          console.info(
+            `${ServerInfo.REDIS_HGETALL_FAIL}: ${JSON.stringify(keys)}`
+          );
           console.info(`Error: ${err?.message}`);
           resolve(defaultVal);
         });
@@ -119,8 +138,9 @@ class RedisConnection {
     );
   }
 
-  async getMap(key: string): Promise<IObject> {
-    return setPromiseTimeout(() => this._hgetall({}, key), null);
+  async getMaps<T = any>(keys: string | string[]): Promise<IObject<T>[]> {
+    const _keys = typeof keys === "string" ? [keys] : keys;
+    return setPromiseTimeout(() => this._hgetall<T>([], _keys), []);
   }
 
   async del(keys: string | string[]): Promise<void> {
@@ -160,10 +180,10 @@ class RedisConnection {
     const _date = date || (await this.getCurrent());
     const { pKey, sKey, fullKey } = this.getKeys(uN, pr, _date, limit);
     return new Promise((resolve) => {
-      this.getMap(pKey).then((pMap) => {
-        if (!pMap?.[sKey]) resolve([]);
+      this.getMaps<object>(pKey).then((maps) => {
+        if (isEmpty(maps) || !maps[0]?.[sKey]) resolve([]);
         else this.get<IPost[]>([], fullKey).then(resolve);
-      }); // catch for getMap and get handled by inner setPromiseTimeout calls
+      });
     });
   }
 
@@ -196,33 +216,40 @@ class RedisConnection {
       prKey = this.getPrimaryKey(username, true);
       puKey = this.getPrimaryKey(username, false);
       hKey = isPrivate ? "" : this.getPrimaryKey("", false);
-      let toDelete = [];
-      Promise.all([this.getMap(prKey), this.getMap(puKey), this.getMap(hKey)])
-        .then(([prMap, puMap, hMap]) => {
-          toDelete = [
-            ...this.resetHelper(prMap, prKey, id),
-            ...this.resetHelper(puMap, puKey, id),
-            ...this.resetHelper(hMap, hKey, id),
-          ];
+      this.getMaps([prKey, puKey, hKey])
+        .then((maps) => {
+          const parentMap = {
+            [prKey]: maps[0],
+            [puKey]: maps[1],
+            [hKey]: maps[2],
+          };
+          return this.resetHelper(parentMap, id);
         })
-        .then(() => this.del(toDelete))
-        .then(() => {
+        .then(async (toDelete) => await this.del(toDelete))
+        .catch(console.info)
+        .finally(() => {
           if (!keepAlive) this.close();
           resolve();
-        })
-        .catch(console.info);
+        });
     });
   }
 
-  resetHelper(map: IObject<string>, pKey: string, postId: string): string[] {
-    const fullKeys = [];
-    for (const sKey of Object.keys(map)) {
-      if (map[sKey].includes(postId)) {
-        this.hdel(pKey, sKey);
-        fullKeys.push(pKey + Flag.DATE_TAG + sKey);
+  resetHelper(map: IObject, postId: string): Promise<string[]> {
+    return new Promise((resolve) => {
+      const fullKeys = [];
+      if (isEmpty(map)) resolve(fullKeys);
+      for (const pKey of Object.keys(map)) {
+        const sMap = map[pKey];
+        if (isEmpty(sMap)) continue;
+        for (const sKey of Object.keys(sMap)) {
+          if (sMap[sKey].includes(postId)) {
+            this.hdel(pKey, sKey);
+            fullKeys.push(pKey + Flag.DATE_TAG + sKey);
+          }
+        }
       }
-    }
-    return fullKeys;
+      resolve(fullKeys);
+    });
   }
 
   newPostCreated(post: IPost, keepAlive = true): Promise<void> {
@@ -236,12 +263,12 @@ class RedisConnection {
         toDelete = [privateQUser, publicQUser, publicQHome];
       }
       this.del(toDelete)
-        .then(() => this.updateCurrent())
-        .then(() => {
+        .then(async () => await this.updateCurrent())
+        .catch(console.info)
+        .finally(() => {
           if (!keepAlive) this.close();
           resolve();
-        })
-        .catch(console.info);
+        });
     });
   }
 
