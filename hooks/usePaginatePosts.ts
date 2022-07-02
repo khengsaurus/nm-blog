@@ -36,25 +36,37 @@ const usePaginatePosts = (
       HTTPService.makeGetReq(DBService.POSTS, query).then((res) => {
         const { posts: newPosts, message } = res?.data || {};
         if (res.status === 200) {
-          if (newPosts?.length > 0) {
-            const _posts = dateRef.current
-              ? [...existingPosts, ...newPosts]
-              : newPosts;
-            let dateVal = newPosts[newPosts.length - 1].createdAt;
-            dateVal = new Date(dateVal).valueOf();
-            dateRef.current = dateVal;
-            setPosts(_posts);
+          if (newPosts?.length) {
+            let _posts = [];
+            let updated = false;
+            if (dateRef.current) {
+              _posts = [...existingPosts, ...newPosts]; // not first pull -> append
+              updated = true;
+            } else if (
+              !initPosts?.length ||
+              message === ServerInfo.POST_RETRIEVED
+            ) {
+              // first pull, overwrite initPosts if not cached res OR initPosts not provided
+              _posts = newPosts;
+              updated = true;
+            }
+            if (updated) {
+              let dateVal = newPosts[newPosts.length - 1].createdAt;
+              dateVal = new Date(dateVal).valueOf();
+              dateRef.current = dateVal;
+              setPosts(_posts);
+            }
           }
           if (newPosts?.length < limit || message === ServerInfo.POST_NA) {
             toast.success("You've reached the end!");
             setLimitReached(true);
           }
         }
-        setTimeout(() => (isLoading.current = false), 1000);
+        setTimeout(() => (isLoading.current = false), 1000); // throttle
         setStatus(Status.IDLE);
       });
     },
-    [limit, username, publicPosts]
+    [limit, username, publicPosts, initPosts?.length]
   );
 
   useIsoEffect(() => {

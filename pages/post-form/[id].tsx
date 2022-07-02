@@ -79,7 +79,7 @@ const EditPost = ({ id }: IPostPage) => {
       // If existing post with new slug || new post -> check if slug avail
       if (isNewPost || slug.trim() !== realtimePost?.slug?.trim()) {
         if (!!user?.posts?.find((post) => post.slug === slug)) {
-          reject(new Error(ErrorMessage.POST_SLUG_USED));
+          reject(new Error(ErrorMessage.P_SLUG_USED));
           return;
         }
       }
@@ -131,7 +131,7 @@ const EditPost = ({ id }: IPostPage) => {
             reject(err);
           });
       } else {
-        toast.error(ToastMessage.IMAGE_UPLOAD_FAIL);
+        toast.error(ToastMessage.I_UPLOAD_FAIL);
       }
     });
   };

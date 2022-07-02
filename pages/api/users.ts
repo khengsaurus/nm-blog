@@ -1,5 +1,5 @@
 import { CACHE_DEFAULT } from "consts";
-import { APIAction, HttpRequest, ServerInfo } from "enums";
+import { APIAction, ErrorMessage, HttpRequest, ServerInfo } from "enums";
 import {
   createUserObject,
   decodeToken,
@@ -11,6 +11,7 @@ import {
   processUserData,
   verify,
 } from "lib/middlewares";
+import { throwAPIError } from "lib/middlewares/util";
 import { hashPassword, MongoConnection, ServerError } from "lib/server";
 import { isEmpty } from "lodash";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -76,19 +77,19 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 async function handleRegister(reqBody: Partial<IUserReq>): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     const { email, password } = reqBody;
-    try {
-      const { User } = await MongoConnection();
-      await User.exists({ email }).then((exists) => {
-        if (exists) {
-          resolve({ status: 200, message: ServerInfo.EMAIL_USED });
-        } else {
-          // Create acc without setting username
-          const user = createUserObject({
-            email,
-            password: hashPassword(password),
-          });
-          User.create(user).then((res) => {
-            if (!!res.id) {
+    const { User } = await MongoConnection();
+    await User?.exists({ email }).then((exists) => {
+      if (exists) {
+        resolve({ status: 200, message: ServerInfo.EMAIL_USED });
+      } else {
+        // Create acc without setting username
+        const user = createUserObject({
+          email,
+          password: hashPassword(password),
+        });
+        User?.create(user)
+          .then((res) => {
+            if (res.id) {
               const token = generateToken(email, email, res.id);
               resolve({
                 status: 200,
@@ -98,37 +99,35 @@ async function handleRegister(reqBody: Partial<IUserReq>): Promise<IResponse> {
             } else {
               reject(new ServerError());
             }
+          })
+          .catch((err) => {
+            throwAPIError(reject, err, ErrorMessage.U_REGISTER_FAILED);
           });
-        }
-      });
-    } catch (err) {
-      reject(new ServerError(500, err.message));
-    }
+      }
+    });
   });
 }
 
 async function getDoc(params: Partial<IUserReq>): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
-    try {
-      const { User } = await MongoConnection();
-      await (params?.id ? User.findById(params.id) : User.findOne(params)).then(
-        (userData) => {
-          if (isEmpty(userData)) {
-            resolve({ status: 200, message: ServerInfo.USER_NA });
-          } else {
-            resolve({
-              status: 200,
-              message: ServerInfo.USER_RETRIEVED,
-              data: {
-                user: processUserData(userData, userData._id),
-              },
-            });
-          }
+    const { User } = await MongoConnection();
+    await (params?.id ? User.findById(params.id) : User.findOne(params))
+      .then((userData) => {
+        if (isEmpty(userData)) {
+          resolve({ status: 200, message: ServerInfo.USER_NA });
+        } else {
+          resolve({
+            status: 200,
+            message: ServerInfo.USER_RETRIEVED,
+            data: {
+              user: processUserData(userData, userData._id),
+            },
+          });
         }
-      );
-    } catch (err) {
-      reject(new ServerError(500, err.message));
-    }
+      })
+      .catch((err) => {
+        throwAPIError(reject, err, ErrorMessage.U_RETRIEVE_FAILED);
+      });
   });
 }
 
@@ -140,9 +139,9 @@ async function getDoc(params: Partial<IUserReq>): Promise<IResponse> {
 async function handleLogin(reqBody: Partial<IUserReq>): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     const { username, password } = reqBody;
-    try {
-      const { User } = await MongoConnection();
-      await User.findOne({ username }).then((userData) => {
+    const { User } = await MongoConnection();
+    await User.findOne({ username })
+      .then((userData) => {
         if (isEmpty(userData) || !verify({ username, password }, userData)) {
           resolve({
             status: 200,
@@ -160,10 +159,10 @@ async function handleLogin(reqBody: Partial<IUserReq>): Promise<IResponse> {
             },
           });
         }
+      })
+      .catch((err) => {
+        throwAPIError(reject, err, ErrorMessage.U_LOGIN_FAILED);
       });
-    } catch (err) {
-      reject(new ServerError(500, err.message));
-    }
   });
 }
 
@@ -215,8 +214,8 @@ async function patchDoc(req: NextApiRequest): Promise<IResponse> {
     const { action, ..._existingUser } = reqBody;
     const { email, username } = _existingUser;
     try {
-      let user;
       const { User } = await MongoConnection();
+      let user;
       if (action === APIAction.USER_SET_USERNAME) {
         await User.exists({ username }).then(async (exists) => {
           if (exists) {
@@ -249,26 +248,25 @@ async function patchDoc(req: NextApiRequest): Promise<IResponse> {
         })
         .catch((err) => reject(new ServerError(500, err.message)));
     } catch (err) {
-      reject(new ServerError(500, err.message));
+      throwAPIError(reject, err, ErrorMessage.U_UPDATE_FAILED);
+    } finally {
+      resolve({ status: 200 });
     }
-    resolve({ status: 200 });
   });
 }
 
 async function deleteDoc(req: NextApiRequest) {
   const userId = req.headers["user-id"];
   return new Promise(async (resolve, reject) => {
-    try {
-      const { User } = await MongoConnection();
-      User.findByIdAndDelete(userId, (err, _, __) => {
-        if (!!err) {
-          reject(new ServerError(500, err.message));
-        } else {
-          resolve({ status: 200, message: ServerInfo.USER_DELETED });
-        }
-      });
-    } catch (err) {
-      reject(new ServerError(500, err.message));
-    }
+    const { User } = await MongoConnection();
+    User.findByIdAndDelete(userId, (err, _, __) => {
+      if (!!err) {
+        reject(new ServerError(500, err.message));
+      } else {
+        resolve({ status: 200, message: ServerInfo.USER_DELETED });
+      }
+    }).catch((err) => {
+      throwAPIError(reject, err, ErrorMessage.U_DELETE_FAILED);
+    });
   });
 }

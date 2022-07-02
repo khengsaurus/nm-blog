@@ -43,7 +43,7 @@ export async function getUploadedImageKey(image: any): Promise<string> {
         .then(() => resolve(imageKey))
         .catch(reject);
     } else {
-      reject(new Error(ErrorMessage.IMAGE_UPLOAD_500));
+      reject(new Error(ErrorMessage.I_UPLOAD_500));
     }
   });
 }

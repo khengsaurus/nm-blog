@@ -1,6 +1,6 @@
 import { CircleLoader } from "components";
 import { MAX_FILE_SIZE } from "consts";
-import { Dimension, ErrorMessage, Status } from "enums";
+import { Dimension, Status, ToastMessage } from "enums";
 import { IPost } from "types";
 
 export function parse(val: any) {
@@ -95,7 +95,7 @@ export function checkOneFileSelected(
   if (files.length === 0) return;
   if (files.length > 1) {
     event.target.value = null;
-    errorHandler(ErrorMessage.ONE_IMAGE_ONLY);
+    errorHandler(ToastMessage.I_ONE_ONLY);
     return false;
   }
   return true;

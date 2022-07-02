@@ -1,19 +1,17 @@
-import { toast } from "react-hot-toast";
-import { Alert, Collapse } from "@mui/material";
+import { Collapse } from "@mui/material";
 import { CenteredMain, Input, Row, StyledButton } from "components";
 import {
   APIAction,
   DBService,
-  ErrorMessage,
   HttpRequest,
   PageRoute,
-  Status,
-  Transition,
+  ToastMessage,
 } from "enums";
 import { AppContext, useFirstEffect } from "hooks";
 import { HTTPService } from "lib/client";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { AlertStatus, IAlert, IResponse } from "types";
+import { toast } from "react-hot-toast";
+import { IResponse } from "types";
 
 const Login = () => {
   const { user, handleUser, routerPush } = useContext(AppContext);
@@ -84,7 +82,7 @@ const Login = () => {
         }
       });
     } else {
-      toast.error(ErrorMessage.PW_NOT_MATCHING);
+      toast.error(ToastMessage.PW_NOT_MATCHING);
     }
   }, [confirmPassword, email, password, cleanup]);
 

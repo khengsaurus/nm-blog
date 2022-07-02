@@ -91,7 +91,10 @@ export enum ToastMessage {
   PROFILE_SAVE = "Profile saved successfully",
   PROFILE_SAVE_FAIL = "Failed to save profile",
 
-  IMAGE_UPLOAD_FAIL = "Failed to upload image",
+  PW_NOT_MATCHING = "Passwords do not match",
+  I_ONE_ONLY = "Only 1 image can be uploaded",
+
+  I_UPLOAD_FAIL = "Failed to upload image",
 }
 
 export enum ServerInfo {
@@ -135,21 +138,22 @@ export enum ServerInfo {
 }
 
 export enum ErrorMessage {
-  POST_SLUG_USED = "Slug already used",
   TRY_AGAIN = "Please try again",
-  PW_NOT_MATCHING = "Passwords do not match",
-  ONE_IMAGE_ONLY = "Only 1 image can be uploaded",
 
-  POST_CREATE_FAIL = "Failed to create post",
-  POST_DELETE_FAIL = "Failed to delete post",
-  POST_RETRIEVE_FAIL = "Failed to retrieve post",
-  POST_UPDATE_FAIL = "Failed to update post",
+  U_REGISTER_FAILED = "Failed to register user",
+  U_LOGIN_FAILED = "Failed to login user",
+  U_RETRIEVE_FAILED = "Failed to retreive user data",
+  U_UPDATE_FAILED = "Failed to update user",
+  U_DELETE_FAILED = "Failed to delete user",
 
-  IMAGE_DELETE_FAIL = "Failed to delete image",
-  IMAGE_UPLOAD_FAIL = "Failed to upload image",
-  IMAGE_DOWNLOAD_FAIL = "Failed to download image",
-  IMAGE_UPLOAD_400 = "Image upload missing required params",
-  IMAGE_UPLOAD_500 = "Image upload failed",
+  P_SLUG_USED = "Slug already used",
+  P_CREATE_FAIL = "Failed to create post",
+  P_DELETE_FAIL = "Failed to delete post",
+  P_RETRIEVE_FAIL = "Failed to retrieve post",
+  P_UPDATE_FAIL = "Failed to update post",
+
+  I_UPLOAD_400 = "Image upload missing required params",
+  I_UPLOAD_500 = "Image upload failed",
 }
 
 export enum APIAction {

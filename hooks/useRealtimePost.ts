@@ -30,7 +30,7 @@ const useRealtimePost = (post: IPost) => {
           if (res.status === 200 && res.data?.post) {
             const updatedPost = processPostWithUser(res.data?.post) as IPost;
             resolve(updatedPost);
-          } else throw new Error(ErrorMessage.POST_RETRIEVE_FAIL);
+          } else throw new Error(ErrorMessage.P_RETRIEVE_FAIL);
         })
         .catch((err) => {
           console.info(err);

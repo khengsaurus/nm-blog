@@ -1,4 +1,4 @@
-import { HttpResponse } from "enums";
+import { ErrorMessage, HttpResponse } from "enums";
 import { extend } from "lodash";
 import { NextApiRequest, NextApiResponse } from "next";
 import { IResponse, IUser } from "types";
@@ -34,6 +34,15 @@ export function forwardResponse(res: NextApiResponse, payload: IResponse) {
       ...data,
     });
   }
+}
+
+export function throwAPIError(
+  reject: (error: ServerError) => void,
+  err: Error,
+  message: ErrorMessage
+) {
+  console.info(`${message}: ${err?.message}`);
+  reject(new ServerError(500, message));
 }
 
 export function handleBadRequest(res: NextApiResponse, err?: Error) {

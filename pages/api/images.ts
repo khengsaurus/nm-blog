@@ -33,16 +33,12 @@ async function deleteImage(req) {
   return new Promise(async (resolve, reject) => {
     const { imageKey } = req.query;
     if (!imageKey) reject(new ServerError(400));
-    await deleteFile(imageKey)
-      .then(resolve)
-      .catch(reject);
+    await deleteFile(imageKey).then(resolve).catch(reject);
   });
 }
 
 export default route;
 
 export const config = {
-  api: {
-    bodyParser: false,
-  },
+  api: { bodyParser: false },
 };
