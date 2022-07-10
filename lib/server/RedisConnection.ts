@@ -242,7 +242,9 @@ class RedisConnection {
         const sMap = map[pKey];
         if (isEmpty(sMap)) continue;
         for (const sKey of Object.keys(sMap)) {
-          if (sMap[sKey].includes(postId)) {
+          if (!sMap[sKey]) continue;
+          const postIds = sMap[sKey].split("|");
+          if (postIds.indexOf(postId) !== -1) {
             this.hdel(pKey, sKey);
             fullKeys.push(pKey + Flag.DATE_TAG + sKey);
           }
