@@ -1,6 +1,6 @@
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { DEFAULT_THEME } from "consts";
-import { Dimension, TransitionSpeed } from "enums";
+import { Dimension } from "enums";
 import { AppContext } from "hooks";
 import { useContext, useEffect, useState } from "react";
 import { ITheme } from "types";

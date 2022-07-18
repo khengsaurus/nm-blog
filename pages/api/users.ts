@@ -1,4 +1,4 @@
-import { CACHE_DEFAULT } from "consts";
+import { CACHE_DEFAULT, EXPERIMENT_RUNTIME } from "consts";
 import { APIAction, ErrorMessage, HttpRequest, ServerInfo } from "enums";
 import {
   createUserObject,
@@ -16,6 +16,8 @@ import { hashPassword, MongoConnection, ServerError } from "lib/server";
 import { isEmpty } from "lodash";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { IResponse, IUser, IUserReq } from "types";
+
+export const config = EXPERIMENT_RUNTIME;
 
 export default async function handler(
   req: NextApiRequest,

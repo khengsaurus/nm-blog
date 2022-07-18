@@ -1,4 +1,4 @@
-import { CURR_STAMP, DEFAULT_EXPIRE, PAGINATE_LIMIT } from "consts";
+import { CURR_STAMP, DEFAULT_EXPIRE, HOME, PAGINATE_LIMIT } from "consts";
 import { DurationMS, Flag, ServerInfo } from "enums";
 import { isEmpty } from "lodash";
 import { createClient, RedisClientType } from "redis";
@@ -35,7 +35,7 @@ class RedisConnection {
         .then(() => this.client.get(CURR_STAMP))
         .then(resolve)
         .catch((err) => {
-          console.info(err);
+          console.info(err?.message);
           resolve(`${new Date().valueOf()}`);
         });
     });
@@ -76,6 +76,24 @@ class RedisConnection {
     });
   }
 
+  async setKeyValue(key: string, value: any, ttl?: number): Promise<number> {
+    const val = typeof value === "string" ? value : JSON.stringify(value);
+    return new Promise(async (resolve) => {
+      this.connect()
+        .then(() => this.client.set(key, val))
+        .then(() => {
+          if (ttl) this.client.expire(key, ttl);
+          // console.info(`RedisConnection: set ${key}`);
+          resolve(1);
+        })
+        .catch((err) => {
+          console.info(`${ServerInfo.REDIS_SET_FAIL}: ${key}`);
+          console.info(`Error: ${err?.message}`);
+          resolve(-1);
+        });
+    });
+  }
+
   _get<T extends any>(defaultVal: T, pKey: string, sKey?: string): Promise<T> {
     return new Promise(async (resolve) => {
       const isHGet = sKey !== undefined;
@@ -86,7 +104,9 @@ class RedisConnection {
         .then((val) => {
           if (!val) resolve(defaultVal);
           else {
-            this.client.expire(pKey, DEFAULT_EXPIRE);
+            if (pKey !== HOME) this.client.expire(pKey, DEFAULT_EXPIRE);
+            // const logKey = pKey + sKey ? `-${sKey}` : "";
+            // console.info(`RedisConnection: get ${logKey}`);
             resolve(JSON.parse(val) as T);
           }
         })
@@ -105,7 +125,7 @@ class RedisConnection {
         .HGETALL(key)
         .then((res) => resolve(res as unknown as T))
         .catch((err) => {
-          console.info(err);
+          console.info(err?.message);
           resolve(null);
         });
     });
@@ -203,6 +223,7 @@ class RedisConnection {
       this.set(postIds, pKey, sKey)
         .then(() => this.set(posts, fullKey))
         .then(resolve);
+      if (!uN && !pr && !date) this.setKeyValue(HOME, posts);
     });
   }
 
@@ -258,11 +279,11 @@ class RedisConnection {
     return new Promise((resolve) => {
       const { username, isPrivate } = post;
       const privateQUser = this.getPrimaryKey(username, isPrivate);
-      let toDelete = [privateQUser];
+      let toDelete = [privateQUser, HOME];
       if (!isPrivate) {
         const publicQUser = this.getPrimaryKey(username, true); // public Q for user
         const publicQHome = this.getPrimaryKey("", false); // public Q for recent
-        toDelete = [privateQUser, publicQUser, publicQHome];
+        toDelete = [...toDelete, publicQUser, publicQHome];
       }
       this.del(toDelete)
         .then(async () => await this.updateCurrent())

@@ -1,4 +1,4 @@
-import { CACHE_DEFAULT, PAGINATE_LIMIT } from "consts";
+import { CACHE_DEFAULT, EXPERIMENT_RUNTIME, PAGINATE_LIMIT } from "consts";
 import { ErrorMessage, HttpRequest, ServerInfo } from "enums";
 import {
   forwardResponse,
@@ -18,6 +18,8 @@ import {
   processPostWithoutUser,
   processPostWithUser,
 } from "utils";
+
+export const config = EXPERIMENT_RUNTIME;
 
 export default async function handler(
   req: NextApiRequest,

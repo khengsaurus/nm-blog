@@ -1,8 +1,14 @@
+import { EXPERIMENT_RUNTIME } from "consts";
 import { APIAction } from "enums";
 import { handleRequest } from "lib/middlewares";
 import { deleteFile, generateUploadURL, ServerError } from "lib/server";
 import { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from "next-connect";
+
+export const config = {
+  api: { bodyParser: false },
+  config: EXPERIMENT_RUNTIME,
+};
 
 const route = nextConnect({
   onNoMatch(req: NextApiRequest, res: NextApiResponse) {
@@ -38,7 +44,3 @@ async function deleteImage(req) {
 }
 
 export default route;
-
-export const config = {
-  api: { bodyParser: false },
-};
