@@ -229,7 +229,7 @@ class RedisConnection {
 
   resetCache(post: Partial<IPost>, keepAlive = true): Promise<void> {
     return new Promise((resolve) => {
-      const { id, isPrivate, username } = post;
+      const { id, isPrivate, slug, username } = post;
       if (!id) return;
       let prKey; // private Q for user
       let puKey; // public Q for user
@@ -246,7 +246,11 @@ class RedisConnection {
           };
           return this.resetHelper(parentMap, id);
         })
-        .then(async (toDelete) => await this.del(toDelete))
+        .then(
+          async (toDelete) =>
+            // TODO: check if HOME cache contains post instead
+            await this.del([...toDelete, `${username}-${slug}`, HOME])
+        )
         .catch(console.info)
         .finally(() => {
           if (!keepAlive) this.close();

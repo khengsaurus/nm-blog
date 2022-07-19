@@ -35,7 +35,7 @@ export async function getServerSideProps({ params }) {
 
 const EditPost = ({ id }: IPostPage) => {
   const { user, updatePostSlugs } = useContext(AppContext);
-  const { realtimePost, refreshPost } = useRealtimePost({ id, user });
+  const { realtimePost, refreshPost } = useRealtimePost({ id, user }, true);
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [body, setBody] = useState("");

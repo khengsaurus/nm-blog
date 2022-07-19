@@ -1,4 +1,9 @@
-import { CACHE_DEFAULT, EXPERIMENT_RUNTIME, PAGINATE_LIMIT } from "consts";
+import {
+  CACHE_DEFAULT,
+  DEFAULT_EXPIRE,
+  EXPERIMENT_RUNTIME,
+  PAGINATE_LIMIT,
+} from "consts";
 import { ErrorMessage, HttpRequest, ServerInfo } from "enums";
 import {
   forwardResponse,
@@ -102,9 +107,22 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
 
 async function getPost(params: Partial<IPostReq>): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
-    const { id, username, slug } = params;
+    const { fresh, id, slug, username } = params;
     if (!id && !username && !slug) reject(new ServerError(400));
     else {
+      const client = new RedisConnection();
+      const _fresh = castAsBoolean(fresh);
+      if (username && slug && !_fresh) {
+        const key = `${username}-${slug}`;
+        const post = await client.get(null, key);
+        if (post) {
+          return resolve({
+            status: 200,
+            message: ServerInfo.POST_RETRIEVED_CACHED,
+            data: { post },
+          });
+        }
+      }
       const { Post } = await MongoConnection();
       await (id ? Post.findById(id) : Post.findOne({ username, slug }))
         .select(["-user"])
@@ -114,6 +132,8 @@ async function getPost(params: Partial<IPostReq>): Promise<IResponse> {
             reject(new ServerError(400, ServerInfo.POST_NA));
           } else {
             const post = processPostWithoutUser(_post);
+            const postKey = `${post.username}-${post.slug}`;
+            client.setKeyValue(postKey, post, DEFAULT_EXPIRE);
             resolve({
               status: 200,
               message: ServerInfo.POST_RETRIEVED,
