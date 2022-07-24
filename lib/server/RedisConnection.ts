@@ -227,6 +227,11 @@ class RedisConnection {
     });
   }
 
+  /**
+   * Reset cached values in Redis if they contain the edited/deleted post.
+   * @NB this will not reset `HOME` value as it is a preliminary return for
+   * SSR and will be overriden on each `HOME` request by `usePaginatePosts`.
+   */
   resetCache(post: Partial<IPost>, keepAlive = true): Promise<void> {
     return new Promise((resolve) => {
       const { id, isPrivate, slug, username } = post;
@@ -246,11 +251,7 @@ class RedisConnection {
           };
           return this.resetHelper(parentMap, id);
         })
-        .then(
-          async (toDelete) =>
-            // TODO: check if HOME cache contains post instead
-            await this.del([...toDelete, `${username}-${slug}`, HOME])
-        )
+        .then((toDelete) => this.del([...toDelete, `${username}-${slug}`]))
         .catch(console.info)
         .finally(() => {
           if (!keepAlive) this.close();

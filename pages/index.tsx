@@ -19,7 +19,6 @@ export async function getServerSideProps({ res }) {
       .select(["-user"])
       .sort({ createdAt: -1 })
       .limit(PAGINATE_LIMIT)
-      .populate("user", "-createdAt -updatedAt -email -password -posts")
       .lean();
     initPosts = postQuery.map((post) => processPostWithUser(post));
     client.setKeyValue(HOME, initPosts);

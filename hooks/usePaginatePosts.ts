@@ -17,10 +17,10 @@ const usePaginatePosts = (
   const [limitReached, setLimitReached] = useState(false);
   const [status, setStatus] = useState(Status.IDLE);
   const isLoading = useRef(false);
-  const oldest = useRef("");
+  const oldestCrA = useRef("");
 
   const loadMoreFn = useCallback(
-    async (dateRef: MutableRefObject<string>, existingPosts: IPost[]) => {
+    async (dateRef: MutableRefObject<string>) => {
       if ((!publicPosts && !username) || isLoading.current) return;
       isLoading.current = true;
       setStatus(Status.PENDING);
@@ -37,16 +37,8 @@ const usePaginatePosts = (
         const { posts: newPosts, message } = res?.data || {};
         if (res.status === 200) {
           if (newPosts?.length) {
-            let _posts = initPosts;
-            if (dateRef.current) {
-              _posts = [...existingPosts, ...newPosts]; // not first pull -> append
-            } else if (
-              !initPosts?.length ||
-              message === ServerInfo.POST_RETRIEVED
-            ) {
-              // first pull, overwrite initPosts if not cached res OR initPosts not provided
-              _posts = newPosts;
-            }
+            // If first pull, set as posts. Else append to posts
+            const _posts = dateRef.current ? [...posts, ...newPosts] : newPosts;
             let dateVal = newPosts[newPosts.length - 1].createdAt;
             dateVal = new Date(dateVal).valueOf();
             dateRef.current = dateVal;
@@ -62,14 +54,14 @@ const usePaginatePosts = (
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [limit, username, publicPosts, initPosts?.length]
+    [limit, username, publicPosts, posts?.length]
   );
 
   useIsoEffect(() => {
-    if (ready) loadMoreFn(oldest, posts);
+    if (ready) loadMoreFn(oldestCrA);
   }, [ready, loadMoreFn]);
 
-  const loadMore = () => loadMoreFn(oldest, posts);
+  const loadMore = () => loadMoreFn(oldestCrA);
 
   return { posts, limitReached, status, loadMore };
 };
