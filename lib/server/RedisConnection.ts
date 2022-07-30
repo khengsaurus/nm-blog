@@ -14,7 +14,7 @@ class RedisConnection {
   }
 
   async connect() {
-    console.info("-> RedisConnection.connect()");
+    // console.info("-> RedisConnection.connect()");
     return new Promise(async (resolve) => {
       if (this.client?.isOpen) resolve(1);
       else {
@@ -28,7 +28,7 @@ class RedisConnection {
 
   close() {
     if (this?.client?.isOpen) {
-      console.info("-> RedisConnection.close()");
+      // console.info("-> RedisConnection.close()");
       this.client.quit().catch(console.info);
     }
   }
@@ -46,7 +46,7 @@ class RedisConnection {
   }
 
   async updateCurrent() {
-    console.info("-> RedisConnection.updateCurrent()");
+    // console.info("-> RedisConnection.updateCurrent()");
     return new Promise(async (resolve) => {
       const d1 = new Date();
       const d2 = new Date(d1.getTime() + DurationMS.MIN).valueOf(); // 1 min delay
@@ -61,9 +61,6 @@ class RedisConnection {
   }
 
   async set(value: any, pKey: string, sKey?: string): Promise<any | void> {
-    console.info(
-      `-> RedisConnection.setKeyValue(): ${pKey + sKey ? `-${sKey}` : ""}`
-    );
     const val = typeof value === "string" ? value : JSON.stringify(value);
     const isHSet = sKey !== undefined;
     return new Promise(async (resolve) => {
@@ -85,16 +82,16 @@ class RedisConnection {
   }
 
   async setKeyValue(key: string, value: any, ttl?: number): Promise<number> {
-    console.info(`-> RedisConnection.setKeyValue(): ${key}`);
+    // console.info(`-> RedisConnection.setKeyValue(): ${key}`);
     const val = typeof value === "string" ? value : JSON.stringify(value);
     return new Promise(async (resolve) => {
       this.connect()
-        .then(() => this.client.set(key, val))
         .then(() => {
-          if (ttl) this.client.expire(key, ttl);
           // console.info(`RedisConnection: set ${key}`);
-          resolve(1);
+          this.client.set(key, val);
+          if (ttl) this.client.expire(key, ttl);
         })
+        .then(() => resolve(1))
         .catch((err) => {
           console.info(`${ServerInfo.REDIS_SET_FAIL}: ${key}`);
           console.info(`Error: ${err?.message}`);
@@ -167,13 +164,13 @@ class RedisConnection {
 
   async getMaps<T = any>(keys: string | string[]): Promise<IObject<T>[]> {
     const _keys = typeof keys === "string" ? [keys] : keys;
-    console.info(`-> RedisConnection.getMaps(): ${JSON.stringify(_keys)}`);
+    // console.info(`-> RedisConnection.getMaps(): ${JSON.stringify(_keys)}`);
     return setPromiseTimeout(() => this._hgetall<T>([], _keys), []);
   }
 
   async del(keys: string | string[]): Promise<void> {
     const _keys = typeof keys === "string" ? [keys] : keys;
-    console.info(`-> RedisConnection.del(): ${JSON.stringify(_keys)}`);
+    // console.info(`-> RedisConnection.del(): ${JSON.stringify(_keys)}`);
     if (!_keys?.length) return;
     await this.connect();
     return new Promise((resolve) => {
@@ -242,7 +239,7 @@ class RedisConnection {
    * SSR and will be overriden on each `HOME` request by `usePaginatePosts`.
    */
   resetCache(post: Partial<IPost>, keepAlive = true): Promise<void> {
-    console.info(`-> RedisConnection.resetCache(): ${post?.id}`);
+    // console.info(`-> RedisConnection.resetCache(): ${post?.id}`);
     return new Promise((resolve) => {
       const { id, isPrivate, slug, username } = post;
       if (!id) return;
