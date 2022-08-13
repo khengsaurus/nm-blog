@@ -84,6 +84,7 @@ const PostCard = ({
             <div
               className="markdown-view card"
               dangerouslySetInnerHTML={{ __html: markdown }}
+              onClick={(e) => e.preventDefault()}
             />
           ) : (
             <p className={`body ${hasImage ? "short" : "long"}`}>{body}</p>
