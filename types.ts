@@ -20,18 +20,20 @@ export interface IObject<T = any> {
 }
 
 export interface IAppContext {
+  pageReady: boolean;
   user: IUser;
   userToken: string;
-  history: string[];
-  router: NextRouter;
   userSessionActive: boolean;
+  router: NextRouter;
+  history: string[];
   theme: ITheme;
-  setThemeName: (theme?: string) => void;
+  setPageReady: (pageReady?: boolean) => void;
+  handleUser: (token: string, user: IUser) => void;
+  logout: (backToLogin?: boolean) => void;
   routerPush: (route: string) => void;
   routerBack: () => void;
-  logout: () => void;
+  setThemeName: (theme?: string) => void;
   updatePostSlugs: (user: IUser) => void;
-  handleUser: (token: string, user: IUser) => void;
 }
 
 export interface ITheme {

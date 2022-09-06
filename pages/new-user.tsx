@@ -1,14 +1,17 @@
 import { CenteredMain, Input, Row, StyledButton } from "components";
 import { APIAction, DBService, HttpRequest, PageRoute } from "enums";
+import { usePageReady } from "hooks";
 import { AppContext } from "hooks/context";
 import { HTTPService } from "lib/client";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
 const NewUser = () => {
-  const { user, handleUser, logout, routerPush } = useContext(AppContext);
+  const { user, handleUser, logout, routerPush, setPageReady } =
+    useContext(AppContext);
   const [username, setUsername] = useState("");
   const [toDeleteIfUnload, setToDeleteIfUnload] = useState(true);
+  usePageReady();
 
   useEffect(() => {
     if (!user) {
@@ -22,16 +25,9 @@ const NewUser = () => {
     HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequest.DELETE, {
       user,
     })
-      .then((res) => {
-        if (res.status === 200) {
-          logout();
-          routerPush(PageRoute.LOGIN);
-        } else {
-          console.info(res);
-        }
-      })
-      .catch(console.error);
-  }, [user, logout, routerPush]);
+      .catch(console.error)
+      .finally(() => logout(true));
+  }, [user, logout]);
 
   // If user ends session before setting username, delete records of email from DB to preserve email availability
   useEffect(() => {
@@ -50,16 +46,18 @@ const NewUser = () => {
       email,
       username,
       action: APIAction.USER_SET_USERNAME,
-    }).then((res) => {
-      if (res.data?.token) {
-        setToDeleteIfUnload(false);
-        handleUser(res.data.token, res.data.user);
-        toast.success("Successfully registered");
-        setTimeout(() => routerPush(PageRoute.HOME), 2000);
-      } else {
-        toast.error(res.data?.message || "Failed to register");
-      }
-    });
+    })
+      .then((res) => {
+        if (res.data?.token) {
+          setToDeleteIfUnload(false);
+          handleUser(res.data.token, res.data.user);
+          toast.success("Successfully registered");
+          setTimeout(() => routerPush(PageRoute.HOME), 2000);
+        } else {
+          toast.error(res.data?.message || "Failed to register");
+        }
+      })
+      .finally(() => setPageReady(false));
   }
 
   return (

@@ -7,7 +7,7 @@ import {
   PageRoute,
   ToastMessage,
 } from "enums";
-import { AppContext, useFirstEffect } from "hooks";
+import { AppContext, useFirstEffect, usePageReady } from "hooks";
 import { HTTPService } from "lib/client";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
@@ -20,6 +20,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showRegister, setShowRegister] = useState(false);
+  usePageReady();
 
   useFirstEffect(() => {
     if (!!user) {
@@ -43,6 +44,13 @@ const Login = () => {
       confirmPassword.trim() === "",
     [email, password, confirmPassword]
   );
+
+  const resetFrom = useCallback(() => {
+    setUsername("");
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+  }, []);
 
   const cleanup = useCallback(
     (res: IResponse, route: PageRoute) => {
@@ -134,7 +142,10 @@ const Login = () => {
       <Row style={{ width: 180 }}>
         <StyledButton
           label={showRegister ? "Back" : "Register"}
-          onClick={() => setShowRegister(!showRegister)}
+          onClick={() => {
+            resetFrom();
+            setShowRegister(!showRegister);
+          }}
         />
         {showRegister ? renderRegisterButton() : renderLoginButton()}
       </Row>

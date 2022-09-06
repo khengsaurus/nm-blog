@@ -10,23 +10,26 @@ import useTheme from "./useTheme";
 import useWindowListener from "./useWindowListener";
 
 const initialContext: IAppContext = {
-  theme: themes[DEFAULT_THEME],
-  setThemeName: null,
+  pageReady: false,
   user: null,
   userToken: "",
   userSessionActive: true,
-  history: [],
   router: null,
+  history: [],
+  theme: themes[DEFAULT_THEME],
+  setPageReady: null,
+  handleUser: null,
+  logout: null,
   routerPush: null,
   routerBack: null,
-  logout: null,
+  setThemeName: null,
   updatePostSlugs: null,
-  handleUser: null,
 };
 
 export const AppContext = createContext<IAppContext>(initialContext);
 
 const AppContextProvider = (props: any) => {
+  const [pageReady, setPageReady] = useState(false);
   const [user, setUser] = useState<IUser>();
   const [userSessionActive, setUserSessionActive] = useState(true);
   const [userToken, setUserToken] = useLocalStorage("userToken", "");
@@ -37,6 +40,7 @@ const AppContextProvider = (props: any) => {
   /* -------------------- Start Router stuff -------------------- */
   const routerPush = useCallback(
     (route: string) => {
+      setPageReady(false);
       if (route === PageRoute.HOME) {
         historyRef.current = new Array();
       } else {
@@ -136,18 +140,20 @@ const AppContextProvider = (props: any) => {
   return (
     <AppContext.Provider
       value={{
+        pageReady,
         user,
         userToken,
         userSessionActive,
-        theme,
-        history: historyRef.current,
         router,
-        setThemeName,
-        routerPush,
-        routerBack,
-        logout,
-        updatePostSlugs,
+        history: historyRef.current,
+        theme,
+        setPageReady,
         handleUser,
+        logout,
+        routerBack,
+        routerPush,
+        setThemeName,
+        updatePostSlugs,
       }}
       {...props}
     />

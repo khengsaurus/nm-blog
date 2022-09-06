@@ -1,6 +1,6 @@
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { DEFAULT_THEME } from "consts";
-import { Dimension } from "enums";
+import { Dimension, TransitionSpeed } from "enums";
 import { AppContext } from "hooks";
 import { useContext, useEffect, useState } from "react";
 import { ITheme } from "types";
@@ -93,6 +93,7 @@ function newMuiTheme(theme: ITheme) {
             backgroundColor: "transparent",
             "&:hover": {
               cursor: "pointer",
+              boxShadow: `0 0 0px 2px ${highlightColor}`,
             },
           },
         },
@@ -100,14 +101,10 @@ function newMuiTheme(theme: ITheme) {
       MuiCardContent: {
         styleOverrides: {
           root: {
-            border: `2px solid ${primary}`,
             padding: "4px 12px",
             backgroundColor: primary,
             "&:last-child": {
               padding: "4px 8px",
-            },
-            "&:hover": {
-              borderColor: highlightColor,
             },
           },
         },
@@ -210,10 +207,11 @@ function newMuiTheme(theme: ITheme) {
         styleOverrides: {
           colorInherit: { color: mainText },
           root: {
+            transition: "300ms",
             color: mainText,
             backgroundColor: "transparent !important",
             "&:hover": {
-              color: highlightColor,
+              color: `${highlightColor} !important`,
             },
           },
         },
@@ -251,6 +249,21 @@ function newMuiTheme(theme: ITheme) {
             "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
               borderColor: highlightColor,
               borderWidth: "2px",
+            },
+          },
+        },
+      },
+      MuiLinearProgress: {
+        styleOverrides: {
+          root: {
+            height: "2px",
+            backgroundColor: secondary,
+            transition: TransitionSpeed.MEDIUM,
+            '[class*="barColorPrimary"]': {
+              backgroundColor: `${secondary} !important`,
+            },
+            '[class*="barColorSecondary"]': {
+              backgroundColor: `${secondary} !important`,
             },
           },
         },

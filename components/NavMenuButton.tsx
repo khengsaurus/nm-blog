@@ -3,9 +3,14 @@ import { StyledButton } from "components";
 interface INavMenuButton {
   label: string;
   fontSize?: number;
+  callback?: () => void;
 }
 
-const NavMenuButton = ({ label, fontSize = 16 }: INavMenuButton) => {
+const NavMenuButton = ({
+  label,
+  fontSize = 16,
+  callback = null,
+}: INavMenuButton) => {
   return (
     <StyledButton
       label={label}
@@ -16,6 +21,7 @@ const NavMenuButton = ({ label, fontSize = 16 }: INavMenuButton) => {
         textTransform: "capitalize",
       }}
       sx={{ fontSize: fontSize }}
+      onClick={callback}
     />
   );
 };

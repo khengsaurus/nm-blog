@@ -7,7 +7,13 @@ import {
   StyledText,
 } from "components";
 import { DBService, Flag, HttpRequest, Status, ToastMessage } from "enums";
-import { AppContext, useAsync, useIsoEffect, usePreviewImg } from "hooks";
+import {
+  AppContext,
+  useAsync,
+  useIsoEffect,
+  usePageReady,
+  usePreviewImg,
+} from "hooks";
 import {
   avatarStyles,
   deleteImage,
@@ -27,6 +33,7 @@ const EditProfile = () => {
   const [newImage, setNewImage] = useState<any>(null);
   const [imageKey, setImageKey] = useState("");
   const imageUpdated = !!newImage || imageKey !== user?.avatarKey;
+  usePageReady();
 
   const previewImg = usePreviewImg(Flag.PREVIEW_IMG, newImage, false, 0);
   useIsoEffect(() => {
@@ -43,7 +50,9 @@ const EditProfile = () => {
         imageKey = user?.avatarKey || "";
       if (imageUpdated) {
         if (user?.avatarKey)
-          deleteImage(user.avatarKey).catch((err) => console.info(err?.message));
+          deleteImage(user.avatarKey).catch((err) =>
+            console.info(err?.message)
+          );
         await getUploadedImageKey(newImage)
           .then((key) => {
             imageKey = key;

@@ -16,7 +16,13 @@ import {
   Status,
   ToastMessage,
 } from "enums";
-import { AppContext, useAsync, usePreviewImg, useRealtimePost } from "hooks";
+import {
+  AppContext,
+  useAsync,
+  usePageReady,
+  usePreviewImg,
+  useRealtimePost,
+} from "hooks";
 import { deleteImage, getUploadedImageKey, HTTPService } from "lib/client";
 import { ServerError } from "lib/server";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
@@ -48,6 +54,7 @@ const EditPost = ({ id }: IPostPage) => {
   const isNewPost = id === "new";
   const imageUpdated = !!newImage || imageKey !== realtimePost?.imageKey;
   const today = useRef(new Date());
+  usePageReady();
 
   useEffect(() => {
     if (!hasEditedSlug.current) {

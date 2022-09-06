@@ -8,6 +8,7 @@ import useIsoEffect from "./useIsoEffect";
 import useKeyListener from "./useKeyListener";
 import useLocalStorage from "./useLocalStorage";
 import useMarkdown from "./useMarkdown";
+import usePageReady from "./usePageReady";
 import usePaginatePosts from "./usePaginatePosts";
 import usePreviewImg from "./usePreviewImg";
 import useRealtimePost from "./useRealtimePost";
@@ -28,6 +29,7 @@ export {
   useKeyListener,
   useLocalStorage,
   useMarkdown,
+  usePageReady,
   usePaginatePosts,
   usePreviewImg,
   useRefClick,

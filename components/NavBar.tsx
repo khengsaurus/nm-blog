@@ -1,7 +1,7 @@
 import AddIcon from "@mui/icons-material/Add";
 import DynamicFeedIcon from "@mui/icons-material/DynamicFeed";
 import HomeIcon from "@mui/icons-material/Home";
-import { AppBar, Toolbar } from "@mui/material";
+import { AppBar, LinearProgress, Toolbar } from "@mui/material";
 import { NavButton, ProfileNav } from "components";
 import { PageRoute } from "enums";
 import { AppContext } from "hooks";
@@ -10,7 +10,13 @@ import { useContext } from "react";
 const preLoginRoutes = [PageRoute.LOGIN, PageRoute.NEW_USER];
 
 const NavBar = () => {
-  const { userSessionActive, router, routerPush } = useContext(AppContext);
+  const {
+    pageReady,
+    router,
+    userSessionActive,
+    theme: { secondary, highlightColor },
+  } = useContext(AppContext);
+
   // edge case - at new-user screen, no username set yet
   const isPreLogin = preLoginRoutes.some((route) =>
     router?.asPath.startsWith(route)
@@ -36,6 +42,11 @@ const NavBar = () => {
         )}
         <ProfileNav />
       </Toolbar>
+      <LinearProgress
+        style={{
+          backgroundColor: pageReady ? secondary : highlightColor,
+        }}
+      />
     </AppBar>
   );
 };

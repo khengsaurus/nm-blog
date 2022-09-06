@@ -34,7 +34,7 @@ function getHeight(items: number) {
 const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
   (props: IDropdownMenu, ref?: MutableRefObject<any>) => {
     const { open, handleClose } = props;
-    const { theme, user, logout, routerPush, setThemeName } =
+    const { theme, user, setPageReady, logout, routerPush, setThemeName } =
       useContext(AppContext);
     const [activeMenu, setActiveMenu] = useState("main");
     const [menuHeight, setMenuHeight] = useState(0);
@@ -104,7 +104,12 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
             leftIcon={<PersonOutlineIcon />}
             callback={() => handleNav(PageRoute.MY_PROFILE)}
           >
-            {<NavMenuButton label="Details" />}
+            {
+              <NavMenuButton
+                label="Details"
+                callback={() => setPageReady(false)}
+              />
+            }
           </DropdownItem>
         </div>
       );
@@ -182,6 +187,7 @@ const DropdownMenu = forwardRef<MutableRefObject<any>, IDropdownMenu>(
             setActiveMenu("main");
           }, 500)
         }
+        style={{ zIndex: 1000 }}
       >
         <Container
           className="dropdown"

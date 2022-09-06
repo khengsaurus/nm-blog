@@ -12,7 +12,7 @@ import {
   StyledText,
 } from "components";
 import { PageRoute } from "enums";
-import { AppContext, useMarkdown, useRealtimePost } from "hooks";
+import { AppContext, useMarkdown, usePageReady, useRealtimePost } from "hooks";
 import { MongoConnection } from "lib/server";
 import moment from "moment";
 import { GetStaticPropsResult } from "next";
@@ -87,6 +87,7 @@ const Post = ({ post, username, slug }: IPostPage) => {
     hasMarkdown,
   } = realtimePost || {};
   const markdown = useMarkdown(hasMarkdown, theme?.name, body);
+  usePageReady();
 
   const dateText = useMemo(() => {
     if (createdAt === updatedAt) {

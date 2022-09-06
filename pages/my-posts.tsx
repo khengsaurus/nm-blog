@@ -1,9 +1,10 @@
 import { DarkText, PostFeed } from "components";
-import { AppContext } from "hooks";
+import { AppContext, usePageReady } from "hooks";
 import { useContext } from "react";
 
 const MyPosts = () => {
   const { user } = useContext(AppContext);
+  usePageReady();
 
   return (
     <main>
