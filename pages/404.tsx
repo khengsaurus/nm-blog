@@ -1,6 +1,9 @@
+import { useNavShortcuts } from "hooks";
 import { DarkText } from "../components";
 
 const FourOFour = () => {
+  useNavShortcuts();
+
   return (
     <main className="left pad-top">
       <DarkText text="Whoops!" variant="h2" />

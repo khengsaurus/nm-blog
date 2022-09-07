@@ -2,7 +2,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import { Avatar, Fab } from "@mui/material";
 import { Centered, CircleLoader, DarkText } from "components";
 import { PageRoute } from "enums";
-import { AppContext, usePageReady } from "hooks";
+import { AppContext, useNavShortcuts, usePageReady } from "hooks";
 import { avatarStyles } from "lib/client";
 import { useContext } from "react";
 import { getAvatarLarge } from "utils";
@@ -10,6 +10,7 @@ import { getAvatarLarge } from "utils";
 const MyProfile = () => {
   const { user, routerPush } = useContext(AppContext);
   const { bio, avatarKey, username } = user || {};
+  useNavShortcuts();
   usePageReady();
 
   return (

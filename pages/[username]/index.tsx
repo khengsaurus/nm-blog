@@ -1,7 +1,7 @@
 import { Avatar } from "@mui/material";
 import { Column, DarkText, PostFeed } from "components";
 import { CACHE_DEFAULT, PAGINATE_LIMIT } from "consts";
-import { usePageReady } from "hooks";
+import { useNavShortcuts, usePageReady } from "hooks";
 import { avatarStyles } from "lib/client";
 import { MongoConnection } from "lib/server";
 import { IUser } from "types";
@@ -42,6 +42,7 @@ export async function getServerSideProps({ params, res }) {
 const UserPage = (props: IUserPageProps) => {
   const { visitingUser } = props;
   const { avatarKey, bio, posts, username } = visitingUser || {};
+  useNavShortcuts();
   usePageReady();
 
   return visitingUser ? (

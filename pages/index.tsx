@@ -1,6 +1,6 @@
 import { DarkText, PostFeed } from "components";
 import { CACHE_DEFAULT, HOME, PAGINATE_LIMIT } from "consts";
-import { usePageReady } from "hooks";
+import { useNavShortcuts, usePageReady } from "hooks";
 import { MongoConnection, RedisConnection } from "lib/server";
 import { IPost } from "types";
 import { processPostWithUser } from "utils";
@@ -31,6 +31,7 @@ export async function getServerSideProps({ res }) {
 }
 
 const Home = ({ initPosts }: IHomeProps) => {
+  useNavShortcuts();
   usePageReady();
 
   return (

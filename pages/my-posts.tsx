@@ -1,9 +1,10 @@
 import { DarkText, PostFeed } from "components";
-import { AppContext, usePageReady } from "hooks";
+import { AppContext, useNavShortcuts, usePageReady } from "hooks";
 import { useContext } from "react";
 
 const MyPosts = () => {
   const { user } = useContext(AppContext);
+  useNavShortcuts();
   usePageReady();
 
   return (

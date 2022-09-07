@@ -7,7 +7,12 @@ import {
   PageRoute,
   ToastMessage,
 } from "enums";
-import { AppContext, useFirstEffect, usePageReady } from "hooks";
+import {
+  AppContext,
+  useFirstEffect,
+  useKeyListener,
+  usePageReady,
+} from "hooks";
 import { HTTPService } from "lib/client";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
@@ -93,6 +98,14 @@ const Login = () => {
       toast.error(ToastMessage.PW_NOT_MATCHING);
     }
   }, [confirmPassword, email, password, cleanup]);
+
+  useKeyListener(
+    "Enter",
+    useCallback(() => {
+      (showRegister ? handleRegister : handleLogin)();
+    }, [showRegister, handleLogin, handleRegister]),
+    true
+  );
 
   const renderLoginButton = () => (
     <StyledButton
