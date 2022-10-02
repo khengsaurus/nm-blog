@@ -20,9 +20,9 @@
   }
 }
 
+$card-width: 280px;
 $nav-bar-height: 50px;
-$main-side-margin: clamp(20px, 3vw, 80px);
-$main-width: calc(100vw - (2 * $main-side-margin));
+$main-margin: 50px;
 $speed-fast: 150ms;
 $speed-medium: 350ms;
 $init-bg-color: rgb(40, 40, 40);
@@ -44,7 +44,7 @@ main {
   @include flex-(column);
   @include orientate-contents-(center);
   font-family: "Roboto", sans-serif;
-  margin: 50px $main-side-margin 120px;
+  margin: $main-margin $main-margin 120px;
   &.left {
     @include orientate-contents-(flex-start);
   }
@@ -79,8 +79,10 @@ main {
     &.header {
       @include flex-(row);
       align-items: center;
-      margin: 20px 0px;
+      justify-content: space-between;
+      margin: 20px 6px;
       min-height: fit-content;
+      width: 100%;
     }
     &.column {
       @include flex-(column);

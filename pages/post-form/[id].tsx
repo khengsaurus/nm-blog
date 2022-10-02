@@ -53,7 +53,6 @@ const EditPost = ({ id }: IPostPage) => {
   const hasEditedSlug = useRef(false);
   const isNewPost = id === "new";
   const imageUpdated = !!newImage || imageKey !== realtimePost?.imageKey;
-  const today = useRef(new Date());
   usePageReady();
 
   useEffect(() => {
@@ -221,7 +220,7 @@ const EditPost = ({ id }: IPostPage) => {
               user,
               title: title || "Preview title",
               body: body || "Preview body",
-              updatedAt: today.current?.toString(),
+              createdAt: new Date().toString(),
               imageKey: imageKey || Flag.PREVIEW_IMG,
               hasMarkdown,
             }}
@@ -231,7 +230,7 @@ const EditPost = ({ id }: IPostPage) => {
           />
           <Column style={{ width: "280px" }}>
             <ImageForm
-              label="banner"
+              label="banner image"
               hasImage={!!imageKey || !!newImage}
               setImage={setNewImage}
               setImageKey={setImageKey}

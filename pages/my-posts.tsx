@@ -1,4 +1,4 @@
-import { DarkText, PostFeed } from "components";
+import { PostFeed } from "components";
 import { AppContext, useNavShortcuts, usePageReady } from "hooks";
 import { useContext } from "react";
 
@@ -9,15 +9,14 @@ const MyPosts = () => {
 
   return (
     <main>
-      <section className="header">
-        <DarkText text="My Posts" variant="h3" />
-      </section>
       <PostFeed
         hasAuthorLink={false}
         limitPosts={user?.posts.length}
         publicPosts={false}
         username={user?.username}
         windowReady={!!user}
+        title="My posts"
+        hasSearch
       />
     </main>
   );

@@ -1,4 +1,4 @@
-import { DarkText, PostFeed } from "components";
+import { PostFeed } from "components";
 import { CACHE_DEFAULT, HOME, PAGINATE_LIMIT } from "consts";
 import { useNavShortcuts, usePageReady } from "hooks";
 import { MongoConnection, RedisConnection } from "lib/server";
@@ -36,10 +36,7 @@ const Home = ({ initPosts }: IHomeProps) => {
 
   return (
     <main>
-      <section className="header">
-        <DarkText text="Public Posts" variant="h3" />
-      </section>
-      <PostFeed initPosts={initPosts} />
+      <PostFeed initPosts={initPosts} title="Public posts" hasSearch />
     </main>
   );
 };

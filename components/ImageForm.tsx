@@ -39,15 +39,15 @@ const ImageForm = ({ label, hasImage, setImage, setImageKey }: IImageForm) => {
         component="label"
         style={{
           height: "40px",
-          width: "120px",
+          width: "200px",
           padding: "0px",
           justifyContent: "flex-start",
-          textTransform: "capitalize",
+          textTransform: "initial",
           marginLeft: 10,
         }}
         onClick={hasImage ? removeImage : null}
       >
-        {`${hasImage ? "Remove" : "Add"} ${label}`}
+        {`${hasImage ? "Remove" : "Add"} ${label.toLowerCase()}`}
         {!hasImage && <input type="file" hidden onChange={handleAttachment} />}
       </Button>
     </Row>

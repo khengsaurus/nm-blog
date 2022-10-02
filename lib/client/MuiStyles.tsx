@@ -132,7 +132,7 @@ function newMuiTheme(theme: ITheme) {
             border: `2px solid ${mainText}`,
             borderRadius: "4px",
             color: mainText,
-            margin: 0,
+            margin: "0px !important",
             padding: "5px !important",
           },
         },

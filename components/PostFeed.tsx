@@ -1,6 +1,7 @@
 import {
   CircleLoader,
   DarkText,
+  Input,
   PostCard,
   PostFeedDiv,
   StyledButton,
@@ -8,8 +9,8 @@ import {
 } from "components";
 import { PAGINATE_LIMIT } from "consts";
 import { Dimension, Status } from "enums";
-import { usePaginatePosts, useWindowLoaded } from "hooks";
-import { CSSProperties } from "react";
+import { usePaginatePosts, useWindowDimensions, useWindowLoaded } from "hooks";
+import { CSSProperties, useMemo, useState } from "react";
 import { IPost } from "types";
 
 interface IPostFeed {
@@ -22,6 +23,8 @@ interface IPostFeed {
   ready?: boolean;
   username?: string;
   windowReady?: boolean;
+  title?: string;
+  hasSearch?: boolean;
 }
 
 export const initFeedWidth: CSSProperties = { width: 4 * Dimension.CARD_W };
@@ -36,8 +39,11 @@ const PostFeed = ({
   ready = true,
   username = "",
   windowReady = true,
+  title = "",
+  hasSearch = false,
 }: IPostFeed) => {
   const windowLoaded = useWindowLoaded();
+  const [searchStr, setSearchStr] = useState("");
   const { posts, limitReached, status, loadMore } = usePaginatePosts(
     ready && typeof window !== undefined,
     publicPosts,
@@ -56,9 +62,28 @@ const PostFeed = ({
     );
   }
 
+  const { width } = useWindowDimensions();
+  const feedWidth: CSSProperties = useMemo(() => {
+    const cards = Math.floor((width - 100) / Dimension.CARD_W);
+    return { width: `${cards * (Dimension.CARD_W + 12)}px` };
+  }, [width]);
+
   return (
     <WindowLoaded ready={windowReady}>
-      <PostFeedDiv style={windowLoaded ? null : initFeedWidth}>
+      <PostFeedDiv style={windowLoaded ? feedWidth : initFeedWidth}>
+        {(title || hasSearch) && (
+          <section className="header">
+            <DarkText text={title} variant="h3" />
+            {hasSearch && (
+              <Input
+                label="Search"
+                value={searchStr}
+                onChange={(e) => setSearchStr(e.target.value)}
+                inputProps={{ maxLength: 50 }}
+              />
+            )}
+          </section>
+        )}
         {posts.map((post, index) => (
           <PostCard
             key={index}
