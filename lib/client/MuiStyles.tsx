@@ -112,7 +112,7 @@ function newMuiTheme(theme: ITheme) {
       MuiCardMedia: {
         styleOverrides: {
           root: {
-            height: 80,
+            height: Dimension.CARD_IMG_H,
             objectPosition: "50% 40%",
           },
         },

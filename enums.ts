@@ -39,6 +39,7 @@ export enum DurationMS {
 
 export enum Dimension {
   BANNER_H = 350,
+  CARD_IMG_H = 80,
   CARD_W = 280,
   AVATAR_S = 24,
   AVATAR_M = 40,

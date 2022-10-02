@@ -138,7 +138,7 @@ export const getStatusLabel = (saveStatus: Status) => {
 
 export function getCardSrc(imageKey: string) {
   if (!imageKey) return "";
-  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-${Dimension.CARD_W},h-80,q-70`;
+  return `${process.env.ENV_IMG_SRC}${imageKey}?tr=w-${Dimension.CARD_W},h-${Dimension.CARD_IMG_H},q-100`;
 }
 
 export function getBannerSrc(imageKey: string) {

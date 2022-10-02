@@ -1,12 +1,12 @@
+/* eslint-disable @next/next/no-img-element */
 import { Card, CardContent, CardMedia } from "@mui/material";
 import { AuthorLink, Row } from "components";
 import { Dimension, Flag } from "enums";
-import { motion } from "framer-motion";
-import { AppContext, useDynamicSrc, useMarkdown } from "hooks";
+import { AppContext, useMarkdown } from "hooks";
 import moment from "moment";
-import { useCallback, useContext } from "react";
+import { useContext } from "react";
 import { IPost } from "types";
-import { getCardSrc, getBannerSrc } from "utils";
+import { getCardSrc } from "utils";
 
 interface IPostCard {
   post: IPost;
@@ -17,7 +17,7 @@ interface IPostCard {
 }
 
 const imgStyle: any = {
-  height: "80px",
+  height: `${Dimension.CARD_IMG_H}px`,
   width: "100%",
   objectFit: "cover",
 };
@@ -36,11 +36,11 @@ const PostCard = ({
   const date = moment(new Date(createdAt)).format("DD/MM/YY");
   const hasRealImage = !!imageKey && imageKey !== Flag.PREVIEW_IMG;
   const hasImage = showingPreview || hasRealImage;
-  const readySrc = useDynamicSrc(getCardSrc(imageKey), getBannerSrc(imageKey));
 
-  const handleClick = useCallback(() => {
-    disable ? null : routerPush(`/${username}/${slug}`);
-  }, [disable, username, slug, routerPush]);
+  const handleClick = () => {
+    if (disable) return;
+    routerPush(`/${username}/${slug}`);
+  };
 
   return (
     <Card
@@ -50,15 +50,15 @@ const PostCard = ({
     >
       {hasRealImage && (
         <CardMedia>
-          <motion.img
-            src={readySrc}
+          <img
+            src={getCardSrc(imageKey)}
             alt="card-image"
-            layoutId={`banner-${imageKey}`}
             style={imgStyle}
+            id={imageKey}
           />
         </CardMedia>
       )}
-      {imageKey === Flag.PREVIEW_IMG && ( // eslint-disable-next-line @next/next/no-img-element
+      {imageKey === Flag.PREVIEW_IMG && (
         <img
           src=""
           alt={Flag.PREVIEW_IMG}
