@@ -10,7 +10,8 @@ import {
 import { PAGINATE_LIMIT } from "consts";
 import { Dimension, Status } from "enums";
 import { usePaginatePosts, useWindowDimensions, useWindowLoaded } from "hooks";
-import { CSSProperties, useMemo, useState } from "react";
+import { useQueryState } from "next-usequerystate";
+import { CSSProperties, useMemo } from "react";
 import { IPost } from "types";
 
 interface IPostFeed {
@@ -43,12 +44,14 @@ const PostFeed = ({
   hasSearch = false,
 }: IPostFeed) => {
   const windowLoaded = useWindowLoaded();
-  const [searchStr, setSearchStr] = useState("");
+  const [searchStr, setSearchStr] = useQueryState("q", { history: "replace" });
+  const { width } = useWindowDimensions();
   const { posts, limitReached, status, loadMore } = usePaginatePosts(
     ready && typeof window !== undefined,
     publicPosts,
     initPosts,
     username,
+    searchStr,
     paginateLimit
   );
 
@@ -61,8 +64,6 @@ const PostFeed = ({
       <StyledButton label="Load more" onClick={loadMore} />
     );
   }
-
-  const { width } = useWindowDimensions();
   const feedWidth: CSSProperties = useMemo(() => {
     const cards = Math.floor((width - 100) / Dimension.CARD_W);
     return { width: `${cards * (Dimension.CARD_W + 12)}px` };
@@ -77,8 +78,13 @@ const PostFeed = ({
             {hasSearch && (
               <Input
                 label="Search"
-                value={searchStr}
-                onChange={(e) => setSearchStr(e.target.value)}
+                value={searchStr || ""}
+                onChange={(e) =>
+                  setSearchStr(e.target.value, {
+                    scroll: false,
+                    shallow: true,
+                  })
+                }
                 inputProps={{ maxLength: 50 }}
               />
             )}

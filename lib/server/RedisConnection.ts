@@ -169,8 +169,8 @@ class RedisConnection {
   }
 
   async del(keys: string | string[]): Promise<void> {
-    const _keys = typeof keys === "string" ? [keys] : keys;
     // console.info(`-> RedisConnection.del(): ${JSON.stringify(_keys)}`);
+    const _keys = typeof keys === "string" ? [keys] : keys;
     if (!_keys?.length) return;
     await this.connect();
     return new Promise((resolve) => {
@@ -185,6 +185,9 @@ class RedisConnection {
     });
   }
 
+  /**
+   * @TODO how to hdel(pKey, ...sKeys)
+   */
   async hdel(pKey: string, sKey: string): Promise<number> {
     return new Promise((resolve) => {
       this.client
@@ -201,10 +204,11 @@ class RedisConnection {
     uN: string,
     pr: boolean,
     date = "",
+    search = "",
     limit = PAGINATE_LIMIT
   ): Promise<IPost[]> {
     const _date = date || (await this.getCurrent());
-    const { pKey, sKey, fullKey } = this.getKeys(uN, pr, _date, limit);
+    const { pKey, sKey, fullKey } = this.getKeys(uN, pr, _date, search, limit);
     return new Promise((resolve) => {
       this.getMaps<object>(pKey).then((maps) => {
         if (isEmpty(maps) || !maps[0]?.[sKey]) resolve([]);
@@ -218,12 +222,19 @@ class RedisConnection {
     uN: string,
     pr: boolean,
     date = "",
+    search = "",
     limit = PAGINATE_LIMIT
   ): Promise<void> {
     if (!posts.length) return;
     return new Promise(async (resolve) => {
       const _date = date || (await this.getCurrent());
-      const { pKey, sKey, fullKey } = this.getKeys(uN, pr, _date, limit);
+      const { pKey, sKey, fullKey } = this.getKeys(
+        uN,
+        pr,
+        _date,
+        search,
+        limit
+      );
       let postIds = "";
       posts.forEach((post) => (postIds += post.id + "|"));
       this.set(postIds, pKey, sKey)
@@ -237,8 +248,15 @@ class RedisConnection {
    * Reset cached values in Redis if they contain the edited/deleted post.
    * @NB this will not reset `HOME` value as it is a preliminary return for
    * SSR and will be overriden on each `HOME` request by `usePaginatePosts`.
+   *
+   * @param privacyChange:
+   *  0 (no change); 1 (public -> private); 2 (private -> public)
    */
-  resetCache(post: Partial<IPost>, keepAlive = true): Promise<void> {
+  resetCache(
+    post: Partial<IPost>,
+    keepAlive = true,
+    privacyChange = 0
+  ): Promise<void> {
     // console.info(`-> RedisConnection.resetCache(): ${post?.id}`);
     return new Promise((resolve) => {
       const { id, isPrivate, slug, username } = post;
@@ -248,7 +266,10 @@ class RedisConnection {
       let hKey; // public Q for recent
       prKey = this.getPrimaryKey(username, true);
       puKey = this.getPrimaryKey(username, false);
-      hKey = isPrivate ? "" : this.getPrimaryKey("", false);
+      hKey =
+        !isPrivate || Boolean(privacyChange)
+          ? this.getPrimaryKey("", false)
+          : "";
       this.getMaps([prKey, puKey, hKey])
         .then((maps) => {
           const parentMap = {
@@ -256,7 +277,12 @@ class RedisConnection {
             [puKey]: maps[1],
             [hKey]: maps[2],
           };
-          return this.resetHelper(parentMap, id);
+          return this.resetHelper(
+            parentMap,
+            id,
+            Boolean(hKey),
+            privacyChange === 2 ? hKey : ""
+          );
         })
         .then((toDelete) => this.del([...toDelete, `${username}-${slug}`]))
         .catch(console.info)
@@ -267,22 +293,36 @@ class RedisConnection {
     });
   }
 
-  resetHelper(map: IObject, postId: string): Promise<string[]> {
+  resetHelper(
+    map: IObject,
+    postId: string,
+    resetHome = false,
+    resetAll = ""
+  ): Promise<string[]> {
     return new Promise((resolve) => {
       const fullKeys = [];
       if (isEmpty(map)) resolve(fullKeys);
       for (const pKey of Object.keys(map)) {
         const sMap = map[pKey];
-        if (isEmpty(sMap)) continue;
-        for (const sKey of Object.keys(sMap)) {
-          if (!sMap[sKey]) continue;
-          const postIds = sMap[sKey].split("|");
-          if (postIds.indexOf(postId) !== -1) {
+        if (resetAll === pKey) {
+          for (const sKey of Object.keys(sMap)) {
             this.hdel(pKey, sKey);
             fullKeys.push(pKey + Flag.DATE_TAG + sKey);
           }
+        } else if (isEmpty(sMap)) {
+          continue;
+        } else {
+          for (const sKey of Object.keys(sMap)) {
+            if (!sMap[sKey]) continue;
+            const postIds = sMap[sKey].split("|");
+            if (postIds.indexOf(postId) !== -1) {
+              this.hdel(pKey, sKey);
+              fullKeys.push(pKey + Flag.DATE_TAG + sKey);
+            }
+          }
         }
       }
+      if (resetHome) this.del(HOME);
       resolve(fullKeys);
     });
   }
@@ -307,14 +347,20 @@ class RedisConnection {
     });
   }
 
-  getPrimaryKey(username: string, isPrivate: boolean) {
+  getPrimaryKey(username: string, isPrivate: boolean, search = "") {
     return `${Flag.USER_TAG}${username || ""}${Flag.PRIVATE_TAG}${
       isPrivate || false
-    }`;
+    }${Flag.SEARCH}${search}`;
   }
 
-  getKeys(username: string, isPrivate: boolean, date: string, limit: number) {
-    const pKey = this.getPrimaryKey(username, isPrivate);
+  getKeys(
+    username: string,
+    isPrivate: boolean,
+    date: string,
+    search: string,
+    limit: number
+  ) {
+    const pKey = this.getPrimaryKey(username, isPrivate, search);
     const sKey = `${date}` + `${Flag.LIMIT_TAG}${limit}`;
     const fullKey = pKey + Flag.DATE_TAG + sKey;
     return { pKey, sKey, fullKey };

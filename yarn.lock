@@ -6872,6 +6872,11 @@ next-connect@^0.12.2:
   dependencies:
     trouter "^3.2.0"
 
+next-usequerystate@^1.7.2:
+  version "1.7.2"
+  resolved "https://registry.yarnpkg.com/next-usequerystate/-/next-usequerystate-1.7.2.tgz#3f83426a27d7f3710320cd0a178769812f56f9b2"
+  integrity sha512-5ChbGoG/TGYRuKtpI4fKf1wsePYrO75srXwLcuPR0Nnbm7Tspfbx0L6215PRmUb9ZJCRLoXy6J3CqJRZYCot3w==
+
 next@^12.1.6:
   version "12.1.6"
   resolved "https://registry.yarnpkg.com/next/-/next-12.1.6.tgz#eb205e64af1998651f96f9df44556d47d8bbc533"

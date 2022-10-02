@@ -1,67 +1,120 @@
 import { PAGINATE_LIMIT } from "consts";
 import { DBService, ServerInfo, Status } from "enums";
 import { HTTPService } from "lib/client";
-import { MutableRefObject, useCallback, useRef, useState } from "react";
+import debounce from "lodash/debounce";
+import {
+  MutableRefObject,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import toast from "react-hot-toast";
 import { IObject, IPost } from "types";
-import useIsoEffect from "./useIsoEffect";
 
 const usePaginatePosts = (
   ready: boolean,
   publicPosts: boolean,
   initPosts?: IPost[],
   username?: string,
+  searchStr?: string,
   limit = PAGINATE_LIMIT
 ) => {
   const [posts, setPosts] = useState(initPosts || []);
   const [limitReached, setLimitReached] = useState(false);
   const [status, setStatus] = useState(Status.IDLE);
-  const isLoading = useRef(false);
+  const [search, setSearch] = useState("");
   const oldestCrA = useRef("");
+  const prevSearch = useRef("");
+  const abortControllerRef = useRef<AbortController>(null);
 
-  const loadMoreFn = useCallback(
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debounceSearchStr = useCallback(
+    debounce((str: string) => {
+      if (str?.trim() !== prevSearch.current?.trim()) {
+        setSearch(str || "");
+      }
+    }, 1000),
+    []
+  );
+
+  useEffect(() => debounceSearchStr(searchStr), [debounceSearchStr, searchStr]);
+
+  const abortPendingReq = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = null;
+  };
+
+  const loadMoreCb = useCallback(
     async (dateRef: MutableRefObject<string>) => {
-      if ((!publicPosts && !username) || isLoading.current) return;
-      isLoading.current = true;
+      if (!publicPosts && !username) return;
+      abortPendingReq();
       setStatus(Status.PENDING);
+      const newAbortController = new AbortController();
+      abortControllerRef.current = newAbortController;
+
+      let isNewQuery = false;
+      if (search?.trim() !== prevSearch.current?.trim()) {
+        isNewQuery = true;
+        dateRef.current = "";
+        prevSearch.current = search || "";
+      }
 
       const query: IObject<any> = {
         limit,
         isPrivate: true,
       };
-      if (dateRef.current) query.createdAt = dateRef.current;
+      if (!isNewQuery && dateRef.current) query.createdAt = dateRef.current;
       if (username) query.username = username;
       if (publicPosts) query.isPrivate = false;
+      if (search) query.search = search;
 
-      HTTPService.makeGetReq(DBService.POSTS, query).then((res) => {
+      HTTPService.makeGetReq(DBService.POSTS, query, {
+        signal: newAbortController.signal,
+      }).then((res) => {
+        abortControllerRef.current = null;
         const { posts: newPosts, message } = res?.data || {};
         if (res.status === 200) {
           if (newPosts?.length) {
-            // If first pull, set as posts. Else append to posts
-            const _posts = dateRef.current ? [...posts, ...newPosts] : newPosts;
+            // If first pull, set as posts, else append to posts
+            const _posts =
+              isNewQuery || !dateRef.current
+                ? newPosts
+                : [...posts, ...newPosts];
             let dateVal = newPosts[newPosts.length - 1].createdAt;
             dateVal = new Date(dateVal).valueOf();
             dateRef.current = dateVal;
             setPosts(_posts);
           }
-          if (newPosts?.length < limit || message === ServerInfo.POST_NA) {
-            toast.success("You've reached the end!");
+          if (newPosts?.length < limit) {
+            if (message === ServerInfo.POST_NA && isNewQuery) {
+              toast.error("No posts found");
+            } else {
+              toast.success("You've reached the end");
+            }
             setLimitReached(true);
+          } else {
+            setLimitReached(false);
           }
         }
-        setTimeout(() => (isLoading.current = false), 1000); // throttle
         setStatus(Status.IDLE);
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [limit, username, publicPosts, posts?.length]
+    [limit, username, publicPosts, search, posts?.length]
   );
 
-  useIsoEffect(() => {
-    if (ready) loadMoreFn(oldestCrA);
-  }, [ready, loadMoreFn]);
+  useEffect(() => {
+    if (ready) {
+      abortPendingReq();
+      loadMoreCb(oldestCrA);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, search]);
 
-  const loadMore = () => loadMoreFn(oldestCrA);
+  const loadMore = () => loadMoreCb(oldestCrA);
 
   return { posts, limitReached, status, loadMore };
 };

@@ -9,6 +9,10 @@ const useNavShortcuts = () => {
 
   const handleShortcut = useCallback(
     (e) => {
+      const activeElement = document.activeElement;
+      if (activeElement.tagName === "INPUT") {
+        return;
+      }
       switch (e?.key) {
         case "h":
           return currRoute !== PageRoute.HOME

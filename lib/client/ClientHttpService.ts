@@ -68,8 +68,16 @@ class ClientHTTPService {
     }
   }
 
-  makeGetReq(service: DBService, params?: object) {
-    return this.instance.get(service, { params, headers: authBearer });
+  makeGetReq(
+    service: DBService,
+    params?: object,
+    config: AxiosRequestConfig = {}
+  ) {
+    return this.instance.get(service, {
+      params,
+      headers: authBearer,
+      ...config,
+    });
   }
 
   /**

@@ -165,3 +165,7 @@ export function castAsBoolean(str: string | boolean) {
   if (typeof str === "boolean") return str;
   return !(str === "false" || !str);
 }
+
+export function sleep(ms = 1000) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

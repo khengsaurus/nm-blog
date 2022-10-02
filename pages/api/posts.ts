@@ -22,6 +22,7 @@ import {
   processPostsWithoutUser,
   processPostWithoutUser,
   processPostWithUser,
+  sleep,
 } from "utils";
 
 export const config = EXPERIMENT_RUNTIME;
@@ -62,13 +63,20 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
     username,
     isPrivate: _isPrivate,
     createdAt = "",
+    search = "",
     limit = PAGINATE_LIMIT,
   } = params;
   const isPrivate = castAsBoolean(_isPrivate);
 
   return new Promise(async (resolve, reject) => {
     const client = new RedisConnection();
-    let posts = await client.read(username, isPrivate, createdAt, limit);
+    let posts = await client.read(
+      username,
+      isPrivate,
+      createdAt,
+      search,
+      limit
+    );
     if (posts?.length) {
       client.close();
       resolve({
@@ -80,6 +88,14 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
       const query: any = createdAt ? { createdAt: { $lt: createdAt } } : {};
       if (username) query.username = username;
       if (!isPrivate) query.isPrivate = false;
+      // if (search) query.body = { $regex: search, $options: "i" };
+      if (search)
+        query.$or = [
+          { username: { $regex: search, $options: "i" } },
+          { slug: { $regex: search, $options: "i" } },
+          { title: { $regex: search, $options: "i" } },
+          { body: { $regex: search, $options: "i" } },
+        ];
       const { Post } = await MongoConnection();
       await Post.find(query)
         .select(["-user"])
@@ -89,7 +105,7 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
         .then((_posts) => {
           if (_posts?.length) {
             posts = processPostsWithoutUser(_posts);
-            client.write(posts, username, isPrivate, createdAt, limit);
+            client.write(posts, username, isPrivate, createdAt, search, limit);
           }
           resolve({
             status: 200,
@@ -208,13 +224,24 @@ async function patchDoc(req: NextApiRequest): Promise<IResponse> {
     _set.isPrivate = castAsBoolean(req.body?.isPrivate);
     const { Post } = await MongoConnection();
     const post = await Post.findById(id);
+    const wasPrivate = castAsBoolean(post.isPrivate);
+    // modify post
     for (const key of Object.keys(_set)) post[key] = _set[key];
     await post
       .save()
       .then((_post) => {
         const post = processPostWithUser(_post);
         const client = new RedisConnection();
-        client.resetCache(post, false);
+        client.resetCache(
+          post,
+          false,
+          // Reset home keys if isPrivate changed
+          _set.isPrivate === wasPrivate
+            ? 0
+            : !wasPrivate && _set.isPrivate
+            ? 1
+            : 2
+        );
         resolve({
           status: 200,
           message: ServerInfo.POST_UPDATED,

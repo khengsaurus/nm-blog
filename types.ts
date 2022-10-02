@@ -93,6 +93,7 @@ export interface IPostReq extends IPost, IRequest {
   sort?: 1 | -1;
   cursor?: string;
   fresh?: boolean;
+  search?: string;
 }
 
 export interface IUser extends IHasId, Partial<IHasTimestamps> {

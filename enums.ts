@@ -52,6 +52,7 @@ export enum Flag {
   DATE_TAG = "d=",
   LIMIT_TAG = "l=",
   PRIVATE_TAG = "p=",
+  SEARCH = "s=",
 }
 
 export enum TransitionSpeed {
