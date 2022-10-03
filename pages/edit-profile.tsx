@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import {
   Column,
   EditPreviewMarkdown,
@@ -109,23 +110,23 @@ const EditProfile = () => {
         />
         <Row style={{ alignItems: "flex-start" }}>
           <Column style={{ alignItems: "flex-start" }}>
-            <ImageForm
-              label="avatar"
-              newImage={newImage}
-              hasImage={!!newImage || !!imageKey}
-              setImage={setNewImage}
-              setImageKey={setImageKey}
-            />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={getAvatarLarge(imageKey)}
               alt={Flag.PREVIEW_IMG}
               id={Flag.PREVIEW_IMG}
               style={{
                 ...avatarStyles.large,
+                margin: "16px",
                 borderRadius: "50%",
                 display: !previewImg && !imageKey ? "none" : "block",
               }}
+            />
+            <ImageForm
+              label="avatar"
+              newImage={newImage}
+              hasImage={!!newImage || !!imageKey}
+              setImage={setNewImage}
+              setImageKey={setImageKey}
             />
           </Column>
           <EditProfileButtons

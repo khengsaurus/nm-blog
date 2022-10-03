@@ -1,6 +1,6 @@
 import { CircleLoader } from "components";
 import { MAX_FILE_SIZE } from "consts";
-import { Dimension, Status, ToastMessage } from "enums";
+import { Dimension, Size, Status, ToastMessage } from "enums";
 import { IPost } from "types";
 
 export function parse(val: any) {
@@ -128,7 +128,7 @@ export const getStatusLabel = (saveStatus: Status) => {
     case Status.IDLE:
       return "Save";
     case Status.PENDING:
-      return <CircleLoader />;
+      return <CircleLoader size={Size.S} />;
     case Status.SUCCESS:
       return "👌🏻";
     case Status.ERROR:

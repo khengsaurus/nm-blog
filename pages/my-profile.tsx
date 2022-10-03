@@ -1,6 +1,6 @@
 import EditIcon from "@mui/icons-material/Edit";
 import { Avatar, Fab } from "@mui/material";
-import { Centered, CircleLoader, DarkText } from "components";
+import { Column, DarkText, PageLoader } from "components";
 import { PageRoute } from "enums";
 import { AppContext, useNavShortcuts, usePageReady } from "hooks";
 import { avatarStyles } from "lib/client";
@@ -17,15 +17,24 @@ const MyProfile = () => {
     <main className="pad-top">
       {user ? (
         <>
-          {avatarKey && (
-            <Avatar
-              alt={`${username}-avatar`}
-              src={getAvatarLarge(avatarKey)}
-              sx={avatarStyles.large}
-            />
-          )}
-          <DarkText text={username} variant="h2" />
-          <DarkText text={bio || "(No bio)"} variant="h4" paragraph />
+          <section className="header center">
+            {avatarKey && (
+              <Avatar
+                alt={`${username}-avatar`}
+                src={getAvatarLarge(avatarKey)}
+                sx={{ ...avatarStyles.large, marginRight: "20px" }}
+              />
+            )}
+            <Column
+              style={{
+                width: "fit-content",
+                alignItems: avatarKey ? "flex-start" : "center",
+              }}
+            >
+              <DarkText text={username} variant="h2" />
+              <DarkText text={bio || "(No bio)"} variant="h4" paragraph />
+            </Column>
+          </section>
           <div className="edit-container">
             <Fab
               className="edit-button"
@@ -37,9 +46,7 @@ const MyProfile = () => {
           </div>
         </>
       ) : (
-        <Centered style={{ marginTop: "calc(50vh - 120px)" }}>
-          <CircleLoader height={100} width={100} strokeWidth={2} />
-        </Centered>
+        <PageLoader />
       )}
     </main>
   );

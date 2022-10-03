@@ -8,7 +8,7 @@ import EditProfileButtons from "./EditProfileButtons";
 import ImageForm from "./ImageForm";
 import Input from "./Input";
 import Layout from "./Layout";
-import { CircleLoader } from "./Loaders";
+import { CircleLoader, PageLoader } from "./Loaders";
 import MarkdownEditor from "./MarkdownEditor";
 import MarkdownViewer from "./MarkdownViewer";
 import { ActionModal, DeletePostModal } from "./Modals";
@@ -54,6 +54,7 @@ export {
   NavBar,
   NavButton,
   NavMenuButton,
+  PageLoader,
   PostBanner,
   PostCard,
   PostFeed,

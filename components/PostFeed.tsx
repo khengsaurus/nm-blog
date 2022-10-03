@@ -8,7 +8,7 @@ import {
   WindowLoaded,
 } from "components";
 import { PAGINATE_LIMIT } from "consts";
-import { Dimension, Status } from "enums";
+import { Dimension, Size, Status } from "enums";
 import { usePaginatePosts, useWindowDimensions, useWindowLoaded } from "hooks";
 import { useQueryState } from "next-usequerystate";
 import { CSSProperties, useMemo } from "react";
@@ -18,7 +18,6 @@ interface IPostFeed {
   hasAuthorLink?: boolean;
   hasDate?: boolean;
   initPosts?: IPost[];
-  limitPosts?: number;
   paginateLimit?: number;
   publicPosts?: boolean;
   ready?: boolean;
@@ -34,7 +33,6 @@ const PostFeed = ({
   hasAuthorLink = true,
   hasDate = true,
   initPosts = [],
-  limitPosts = Number.MAX_SAFE_INTEGER,
   paginateLimit = PAGINATE_LIMIT,
   publicPosts = true,
   ready = true,
@@ -56,10 +54,10 @@ const PostFeed = ({
   );
 
   function renderLoadMore() {
-    return limitReached || posts.length >= limitPosts ? (
+    return limitReached ? (
       <div style={{ height: 40, width: 40 }} />
     ) : status === Status.PENDING ? (
-      <CircleLoader height={40} width={40} />
+      <CircleLoader size={Size.M} />
     ) : (
       <StyledButton label="Load more" onClick={loadMore} />
     );

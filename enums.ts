@@ -70,6 +70,12 @@ export enum Transition {
   INSTANT = 0,
 }
 
+export enum Size {
+  S,
+  M,
+  L,
+}
+
 export enum HttpResponse {
   _200 = "Success",
   _400 = "Bad request",

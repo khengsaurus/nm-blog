@@ -47,7 +47,7 @@ const UserPage = (props: IUserPageProps) => {
 
   return visitingUser ? (
     <main>
-      <section className="header">
+      <section className="header center">
         {avatarKey && (
           <Avatar
             alt={`${username}-avatar`}
@@ -55,7 +55,12 @@ const UserPage = (props: IUserPageProps) => {
             sx={{ ...avatarStyles.large, marginRight: "20px" }}
           />
         )}
-        <Column style={{ alignItems: avatarKey ? "flex-start" : "center" }}>
+        <Column
+          style={{
+            width: "fit-content",
+            alignItems: avatarKey ? "flex-start" : "center",
+          }}
+        >
           <DarkText text={username} variant="h2" />
           <DarkText text={bio} variant="body1" paragraph />
         </Column>

@@ -88,7 +88,6 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
       const query: any = createdAt ? { createdAt: { $lt: createdAt } } : {};
       if (username) query.username = username;
       if (!isPrivate) query.isPrivate = false;
-      // if (search) query.body = { $regex: search, $options: "i" };
       if (search)
         query.$or = [
           { username: { $regex: search, $options: "i" } },

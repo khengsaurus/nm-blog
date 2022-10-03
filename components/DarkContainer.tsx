@@ -6,7 +6,7 @@ const DarkContainer = ({ children }: any) => {
       sx={{
         border: "none",
         padding: "0px 10px !important",
-        marginTop: "10px",
+        marginTop: "10px !important",
         width: "fit-content",
       }}
     >

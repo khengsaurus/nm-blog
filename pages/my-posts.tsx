@@ -1,4 +1,4 @@
-import { PostFeed } from "components";
+import { PageLoader, PostFeed } from "components";
 import { AppContext, useNavShortcuts, usePageReady } from "hooks";
 import { useContext } from "react";
 
@@ -9,15 +9,19 @@ const MyPosts = () => {
 
   return (
     <main>
-      <PostFeed
-        hasAuthorLink={false}
-        limitPosts={user?.posts.length}
-        publicPosts={false}
-        username={user?.username}
-        windowReady={!!user}
-        title="My posts"
-        hasSearch
-      />
+      {user ? (
+        <PostFeed
+          hasAuthorLink={false}
+          limitPosts={user.posts?.length}
+          publicPosts={false}
+          username={user.username}
+          windowReady={!!user}
+          title="My posts"
+          hasSearch
+        />
+      ) : (
+        <PageLoader />
+      )}
     </main>
   );
 };
