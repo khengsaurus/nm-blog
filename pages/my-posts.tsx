@@ -12,7 +12,6 @@ const MyPosts = () => {
       {user ? (
         <PostFeed
           hasAuthorLink={false}
-          limitPosts={user.posts?.length}
           publicPosts={false}
           username={user.username}
           windowReady={!!user}

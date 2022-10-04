@@ -1,4 +1,5 @@
 import { Fade } from "@mui/material";
+import { motion } from "framer-motion";
 import { AppContext, useKeyListener } from "hooks";
 import Image from "next/image";
 import { useCallback, useContext, useState } from "react";
@@ -20,7 +21,8 @@ const PostBanner = ({ imageKey }: IPostBanner) => {
   return imageKey ? (
     <>
       <header className="banner-image" style={{ borderColor: highlightColor }}>
-        <div
+        <motion.div
+          layoutId={imageKey}
           style={{
             height: "100%",
             width: "100%",
@@ -34,7 +36,7 @@ const PostBanner = ({ imageKey }: IPostBanner) => {
             alt="post-banner-image"
             priority
           />
-        </div>
+        </motion.div>
       </header>
       <Fade in={view} unmountOnExit onClick={hideImage}>
         <div className={"transparent-overlay"}>

@@ -2,11 +2,12 @@
 import { Card, CardContent, CardMedia } from "@mui/material";
 import { AuthorLink, Row } from "components";
 import { Dimension, Flag } from "enums";
-import { AppContext, useMarkdown } from "hooks";
+import { motion } from "framer-motion";
+import { AppContext, useDynamicSrc, useMarkdown } from "hooks";
 import moment from "moment";
 import { useContext } from "react";
 import { IPost } from "types";
-import { getCardSrc } from "utils";
+import { getBannerSrc, getCardSrc } from "utils";
 
 interface IPostCard {
   post: IPost;
@@ -36,6 +37,7 @@ const PostCard = ({
   const date = moment(new Date(createdAt)).format("DD/MM/YY");
   const hasRealImage = !!imageKey && imageKey !== Flag.PREVIEW_IMG;
   const hasImage = showingPreview || hasRealImage;
+  const cardSrc = useDynamicSrc(getCardSrc(imageKey), getBannerSrc(imageKey));
 
   const handleClick = () => {
     if (disable) return;
@@ -50,8 +52,9 @@ const PostCard = ({
     >
       {hasRealImage && (
         <CardMedia>
-          <img
-            src={getCardSrc(imageKey)}
+          <motion.img
+            layoutId={imageKey}
+            src={cardSrc}
             alt="card-image"
             style={imgStyle}
             id={imageKey}
