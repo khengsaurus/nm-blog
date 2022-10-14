@@ -1,0 +1,40 @@
+import boto3
+
+REGION = 'us-east-1'
+BUCKET_NAME = 'notes-app-1-sg'
+
+BUCKET_CONFIG = {'LocationConstraint': REGION}
+BUCKET_CORS_CONFIG = {
+    "CORSRules": [
+        {
+            "AllowedHeaders": ["*"],
+            "AllowedMethods": ["HEAD", "GET", "POST", "PUT", "DELETE"],
+            "AllowedOrigins": ["*"],
+            "ExposeHeaders": ["ETag"],
+            "MaxAgeSeconds": 86400
+        }
+    ]
+}
+
+
+def main():
+    print('HELLO SETUP')
+
+    client = boto3.client(
+        's3',
+        region_name=REGION,
+        endpoint_url="http://localhost.localstack.cloud:4566"
+    )
+
+    client.create_bucket(
+        Bucket=BUCKET_NAME,
+        CreateBucketConfiguration=BUCKET_CONFIG
+    )
+    client.put_bucket_cors(
+        Bucket=BUCKET_NAME,
+        CORSConfiguration=BUCKET_CORS_CONFIG
+    )
+
+
+if __name__ == "__main__":
+    main()

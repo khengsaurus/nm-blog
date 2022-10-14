@@ -1,0 +1,1 @@
+awslocal s3 rm --recursive s3://notes-app-1-sg && awslocal s3api delete-bucket --bucket notes-app-1-sg

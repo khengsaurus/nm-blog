@@ -26,21 +26,21 @@ export async function getPresignedS3URL(): Promise<IResponse | null> {
 
 export async function getUploadedImageKey(image: any): Promise<string> {
   let uploadURL = "";
-  let imageKey = "";
+  let key = "";
   return new Promise(async (resolve, reject) => {
     if (!image) resolve("");
     await getPresignedS3URL()
       .then((res) => {
         uploadURL = res?.data?.uploadURL;
-        imageKey = res?.data?.imageKey;
+        key = res?.data?.Key;
       })
       .catch((err) => {
         reject(err);
         return;
       });
-    if (uploadURL && imageKey) {
+    if (uploadURL && key) {
       await HTTPService.uploadFile(uploadURL, image)
-        .then(() => resolve(imageKey))
+        .then(() => resolve(key))
         .catch(reject);
     } else {
       reject(new Error(ErrorMessage.I_UPLOAD_500));

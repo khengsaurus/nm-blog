@@ -8,3 +8,4 @@ export const EXPERIMENT_RUNTIME = { runtime: "experimental-edge" };
 export const HOME = "HOME";
 export const MAX_FILE_SIZE = 8;
 export const PAGINATE_LIMIT = 8;
+export const IS_DEV = process.env.DEV === "1";

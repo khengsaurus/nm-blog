@@ -1,7 +1,6 @@
+import { IS_DEV } from "consts";
 import mongoose, { Connection, Schema, SchemaTypes } from "mongoose";
 import { IPost, IUser } from "types";
-
-const MONGODB_URI = process.env.MONGODB_URI;
 
 export const MongoUserSchema = new Schema<IUser>({
   avatarKey: SchemaTypes.String,
@@ -43,13 +42,15 @@ MongoUserSchema.set("timestamps", true);
 MongoPostSchema.set("timestamps", true);
 MongoPostSchema.set("toObject", { getters: true, flattenMaps: true });
 
+const mongoUri = IS_DEV ? process.env.DEV_MONGODB_URI : process.env.MONGODB_URI;
+
 const MongoConnection = async () => {
   let mongoConnection: Connection;
   if (mongoose.connection?.readyState === 0 || 3) {
     await mongoose
-      .connect(MONGODB_URI as string)
+      .connect(mongoUri)
       .then((conn) => (mongoConnection = conn.connection))
-      .catch(console.info);
+      .catch(console.error);
   }
 
   const User = mongoose.models.User || mongoose.model("User", MongoUserSchema);

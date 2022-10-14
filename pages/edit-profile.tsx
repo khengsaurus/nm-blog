@@ -7,6 +7,7 @@ import {
   Row,
   StyledText,
 } from "components";
+import { IS_DEV } from "consts";
 import { DBService, Flag, HttpRequest, Status, ToastMessage } from "enums";
 import {
   AppContext,
@@ -60,7 +61,7 @@ const EditProfile = () => {
           })
           .catch((err) => {
             reject(err);
-            imageError = true;
+            if (!IS_DEV) imageError = true;
           });
       }
       if (!imageError) {

@@ -142,7 +142,7 @@ async function handleLogin(reqBody: Partial<IUserReq>): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     const { username, password } = reqBody;
     const { User } = await MongoConnection();
-    await User.findOne({ username })
+    User.findOne({ username })
       .then((userData) => {
         if (isEmpty(userData) || !verify({ username, password }, userData)) {
           resolve({
@@ -151,20 +151,17 @@ async function handleLogin(reqBody: Partial<IUserReq>): Promise<IResponse> {
             data: { token: null },
           });
         } else {
-          const token = generateToken(userData.email, username, userData._id);
           resolve({
             status: 200,
             message: ServerInfo.USER_LOGIN,
             data: {
-              token,
+              token: generateToken(userData.email, username, userData._id),
               user: processUserData(userData, userData._id),
             },
           });
         }
       })
-      .catch((err) => {
-        throwAPIError(reject, err, ErrorMessage.U_LOGIN_FAILED);
-      });
+      .catch((err) => throwAPIError(reject, err, ErrorMessage.U_LOGIN_FAILED));
   });
 }
 

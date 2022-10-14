@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import { IS_DEV } from "consts";
 import { APIAction, DBService, ErrorMessage, HttpRequest } from "enums";
 
 const authBearer = { Authorization: `Bearer ${process.env.BEARER}` };
@@ -83,6 +84,10 @@ class ClientHTTPService {
   /**
    * Upload a file to S3 via a presigned `PutObject` URL.
    * Invokes a PUT fetch with header "Content-Type": "multipart/form-data"
+   *
+   * https://github.com/localstack/localstack/issues/3266
+   * Localstack S3: ensure the same `Content-Type` header is sent when
+   * generating the presigned-url as when uploading to it via PUT request
    */
   uploadFile = async (presignedURL: string, file: any): Promise<Response> => {
     if (!presignedURL || !file) {
@@ -90,9 +95,12 @@ class ClientHTTPService {
     }
     return fetch(presignedURL, {
       method: HttpRequest.PUT,
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+      headers: IS_DEV
+        ? {
+            "Content-Type": "application/json",
+            "x-amz-acl": "public-read-write",
+          }
+        : { "Content-Type": "multipart/form-data" },
       body: file,
     });
   };

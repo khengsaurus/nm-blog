@@ -2,7 +2,8 @@
   "name": "next-mongo-blog",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3000",
+    "dev": "DEV=1 next dev -p 3000",
+    "prod": "next dev -p 3000",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

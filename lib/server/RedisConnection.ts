@@ -1,15 +1,23 @@
-import { CURR_STAMP, DEFAULT_EXPIRE, HOME, PAGINATE_LIMIT } from "consts";
+import {
+  CURR_STAMP,
+  DEFAULT_EXPIRE,
+  HOME,
+  IS_DEV,
+  PAGINATE_LIMIT,
+} from "consts";
 import { DurationMS, Flag, ServerInfo } from "enums";
 import { isEmpty } from "lodash";
 import { createClient, RedisClientType } from "redis";
 import { IObject, IPost } from "types";
 import { setPromiseTimeout } from "utils";
 
+const redisUrl = IS_DEV ? process.env.DEV_REDIS_URL : process.env.ENV_REDIS_URL;
+
 class RedisConnection {
   private client: RedisClientType;
 
   constructor() {
-    this.client = createClient({ url: process.env.ENV_REDIS_URL });
+    this.client = createClient({ url: redisUrl });
     this.connect();
   }
 

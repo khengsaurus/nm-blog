@@ -17,23 +17,11 @@ export async function handleRequest(
 }
 
 export function forwardResponse(res: NextApiResponse, payload: IResponse) {
-  const { status, message, data, ETag } = payload;
-  if (ETag) {
-    res.status(status);
-    res.setHeader("ETag", ETag);
-    res.setHeader("Content-Type", "application/json");
-    res.end(
-      JSON.stringify({
-        message,
-        ...data,
-      })
-    );
-  } else {
-    res.status(status).json({
-      message,
-      ...data,
-    });
-  }
+  const { status, message, data } = payload;
+  res.status(status).json({
+    message,
+    ...data,
+  });
 }
 
 export function throwAPIError(

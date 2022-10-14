@@ -6,6 +6,7 @@ module.exports = {
   env: {
     BEARER: process.env.ENV_VERCEL_BEARER,
     ENV_IMG_SRC: process.env.ENV_IMG_SRC,
+    DEV: process.env.DEV,
   },
   images: {
     domains: ["localhost", "localhost:3000", process.env.ENV_IMG_HOST],
