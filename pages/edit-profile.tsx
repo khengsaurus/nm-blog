@@ -18,8 +18,8 @@ import {
 } from "hooks";
 import {
   avatarStyles,
-  deleteImage,
-  getUploadedImageKey,
+  deleteFile,
+  getUploadedFileKey,
   HTTPService,
 } from "lib/client";
 import { ServerError } from "lib/server";
@@ -52,10 +52,8 @@ const EditProfile = () => {
         imageKey = user?.avatarKey || "";
       if (imageUpdated) {
         if (user?.avatarKey)
-          deleteImage(user.avatarKey).catch((err) =>
-            console.info(err?.message)
-          );
-        await getUploadedImageKey(newImage)
+          deleteFile(user.avatarKey).catch((err) => console.info(err?.message));
+        await getUploadedFileKey(newImage)
           .then((key) => {
             imageKey = key;
           })

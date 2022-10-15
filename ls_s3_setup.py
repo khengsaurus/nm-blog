@@ -18,22 +18,25 @@ BUCKET_CORS_CONFIG = {
 
 
 def main():
-    print('HELLO SETUP')
-
-    client = boto3.client(
-        's3',
-        region_name=REGION,
-        endpoint_url="http://localhost.localstack.cloud:4566"
-    )
-
-    client.create_bucket(
-        Bucket=BUCKET_NAME,
-        CreateBucketConfiguration=BUCKET_CONFIG
-    )
-    client.put_bucket_cors(
-        Bucket=BUCKET_NAME,
-        CORSConfiguration=BUCKET_CORS_CONFIG
-    )
+    res = "SUCCESS"
+    try:
+        client = boto3.client(
+            's3',
+            region_name=REGION,
+            endpoint_url="http://localhost.localstack.cloud:4566"
+        )
+        client.create_bucket(
+            Bucket=BUCKET_NAME,
+            CreateBucketConfiguration=BUCKET_CONFIG
+        )
+        client.put_bucket_cors(
+            Bucket=BUCKET_NAME,
+            CORSConfiguration=BUCKET_CORS_CONFIG
+        )
+    except:
+        res = "FAILURE"
+    finally:
+        print("Create Localstack S3 bucket `%s` - %s" % (BUCKET_NAME, res))
 
 
 if __name__ == "__main__":

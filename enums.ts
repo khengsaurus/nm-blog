@@ -7,9 +7,9 @@ export enum Status {
 }
 
 export enum DBService {
+  FILES = "files",
   POSTS = "posts",
   USERS = "users",
-  IMAGES = "images",
 }
 
 export enum HttpRequest {
@@ -160,8 +160,8 @@ export enum ErrorMessage {
   P_RETRIEVE_FAIL = "Failed to retrieve post",
   P_UPDATE_FAIL = "Failed to update post",
 
-  I_UPLOAD_400 = "Image upload missing required params",
-  I_UPLOAD_500 = "Image upload failed",
+  F_UPLOAD_400 = "File upload missing required params",
+  F_UPLOAD_500 = "File upload failed",
 }
 
 export enum APIAction {

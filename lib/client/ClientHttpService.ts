@@ -91,7 +91,7 @@ class ClientHTTPService {
    */
   uploadFile = async (presignedURL: string, file: any): Promise<Response> => {
     if (!presignedURL || !file) {
-      return Promise.reject(new Error(ErrorMessage.I_UPLOAD_400));
+      return Promise.reject(new Error(ErrorMessage.F_UPLOAD_400));
     }
     return fetch(presignedURL, {
       method: HttpRequest.PUT,

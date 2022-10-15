@@ -3,8 +3,8 @@ import markdown from "./markdown";
 import {
   getPostSlugs,
   getPresignedS3URL,
-  getUploadedImageKey,
-  deleteImage,
+  getUploadedFileKey,
+  deleteFile,
   deletePost,
 } from "./tasks";
 import themes from "./themes";
@@ -19,8 +19,8 @@ export {
   HomeTheme,
   getPostSlugs,
   getPresignedS3URL,
-  getUploadedImageKey,
-  deleteImage,
+  getUploadedFileKey,
+  deleteFile,
   deletePost,
   markdown,
 };

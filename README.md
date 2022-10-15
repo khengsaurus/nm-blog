@@ -7,33 +7,19 @@ NextJS, MongoDB, AWS S3, Redis
 
 ##### Using LocalStack/S3 with Docker Compose
 
-_FIXME: LS data not persisting between container restarts_ 😕
+[Localstack docs](https://docs.localstack.cloud/localstack/persistence-mechanism/): "_...please note that persistence in LocalStack, as currently intended, is a Pro only feature..._" 😕
 
 <br/>
-Install localstack CLI:
+Requirements: LocalStack CLI, Docker Compose, Python 3:
 <br/>
-
-```bash
-pip install awscli-local
-```
-
-<br/>
-Ensure python3 and Docker Compose are installed before running:
 <br/>
 
 ```bash
-docker compose down && docker compose up --build
+> pip install awscli-local
+> docker compose down && docker compose up --build
+> python3 ls_s3_setup.py
 ```
 
-<br/>
-To create the S3 bucket:
-<br/>
-
-```bash
-python3 ls_s3_setup.py
-```
-
-<br/>
 <br/>
 
 ##### See:

@@ -25,6 +25,8 @@ route.get("/*", async (req, res) => {
   }
 });
 
+route.delete("/*", async (req, res) => handleRequest(req, res, deleteCallback));
+
 async function getS3UploadURL() {
   return new Promise(async (resolve, reject) => {
     await generateUploadURL()
@@ -33,13 +35,11 @@ async function getS3UploadURL() {
   });
 }
 
-route.delete("/*", async (req, res) => handleRequest(req, res, deleteImage));
-
-async function deleteImage(req) {
+async function deleteCallback(req) {
   return new Promise(async (resolve, reject) => {
-    const { imageKey } = req.query;
-    if (!imageKey) reject(new ServerError(400));
-    await deleteFile(imageKey).then(resolve).catch(reject);
+    const { key } = req.query;
+    if (!key) reject(new ServerError(400));
+    await deleteFile(key).then(resolve).catch(reject);
   });
 }
 

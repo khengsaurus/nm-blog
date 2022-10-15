@@ -23,7 +23,7 @@ import {
   usePreviewImg,
   useRealtimePost,
 } from "hooks";
-import { deleteImage, getUploadedImageKey, HTTPService } from "lib/client";
+import { deleteFile, getUploadedFileKey, HTTPService } from "lib/client";
 import { ServerError } from "lib/server";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
@@ -95,9 +95,9 @@ const EditPost = ({ id }: IPostPage) => {
         // New image -> delete old image if exists, do not await
         if (realtimePost?.imageKey) {
           _imageKey = "";
-          deleteImage(realtimePost.imageKey).catch(console.info);
+          deleteFile(realtimePost.imageKey).catch(console.info);
         }
-        await getUploadedImageKey(newImage)
+        await getUploadedFileKey(newImage)
           .then((key) => (_imageKey = key))
           .catch((err) => {
             imageError = true;
