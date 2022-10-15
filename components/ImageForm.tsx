@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import Button from "@mui/material/Button";
 import { Row } from "components";
 import { useCallback } from "react";
 import toast from "react-hot-toast";
@@ -21,7 +21,7 @@ const ImageForm = ({ label, hasImage, setImage, setImageKey }: IImageForm) => {
     setImageKey("");
   }
 
-  async function handleAttachment(event: React.ChangeEvent<HTMLInputElement>) {
+  async function handleImage(event: React.ChangeEvent<HTMLInputElement>) {
     if (
       checkOneFileSelected(event, toastError) &&
       checkFileSize(event, toastError) &&
@@ -48,7 +48,7 @@ const ImageForm = ({ label, hasImage, setImage, setImageKey }: IImageForm) => {
         onClick={hasImage ? removeImage : null}
       >
         {`${hasImage ? "Remove" : "Add"} ${label.toLowerCase()}`}
-        {!hasImage && <input type="file" hidden onChange={handleAttachment} />}
+        {!hasImage && <input type="file" hidden onChange={handleImage} />}
       </Button>
     </Row>
   );

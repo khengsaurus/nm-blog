@@ -5,22 +5,18 @@ import { useContext } from "react";
 interface IMarkdownViewerProps {
   text: string;
   height?: string | number;
-  hasMarkdown?: boolean;
+  markdown?: boolean;
 }
 
-const MarkdownViewer = ({
-  text,
-  height,
-  hasMarkdown,
-}: IMarkdownViewerProps) => {
+const MarkdownViewer = ({ text, height, markdown }: IMarkdownViewerProps) => {
   const { theme } = useContext(AppContext);
-  const markdown = useMarkdown(hasMarkdown, theme?.name, text);
+  const __html = useMarkdown(markdown, theme?.name, text);
 
   return (
     <Container
-      className={`markdown-preview ${hasMarkdown ? "show" : "hide"}`}
+      className={`markdown-preview ${markdown ? "show" : "hide"}`}
       style={{ height }}
-      dangerouslySetInnerHTML={{ __html: markdown }}
+      dangerouslySetInnerHTML={{ __html }}
     />
   );
 };

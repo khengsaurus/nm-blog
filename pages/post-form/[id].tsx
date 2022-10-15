@@ -7,6 +7,7 @@ import {
   ImageForm,
   Input,
   PostCard,
+  StyledText,
 } from "components";
 import {
   DBService,
@@ -23,9 +24,11 @@ import {
   usePreviewImg,
   useRealtimePost,
 } from "hooks";
+import useFileUploads from "hooks/useFileUploads";
 import { deleteFile, getUploadedFileKey, HTTPService } from "lib/client";
 import { ServerError } from "lib/server";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import Dropzone from "react-dropzone";
 import { toast } from "react-hot-toast";
 import { IResponse } from "types";
 import { getStatusLabel } from "utils";
@@ -40,8 +43,9 @@ export async function getServerSideProps({ params }) {
 }
 
 const EditPost = ({ id }: IPostPage) => {
-  const { user, updatePostSlugs } = useContext(AppContext);
+  const { theme, user, updatePostSlugs } = useContext(AppContext);
   const { realtimePost, refreshPost } = useRealtimePost({ id, user }, true);
+  const { addFiles, renderSelectFile, renderSelectedFiles } = useFileUploads();
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [body, setBody] = useState("");
@@ -203,12 +207,39 @@ const EditPost = ({ id }: IPostPage) => {
           maxWidth
         />
         <br />
-        <EditPreviewMarkdown
-          label="Body"
-          body={body}
-          hasMarkdown={hasMarkdown}
-          setBody={setBody}
-        />
+        <Dropzone onDrop={addFiles} noClick>
+          {({ getRootProps, getInputProps, isDragActive }) => (
+            <div
+              {...getRootProps()}
+              className="file-drop-zone"
+              style={{
+                borderColor: isDragActive
+                  ? theme?.highlightColor
+                  : "transparent",
+              }}
+            >
+              <EditPreviewMarkdown
+                label="Body"
+                body={body}
+                markdown={hasMarkdown}
+                setBody={setBody}
+                style={{ opacity: isDragActive ? 0.2 : 1 }}
+              />
+              {isDragActive && (
+                <StyledText
+                  text={"Drop here to upload"}
+                  variant="h2"
+                  className="label"
+                  style={{
+                    color:
+                      theme.name === "light" ? "black" : theme?.highlightColor,
+                  }}
+                />
+              )}
+            </div>
+          )}
+        </Dropzone>
+        {renderSelectedFiles()}
         <br />
         <DynamicFlex>
           <PostCard
@@ -233,15 +264,16 @@ const EditPost = ({ id }: IPostPage) => {
               setImage={setNewImage}
               setImageKey={setImageKey}
             />
+            {renderSelectFile()}
             <EditPostButtons
               isPrivate={isPrivate}
-              setIsPrivate={setIsPrivate}
-              hasMarkdown={hasMarkdown}
-              setHasMarkdown={setHasMarkdown}
+              markdown={hasMarkdown}
               saveButtonLabel={getStatusLabel(saveStatus)}
               saveDisabled={saveDisabled}
-              handleSave={handleSave}
               isEdit={!isNewPost}
+              togglePrivate={() => setIsPrivate((b) => !b)}
+              toggleMarkdown={() => setHasMarkdown((b) => !b)}
+              handleSave={handleSave}
               deleteClick={handleDeleteClick}
             />
           </Column>

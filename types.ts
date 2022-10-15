@@ -82,6 +82,7 @@ export interface IPost
   user?: IUser;
   title?: string;
   body?: string;
+  files?: string[];
   isPrivate?: boolean;
   hasMarkdown?: boolean;
 }

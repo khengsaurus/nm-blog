@@ -6,17 +6,13 @@ import { StyledText } from "./StyledMui";
 interface ICheckboxProps {
   value: boolean;
   label?: string;
-  setValue: (b?: boolean) => void;
+  toggleValue: () => void;
 }
 
-const CheckBox = ({ label, value, setValue }: ICheckboxProps) => {
+const CheckBox = ({ label, value, toggleValue }: ICheckboxProps) => {
   return (
     <>
-      <IconButton
-        onClick={() => setValue(!value)}
-        disableRipple
-        style={{ padding: 8 }}
-      >
+      <IconButton onClick={toggleValue} disableRipple style={{ padding: 8 }}>
         {value ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
       </IconButton>
       {label && <StyledText text={label} variant="body1" />}

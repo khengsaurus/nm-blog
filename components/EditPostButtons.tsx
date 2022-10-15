@@ -6,24 +6,24 @@ import CheckBox from "./CheckBox";
 
 interface IEditPostButtons {
   isPrivate: boolean;
-  setIsPrivate: (b: boolean) => void;
-  hasMarkdown: boolean;
-  setHasMarkdown: (b: boolean) => void;
+  markdown: boolean;
   saveButtonLabel: any;
   saveDisabled: boolean;
-  handleSave: () => Promise<any>;
   isEdit: boolean;
+  togglePrivate: () => void;
+  toggleMarkdown: () => void;
+  handleSave: () => Promise<any>;
   deleteClick?: (e: React.MouseEvent) => void;
 }
 
 const EditPostButtons = ({
   isPrivate,
-  setIsPrivate,
-  hasMarkdown,
-  setHasMarkdown,
+  markdown,
   isEdit,
   saveButtonLabel,
   saveDisabled,
+  togglePrivate,
+  toggleMarkdown,
   handleSave,
   deleteClick = null,
 }: IEditPostButtons) => {
@@ -59,12 +59,16 @@ const EditPostButtons = ({
   return (
     <>
       <div className={"row"}>
-        <CheckBox value={isPrivate} setValue={setIsPrivate} label="Private" />
+        <CheckBox
+          value={isPrivate}
+          toggleValue={togglePrivate}
+          label="Private"
+        />
       </div>
       <div className="row">
         <CheckBox
-          value={hasMarkdown}
-          setValue={setHasMarkdown}
+          value={markdown}
+          toggleValue={toggleMarkdown}
           label="Markdown"
         />
       </div>

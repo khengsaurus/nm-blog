@@ -22,7 +22,6 @@ import {
   processPostsWithoutUser,
   processPostWithoutUser,
   processPostWithUser,
-  sleep,
 } from "utils";
 
 export const config = EXPERIMENT_RUNTIME;
@@ -97,7 +96,7 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
         ];
       const { Post } = await MongoConnection();
       await Post.find(query)
-        .select(["-user"])
+        .select(["-user", "-files"])
         .sort({ createdAt: -1 })
         .limit(limit)
         .lean()
@@ -185,6 +184,8 @@ async function createDoc(req: NextApiRequest): Promise<IResponse> {
               isPrivate,
               user: userId,
             });
+            console.log("SAVING NEW POST: ");
+            console.log(newPost);
             return newPost.save() as Promise<IPost>;
           }
         })
@@ -196,7 +197,7 @@ async function createDoc(req: NextApiRequest): Promise<IResponse> {
               userId,
               { $push: { posts: { $each: [res.id], $position: 0 } } },
               { safe: true, upsert: true },
-              function (err) {
+              (err) => {
                 if (err) {
                   reject(new ServerError(500, err?.message));
                 } else {

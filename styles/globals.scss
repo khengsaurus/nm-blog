@@ -396,6 +396,19 @@ textarea {
   transition: all $speed-medium;
 }
 
+.file-drop-zone {
+  width: calc(100% + 10px);
+  border: 5px dashed transparent;
+  border-radius: 4px;
+  transition: $speed-medium;
+  .label {
+    position: absolute;
+    top: 415px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
 // Markdown styling.
 pre {
   margin: 0;

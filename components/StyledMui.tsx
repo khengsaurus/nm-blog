@@ -21,6 +21,7 @@ export interface IStyledTextProps {
   placeSelf?: "left" | "center" | "right";
   paragraph?: boolean;
   nowrap?: boolean;
+  className?: string;
   style?: any;
 }
 
@@ -124,6 +125,7 @@ export const StyledText = ({
   textAlign = "left",
   placeSelf = "left",
   nowrap = false,
+  className = "",
   style = {},
 }: IStyledTextProps) => {
   return (
@@ -137,6 +139,7 @@ export const StyledText = ({
         textOverflow: nowrap ? "ellipsis" : null,
         ...style,
       }}
+      className={className}
       variant={variant}
     >
       {text}
