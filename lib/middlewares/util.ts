@@ -64,7 +64,11 @@ export function errorHandler(
   }
 }
 
-export function processUserData(user: any, id: string): Partial<IUser> {
+export function processUserData(
+  user: any,
+  id: string,
+  forSelf = false
+): Partial<IUser> {
   const posts = [];
   if (user.posts?.length > 0) {
     try {
@@ -75,14 +79,15 @@ export function processUserData(user: any, id: string): Partial<IUser> {
       console.info("Failed to parse user data: " + err.message);
     }
   }
-  return {
+  const _user = {
     id,
-    username: user.username,
     email: user.email,
+    username: user.username,
     avatarKey: user.avatarKey || "",
     bio: user.bio || "",
     posts: posts,
   };
+  return forSelf ? { ..._user, isAdmin: user.isAdmin } : _user;
 }
 
 export function createUserObject(params: Object) {

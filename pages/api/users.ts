@@ -92,11 +92,11 @@ async function handleRegister(reqBody: Partial<IUserReq>): Promise<IResponse> {
         User?.create(user)
           .then((res) => {
             if (res.id) {
-              const token = generateToken(email, email, res.id);
+              const token = generateToken(res.id, email, email);
               resolve({
                 status: 200,
                 message: ServerInfo.USER_REGISTERED,
-                data: { token, user: processUserData(user, res.id) },
+                data: { token, user: processUserData(user, res.id, true) },
               });
             } else {
               reject(new ServerError());
@@ -110,19 +110,23 @@ async function handleRegister(reqBody: Partial<IUserReq>): Promise<IResponse> {
   });
 }
 
-async function getDoc(params: Partial<IUserReq>): Promise<IResponse> {
+async function getDoc(
+  params: Partial<IUserReq>,
+  forSelf = false
+): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     const { User } = await MongoConnection();
     await (params?.id ? User.findById(params.id) : User.findOne(params))
       .then((userData) => {
-        if (isEmpty(userData)) {
+        const user = userData["_doc"];
+        if (isEmpty(user)) {
           resolve({ status: 200, message: ServerInfo.USER_NA });
         } else {
           resolve({
             status: 200,
             message: ServerInfo.USER_RETRIEVED,
             data: {
-              user: processUserData(userData, userData._id),
+              user: processUserData(user, user._id, forSelf),
             },
           });
         }
@@ -144,7 +148,8 @@ async function handleLogin(reqBody: Partial<IUserReq>): Promise<IResponse> {
     const { User } = await MongoConnection();
     User.findOne({ username })
       .then((userData) => {
-        if (isEmpty(userData) || !verify({ username, password }, userData)) {
+        const user = userData["_doc"];
+        if (isEmpty(user) || !verify({ username, password }, user)) {
           resolve({
             status: 200,
             message: ServerInfo.USER_BAD_LOGIN,
@@ -155,8 +160,13 @@ async function handleLogin(reqBody: Partial<IUserReq>): Promise<IResponse> {
             status: 200,
             message: ServerInfo.USER_LOGIN,
             data: {
-              token: generateToken(userData.email, username, userData._id),
-              user: processUserData(userData, userData._id),
+              token: generateToken(
+                user._id,
+                user.email,
+                username,
+                user.isAdmin
+              ),
+              user: processUserData(user, user._id, true),
             },
           });
         }
@@ -176,11 +186,12 @@ async function getPostSlugs(reqBody: Partial<IUserReq>): Promise<IResponse> {
           "-__v -user -username -title -body -isPrivate -createdAt -updatedAt -imageKey"
         )
         .then((userData) => {
+          const user = userData["_doc"];
           resolve({
             status: 200,
             message: ServerInfo.POST_SLUGS_RETRIEVED,
             data: {
-              user: processUserData(userData, userData._id),
+              user: processUserData(user, user._id),
             },
           });
         });
@@ -193,17 +204,15 @@ async function getPostSlugs(reqBody: Partial<IUserReq>): Promise<IResponse> {
 async function handleTokenLogin(
   req: NextApiRequest,
   res: NextApiResponse<IResponse | any>
-): Promise<IResponse> {
-  return new Promise(async (_, reject) => {
-    const { id } = decodeToken<Partial<IUser>>(req);
-    if (!id) {
-      reject(new ServerError(401));
-    } else {
-      await getDoc({ _id: id })
-        .then((payload) => forwardResponse(res, payload))
-        .catch((err) => handleAPIError(res, err));
-    }
-  });
+) {
+  const { id } = decodeToken<Partial<IUser>>(req);
+  if (!id) {
+    handleAPIError(res, new ServerError(401));
+  } else {
+    await getDoc({ _id: id }, true)
+      .then((payload) => forwardResponse(res, payload))
+      .catch((err) => handleAPIError(res, err));
+  }
 }
 
 async function patchDoc(req: NextApiRequest): Promise<IResponse> {
@@ -235,12 +244,13 @@ async function patchDoc(req: NextApiRequest): Promise<IResponse> {
       await user
         .save()
         .then((userData) => {
-          const token = generateToken(email, username, userData._id);
+          const user = userData["_doc"];
+          const token = generateToken(user._id, email, username, user.isAdmin);
           resolve({
             status: 200,
             message: ServerInfo.USER_UPDATED,
             data: {
-              user: processUserData(userData, userData._id),
+              user: processUserData(user, user._id, true),
               token,
             },
           });

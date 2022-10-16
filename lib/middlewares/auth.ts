@@ -6,12 +6,18 @@ import { ServerError, verifyPassword } from "../server";
 
 const secretKey = process.env.SECRET_KEY;
 
-export function generateToken(email: string, username: string, id: string) {
+export function generateToken(
+  id: string,
+  email: string,
+  username: string,
+  isAdmin = false
+) {
   return jwt.sign(
     {
+      id,
       email,
       username,
-      id,
+      isAdmin,
     },
     secretKey,
     { expiresIn: "30d" }
@@ -41,9 +47,9 @@ export async function validateAuth(req: NextApiRequest): Promise<boolean> {
   });
 }
 
-export function verify(req: Partial<IUserReq>, userDoc: any) {
+export function verify(req: Partial<IUserReq>, user: any) {
   return (
-    req.username === userDoc.username &&
-    verifyPassword(req.password, userDoc.password)
+    req.username === user.username &&
+    verifyPassword(req.password, user.password)
   );
 }
