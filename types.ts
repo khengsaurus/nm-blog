@@ -73,6 +73,17 @@ interface IHasImage {
   imageKey: string;
 }
 
+export interface IUploadedFile {
+  name: string;
+  key: string;
+  uploaded: number;
+}
+
+export interface INewFile {
+  newFile?: File;
+  uploaded: number;
+}
+
 export interface IPost
   extends Partial<IHasId>,
     Partial<IHasImage>,
@@ -82,7 +93,7 @@ export interface IPost
   user?: IUser;
   title?: string;
   body?: string;
-  files?: string[];
+  files?: IUploadedFile[];
   isPrivate?: boolean;
   hasMarkdown?: boolean;
 }
@@ -104,6 +115,7 @@ export interface IUser extends IHasId, Partial<IHasTimestamps> {
   password: string;
   username: string;
   posts: IPost[];
+  isAdmin: boolean;
 }
 
 export interface IUserReq extends IUser, IRequest {

@@ -184,8 +184,6 @@ async function createDoc(req: NextApiRequest): Promise<IResponse> {
               isPrivate,
               user: userId,
             });
-            console.log("SAVING NEW POST: ");
-            console.log(newPost);
             return newPost.save() as Promise<IPost>;
           }
         })

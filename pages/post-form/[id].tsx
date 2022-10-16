@@ -9,22 +9,24 @@ import {
   PostCard,
   StyledText,
 } from "components";
+import { IS_DEV, MAX_POSTS_PER_USER } from "consts";
 import {
   DBService,
   ErrorMessage,
   Flag,
   HttpRequest,
+  PageRoute,
   Status,
   ToastMessage,
 } from "enums";
 import {
   AppContext,
   useAsync,
+  useFileUploads,
   usePageReady,
   usePreviewImg,
   useRealtimePost,
 } from "hooks";
-import useFileUploads from "hooks/useFileUploads";
 import { deleteFile, getUploadedFileKey, HTTPService } from "lib/client";
 import { ServerError } from "lib/server";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
@@ -43,9 +45,9 @@ export async function getServerSideProps({ params }) {
 }
 
 const EditPost = ({ id }: IPostPage) => {
-  const { theme, user, updatePostSlugs } = useContext(AppContext);
+  const { theme, user, routerPush, updatePostSlugs } = useContext(AppContext);
   const { realtimePost, refreshPost } = useRealtimePost({ id, user }, true);
-  const { addFiles, renderSelectFile, renderSelectedFiles } = useFileUploads();
+  const { addFiles, SelectFile, Files } = useFileUploads(user, realtimePost);
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [body, setBody] = useState("");
@@ -57,6 +59,7 @@ const EditPost = ({ id }: IPostPage) => {
   const hasEditedSlug = useRef(false);
   const isNewPost = id === "new";
   const imageUpdated = !!newImage || imageKey !== realtimePost?.imageKey;
+  const isAdmin = user?.isAdmin || IS_DEV;
   usePageReady();
 
   useEffect(() => {
@@ -71,7 +74,10 @@ const EditPost = ({ id }: IPostPage) => {
   }, [title]);
 
   useEffect(() => {
-    if (!isNewPost) {
+    if (isNewPost) {
+      if (user?.posts?.length >= MAX_POSTS_PER_USER && !isAdmin)
+        routerPush(PageRoute.HOME);
+    } else {
       const { title, slug, body, imageKey, isPrivate, hasMarkdown } =
         realtimePost || {};
       setTitle(title);
@@ -82,7 +88,7 @@ const EditPost = ({ id }: IPostPage) => {
       setHasMarkdown(hasMarkdown);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isNewPost, realtimePost]);
+  }, [user?.posts?.length, isAdmin, isNewPost, realtimePost]);
 
   const _handlePut = () => {
     return new Promise(async (resolve, reject) => {
@@ -145,19 +151,13 @@ const EditPost = ({ id }: IPostPage) => {
   };
 
   const _cleanup = useCallback(() => {
+    updatePostSlugs(user);
     if (isNewPost) {
-      setTitle("");
-      setSlug("");
-      setBody("");
-      setNewImage(null);
-      setImageKey("");
-      setIsPrivate(false);
-      setHasMarkdown(false);
+      routerPush(PageRoute.MY_POSTS);
     } else {
       refreshPost();
     }
-    updatePostSlugs(user);
-  }, [isNewPost, user, refreshPost, updatePostSlugs]);
+  }, [isNewPost, user, refreshPost, routerPush, updatePostSlugs]);
 
   const { execute: handleSave, status: saveStatus } = useAsync<
     IResponse,
@@ -239,8 +239,7 @@ const EditPost = ({ id }: IPostPage) => {
             </div>
           )}
         </Dropzone>
-        {renderSelectedFiles()}
-        <br />
+        <Files />
         <DynamicFlex>
           <PostCard
             post={{
@@ -264,7 +263,7 @@ const EditPost = ({ id }: IPostPage) => {
               setImage={setNewImage}
               setImageKey={setImageKey}
             />
-            {renderSelectFile()}
+            <SelectFile />
             <EditPostButtons
               isPrivate={isPrivate}
               markdown={hasMarkdown}

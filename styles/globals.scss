@@ -20,6 +20,11 @@
   }
 }
 
+@mixin ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 $card-width: 280px;
 $nav-bar-height: 50px;
 $main-margin: 50px;
@@ -136,12 +141,11 @@ h5 {
   margin: 0;
 }
 h6 {
+  @include ellipsis;
   font-size: 18px;
   height: 23px;
   padding: 0px !important;
   margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 p {
   margin: 3px 0px;
@@ -175,21 +179,19 @@ textarea {
 
 .card-content {
   @include round-border;
+  @include ellipsis;
   text-align: left;
-  overflow: hidden;
-  text-overflow: ellipsis;
   max-height: 188px;
   &.has-image {
     max-height: 108px;
   }
   p {
     &.body {
+      @include ellipsis;
       margin: 5px 0px;
       font-size: 14px;
       display: -webkit-box;
       -webkit-box-orient: vertical;
-      overflow: hidden;
-      text-overflow: ellipsis;
       &.short {
         -webkit-line-clamp: 3;
       }
@@ -383,7 +385,6 @@ textarea {
   transform: translateX(-110%);
   transition: all $speed-medium;
 }
-
 .menu-secondary-enter {
   transform: translateX(110%);
 }
@@ -397,15 +398,86 @@ textarea {
 }
 
 .file-drop-zone {
-  width: calc(100% + 10px);
+  width: 100%;
   border: 5px dashed transparent;
   border-radius: 4px;
   transition: $speed-medium;
   .label {
     position: absolute;
-    top: 415px;
+    top: 410px;
     left: 50%;
     transform: translate(-50%, -50%);
+  }
+}
+
+.add-files-label {
+  align-self: flex-start;
+  justify-content: flex-start;
+  height: 40px;
+  width: 200px;
+  margin-left: 10px;
+  padding: 0px;
+  text-transform: initial;
+}
+
+.selected-files {
+  @include flex-(row);
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  height: fit-content;
+  width: 100%;
+  margin: 12px 0px;
+  transition: $speed-medium;
+
+  .file-card {
+    $file-card-w: 190px;
+    $file-icon-w: 38px;
+    @mixin text-content {
+      @include ellipsis;
+      width: $file-card-w - $file-icon-w;
+      white-space: nowrap;
+    }
+    align-items: center;
+    height: $file-icon-w + 2px;
+    width: $file-card-w;
+    margin-right: 4px;
+    svg {
+      height: $file-icon-w;
+      width: $file-icon-w;
+    }
+    .text {
+      transition: $speed-medium;
+      h6 {
+        @include text-content;
+        font-size: 14px;
+        line-height: 23px;
+      }
+      p {
+        @include text-content;
+        font-size: 12px;
+        line-height: 17px;
+      }
+    }
+    .action-btns {
+      height: 100%;
+      opacity: 0;
+      transition: $speed-medium;
+      transform: translateX(-80%);
+      svg {
+        height: 100%;
+        width: 24px;
+      }
+    }
+    &:hover {
+      .text {
+        opacity: 0.2;
+      }
+      .action-btns {
+        cursor: pointer;
+        opacity: 1;
+        transform: translateX(-120%);
+      }
+    }
   }
 }
 
