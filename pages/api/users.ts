@@ -118,7 +118,7 @@ async function getDoc(
     const { User } = await MongoConnection();
     await (params?.id ? User.findById(params.id) : User.findOne(params))
       .then((userData) => {
-        const user = userData["_doc"];
+        const user = userData?._doc;
         if (isEmpty(user)) {
           resolve({ status: 200, message: ServerInfo.USER_NA });
         } else {
@@ -148,7 +148,7 @@ async function handleLogin(reqBody: Partial<IUserReq>): Promise<IResponse> {
     const { User } = await MongoConnection();
     User.findOne({ username })
       .then((userData) => {
-        const user = userData["_doc"];
+        const user = userData?._doc;
         if (isEmpty(user) || !verify({ username, password }, user)) {
           resolve({
             status: 200,
@@ -186,7 +186,7 @@ async function getPostSlugs(reqBody: Partial<IUserReq>): Promise<IResponse> {
           "-__v -user -username -title -body -isPrivate -createdAt -updatedAt -imageKey"
         )
         .then((userData) => {
-          const user = userData["_doc"];
+          const user = userData?._doc;
           resolve({
             status: 200,
             message: ServerInfo.POST_SLUGS_RETRIEVED,
@@ -244,7 +244,7 @@ async function patchDoc(req: NextApiRequest): Promise<IResponse> {
       await user
         .save()
         .then((userData) => {
-          const user = userData["_doc"];
+          const user = userData?._doc;
           const token = generateToken(user._id, email, username, user.isAdmin);
           resolve({
             status: 200,

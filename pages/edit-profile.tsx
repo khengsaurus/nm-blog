@@ -18,7 +18,7 @@ import {
 } from "hooks";
 import {
   avatarStyles,
-  deleteFile,
+  deleteFiles,
   getUploadedFileKey,
   HTTPService,
 } from "lib/client";
@@ -51,8 +51,7 @@ const EditProfile = () => {
       let imageError = false,
         imageKey = user?.avatarKey || "";
       if (imageUpdated) {
-        if (user?.avatarKey)
-          deleteFile(user.avatarKey).catch((err) => console.info(err?.message));
+        if (user?.avatarKey) deleteFiles([user.avatarKey]).catch(console.info);
         await getUploadedFileKey(newImage)
           .then((key) => {
             imageKey = key;
@@ -104,7 +103,7 @@ const EditProfile = () => {
         <EditPreviewMarkdown
           label="Bio"
           body={bio || ""}
-          hasMarkdown={false}
+          markdown={false}
           setBody={setBio}
         />
         <Row style={{ alignItems: "flex-start" }}>
@@ -122,10 +121,12 @@ const EditProfile = () => {
             />
             <ImageForm
               label="avatar"
-              newImage={newImage}
-              hasImage={!!newImage || !!imageKey}
-              setImage={setNewImage}
-              setImageKey={setImageKey}
+              hasImg={!!newImage || !!imageKey}
+              setImg={setNewImage}
+              rmImg={() => {
+                setImageKey("");
+                setNewImage(null);
+              }}
             />
           </Column>
           <EditProfileButtons

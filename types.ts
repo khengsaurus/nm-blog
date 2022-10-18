@@ -1,6 +1,6 @@
 import { NextRouter } from "next/router";
 import { RedisClientType } from "redis";
-import { APIAction, Status } from "./enums";
+import { APIAction, FileStatus, Status } from "./enums";
 
 export type AlertStatus = "success" | "info" | "warning" | "error";
 
@@ -73,15 +73,14 @@ interface IHasImage {
   imageKey: string;
 }
 
-export interface IUploadedFile {
-  name: string;
-  key: string;
+export interface IPostFile {
   uploaded: number;
-}
-
-export interface INewFile {
-  newFile?: File;
-  uploaded: number;
+  // only exists on uploaded files
+  name?: string;
+  key?: string;
+  // only exists on un/newly-uploaded files
+  status?: FileStatus;
+  file?: File;
 }
 
 export interface IPost
@@ -93,7 +92,7 @@ export interface IPost
   user?: IUser;
   title?: string;
   body?: string;
-  files?: IUploadedFile[];
+  files?: IPostFile[];
   isPrivate?: boolean;
   hasMarkdown?: boolean;
 }

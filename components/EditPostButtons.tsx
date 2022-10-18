@@ -13,7 +13,8 @@ interface IEditPostButtons {
   togglePrivate: () => void;
   toggleMarkdown: () => void;
   handleSave: () => Promise<any>;
-  deleteClick?: (e: React.MouseEvent) => void;
+  handleCancel: () => Promise<any>;
+  handleDelete?: (e: React.MouseEvent) => void;
 }
 
 const EditPostButtons = ({
@@ -25,23 +26,22 @@ const EditPostButtons = ({
   togglePrivate,
   toggleMarkdown,
   handleSave,
-  deleteClick = null,
+  handleCancel,
+  handleDelete = null,
 }: IEditPostButtons) => {
   const { routerPush } = useContext(AppContext);
-  const [cancelCalled, setCancelCalled] = useState(false);
 
   function renderCancelDelete() {
     return (
       <>
         <StyledButton
           label={"Cancel"}
-          disabled={cancelCalled}
           onClick={() => {
-            setCancelCalled(true);
+            handleCancel();
             routerPush(PageRoute.MY_POSTS);
           }}
         />
-        <StyledButton label="Delete" onClick={deleteClick} />
+        <StyledButton label="Delete" onClick={handleDelete} />
       </>
     );
   }

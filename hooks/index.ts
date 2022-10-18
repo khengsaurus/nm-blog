@@ -10,6 +10,7 @@ import useKeyListener from "./useKeyListener";
 import useLocalStorage from "./useLocalStorage";
 import useMarkdown from "./useMarkdown";
 import useNavShortcuts from "./useNavShortcuts";
+import useOnWindowUnload from "./useOnWindowUnload";
 import usePageReady from "./usePageReady";
 import usePaginatePosts from "./usePaginatePosts";
 import usePreviewImg from "./usePreviewImg";
@@ -33,6 +34,7 @@ export {
   useLocalStorage,
   useMarkdown,
   useNavShortcuts,
+  useOnWindowUnload,
   usePageReady,
   usePaginatePosts,
   usePreviewImg,

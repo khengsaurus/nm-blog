@@ -1,9 +1,11 @@
+import Button from "@mui/material/Button";
 import {
   Column,
   DeletePostModal,
   DynamicFlex,
   EditPostButtons,
   EditPreviewMarkdown,
+  Files,
   ImageForm,
   Input,
   PostCard,
@@ -11,8 +13,10 @@ import {
 } from "components";
 import { IS_DEV, MAX_POSTS_PER_USER } from "consts";
 import {
+  APIAction,
   DBService,
   ErrorMessage,
+  FileStatus,
   Flag,
   HttpRequest,
   PageRoute,
@@ -23,11 +27,12 @@ import {
   AppContext,
   useAsync,
   useFileUploads,
+  useOnWindowUnload,
   usePageReady,
   usePreviewImg,
   useRealtimePost,
 } from "hooks";
-import { deleteFile, getUploadedFileKey, HTTPService } from "lib/client";
+import { deleteFiles, HTTPService } from "lib/client";
 import { ServerError } from "lib/server";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import Dropzone from "react-dropzone";
@@ -47,20 +52,37 @@ export async function getServerSideProps({ params }) {
 const EditPost = ({ id }: IPostPage) => {
   const { theme, user, routerPush, updatePostSlugs } = useContext(AppContext);
   const { realtimePost, refreshPost } = useRealtimePost({ id, user }, true);
-  const { addFiles, SelectFile, Files } = useFileUploads(user, realtimePost);
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [body, setBody] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
-  const [newImage, setNewImage] = useState<any>(null);
-  const [imageKey, setImageKey] = useState("");
   const [hasMarkdown, setHasMarkdown] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
+  const deleteOnUnloadRef = useRef(true);
   const hasEditedSlug = useRef(false);
   const isNewPost = id === "new";
-  const imageUpdated = !!newImage || imageKey !== realtimePost?.imageKey;
   const isAdmin = user?.isAdmin || IS_DEV;
+  const {
+    newImg,
+    imageKey,
+    imgUpdated,
+    setNewImg,
+    rmImg,
+    resetRefs,
+    files,
+    filesChanged,
+    getAddedFileKeys,
+    getRemovedFileKeys,
+    handleAddFile,
+    handleRemoveFile,
+    handleDropFiles,
+  } = useFileUploads(user, realtimePost);
   usePageReady();
+  useOnWindowUnload(() => {
+    if (deleteOnUnloadRef.current) {
+      deleteFiles(getAddedFileKeys());
+    }
+  });
 
   useEffect(() => {
     if (!hasEditedSlug.current) {
@@ -78,12 +100,10 @@ const EditPost = ({ id }: IPostPage) => {
       if (user?.posts?.length >= MAX_POSTS_PER_USER && !isAdmin)
         routerPush(PageRoute.HOME);
     } else {
-      const { title, slug, body, imageKey, isPrivate, hasMarkdown } =
-        realtimePost || {};
+      const { title, slug, body, isPrivate, hasMarkdown } = realtimePost || {};
       setTitle(title);
       setSlug(slug);
       setBody(body);
-      setImageKey(imageKey);
       setIsPrivate(isPrivate);
       setHasMarkdown(hasMarkdown);
     }
@@ -91,7 +111,7 @@ const EditPost = ({ id }: IPostPage) => {
   }, [user?.posts?.length, isAdmin, isNewPost, realtimePost]);
 
   const _handlePut = () => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       // If existing post with new slug || new post -> check if slug avail
       if (isNewPost || slug.trim() !== realtimePost?.slug?.trim()) {
         if (!!user?.posts?.find((post) => post.slug === slug)) {
@@ -99,54 +119,46 @@ const EditPost = ({ id }: IPostPage) => {
           return;
         }
       }
-      let _imageKey = realtimePost?.imageKey;
-      let imageError = false;
-      if (imageUpdated) {
-        // New image -> delete old image if exists, do not await
-        if (realtimePost?.imageKey) {
-          _imageKey = "";
-          deleteFile(realtimePost.imageKey).catch(console.info);
-        }
-        await getUploadedFileKey(newImage)
-          .then((key) => (_imageKey = key))
-          .catch((err) => {
-            imageError = true;
-            reject(err);
-          });
-      }
-      if (!imageError) {
-        const post = {
-          id: isNewPost ? "" : realtimePost?.id,
-          username: user?.username,
-          title,
-          slug,
-          body,
-          imageKey: _imageKey,
-          isPrivate,
-          hasMarkdown,
-        };
-        await HTTPService.makeAuthHttpReq(
-          DBService.POSTS,
-          isNewPost ? HttpRequest.POST : HttpRequest.PATCH,
-          post
-        )
-          .then((res) => {
-            toast.success(
-              isNewPost ? ToastMessage.POST_CREATED : ToastMessage.POST_EDITED
-            );
-            resolve(res);
-          })
-          .catch((err) => {
-            toast.error(
-              isNewPost
-                ? ToastMessage.POST_CREATED_FAIL
-                : ToastMessage.POST_EDITED_FAIL
-            );
-            reject(err);
-          });
-      } else {
-        toast.error(ToastMessage.I_UPLOAD_FAIL);
-      }
+      const post = {
+        id: isNewPost ? "" : realtimePost?.id,
+        username: user?.username,
+        title,
+        slug,
+        body,
+        imageKey,
+        isPrivate,
+        hasMarkdown,
+        files: files
+          .filter((file) => file.key)
+          .map((file) => {
+            return {
+              uploaded: file.uploaded,
+              name: file.name,
+              key: file.key,
+            };
+          }),
+      };
+      HTTPService.makeAuthHttpReq(
+        DBService.POSTS,
+        isNewPost ? HttpRequest.POST : HttpRequest.PATCH,
+        post
+      )
+        .then((res) => {
+          toast.success(
+            isNewPost ? ToastMessage.POST_CREATED : ToastMessage.POST_EDITED
+          );
+          deleteOnUnloadRef.current = false;
+          deleteFiles(getRemovedFileKeys());
+          resolve(res);
+        })
+        .catch((err) => {
+          toast.error(
+            isNewPost
+              ? ToastMessage.POST_CREATED_FAIL
+              : ToastMessage.POST_EDITED_FAIL
+          );
+          reject(err);
+        });
     });
   };
 
@@ -156,8 +168,10 @@ const EditPost = ({ id }: IPostPage) => {
       routerPush(PageRoute.MY_POSTS);
     } else {
       refreshPost();
+      resetRefs();
+      deleteOnUnloadRef.current = true;
     }
-  }, [isNewPost, user, refreshPost, routerPush, updatePostSlugs]);
+  }, [isNewPost, user, refreshPost, resetRefs, routerPush, updatePostSlugs]);
 
   const { execute: handleSave, status: saveStatus } = useAsync<
     IResponse,
@@ -175,14 +189,15 @@ const EditPost = ({ id }: IPostPage) => {
       body === realtimePost?.body &&
       isPrivate === realtimePost?.isPrivate &&
       hasMarkdown === realtimePost?.hasMarkdown &&
-      !imageUpdated);
+      !imgUpdated &&
+      !filesChanged);
 
-  function handleDeleteClick(e: React.MouseEvent) {
+  function handleDelete(e: React.MouseEvent) {
     e.stopPropagation();
     setShowDelete(true);
   }
 
-  const showingPreview = usePreviewImg(Flag.PREVIEW_IMG, newImage);
+  const showingPreview = usePreviewImg(Flag.PREVIEW_IMG, newImg);
 
   return (
     <main className="left pad-top-small">
@@ -207,8 +222,8 @@ const EditPost = ({ id }: IPostPage) => {
           maxWidth
         />
         <br />
-        <Dropzone onDrop={addFiles} noClick>
-          {({ getRootProps, getInputProps, isDragActive }) => (
+        <Dropzone onDrop={handleDropFiles} noClick>
+          {({ getRootProps, isDragActive }) => (
             <div
               {...getRootProps()}
               className="file-drop-zone"
@@ -239,7 +254,7 @@ const EditPost = ({ id }: IPostPage) => {
             </div>
           )}
         </Dropzone>
-        <Files />
+        <Files files={files} handleRemoveFile={handleRemoveFile} />
         <DynamicFlex>
           <PostCard
             post={{
@@ -259,11 +274,14 @@ const EditPost = ({ id }: IPostPage) => {
           <Column style={{ width: "280px" }}>
             <ImageForm
               label="banner image"
-              hasImage={!!imageKey || !!newImage}
-              setImage={setNewImage}
-              setImageKey={setImageKey}
+              hasImg={!!imageKey || !!newImg}
+              setImg={setNewImg}
+              rmImg={rmImg}
             />
-            <SelectFile />
+            <Button disableRipple component="label" className="add-files-label">
+              Add file
+              <input type="file" hidden onChange={handleAddFile} />
+            </Button>
             <EditPostButtons
               isPrivate={isPrivate}
               markdown={hasMarkdown}
@@ -273,7 +291,8 @@ const EditPost = ({ id }: IPostPage) => {
               togglePrivate={() => setIsPrivate((b) => !b)}
               toggleMarkdown={() => setHasMarkdown((b) => !b)}
               handleSave={handleSave}
-              deleteClick={handleDeleteClick}
+              handleCancel={() => deleteFiles(getAddedFileKeys())}
+              handleDelete={handleDelete}
             />
           </Column>
         </DynamicFlex>

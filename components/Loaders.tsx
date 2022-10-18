@@ -11,6 +11,7 @@ interface ILoader {
 }
 
 const sizeMap = {
+  [Size.XS]: { height: 10, width: 10 },
   [Size.S]: { height: 22, width: 22 },
   [Size.M]: { height: 40, width: 40 },
   [Size.L]: { height: 100, width: 100 },

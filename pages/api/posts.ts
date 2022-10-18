@@ -127,6 +127,7 @@ async function getPost(params: Partial<IPostReq>): Promise<IResponse> {
       const client = new RedisConnection();
       const _fresh = castAsBoolean(fresh);
       if (username && slug && !_fresh) {
+        // Retrieve from cache if !_fresh
         const key = `${username}-${slug}`;
         const post = await client.get(null, key);
         if (post) {
@@ -181,8 +182,8 @@ async function createDoc(req: NextApiRequest): Promise<IResponse> {
           } else {
             newPost = new Post({
               ...post,
-              isPrivate,
               user: userId,
+              isPrivate,
             });
             return newPost.save() as Promise<IPost>;
           }

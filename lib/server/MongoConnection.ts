@@ -16,14 +16,6 @@ export const MongoUserSchema = new Schema<IUser>({
   ],
 });
 
-export const MongoImageSchema = new Schema({
-  name: SchemaTypes.String,
-  img: {
-    data: SchemaTypes.Buffer,
-    contentType: SchemaTypes.String,
-  },
-});
-
 export const MongoPostSchema = new Schema<IPost>({
   user: {
     type: SchemaTypes.ObjectId,
@@ -36,19 +28,25 @@ export const MongoPostSchema = new Schema<IPost>({
   isPrivate: SchemaTypes.Boolean,
   hasMarkdown: SchemaTypes.Boolean,
   imageKey: SchemaTypes.String,
+  files: [
+    {
+      type: SchemaTypes.Map,
+      key: SchemaTypes.String,
+      name: SchemaTypes.String,
+      uploaded: SchemaTypes.Number,
+    },
+  ],
 });
 
 MongoUserSchema.set("timestamps", true);
 MongoPostSchema.set("timestamps", true);
 MongoPostSchema.set("toObject", { getters: true, flattenMaps: true });
 
-const mongoUri = IS_DEV ? process.env.DEV_MONGODB_URI : process.env.MONGODB_URI;
-
 const MongoConnection = async () => {
   let mongoConnection: Connection;
   if (mongoose.connection?.readyState === 0 || 3) {
     await mongoose
-      .connect(mongoUri)
+      .connect(IS_DEV ? process.env.DEV_MONGODB_URI : process.env.MONGODB_URI)
       .then((conn) => (mongoConnection = conn.connection))
       .catch(console.error);
   }
@@ -56,7 +54,7 @@ const MongoConnection = async () => {
   const User = mongoose.models.User || mongoose.model("User", MongoUserSchema);
   const Post = mongoose.models.Post || mongoose.model("Post", MongoPostSchema);
 
-  return { Post, User, mongoConnection };
+  return { mongoConnection, Post, User };
 };
 
 export default MongoConnection;

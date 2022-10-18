@@ -71,6 +71,7 @@ export enum Transition {
 }
 
 export enum Size {
+  XS,
   S,
   M,
   L,
@@ -172,4 +173,9 @@ export enum APIAction {
   GET_POST_SLUGS = "get-post-slugs",
   GET_UPLOAD_KEY = "get-upload-key",
   READ = "read",
+}
+
+export enum FileStatus {
+  PENDING = "pending",
+  UPLOADED = "uploaded",
 }

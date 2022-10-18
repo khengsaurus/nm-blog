@@ -18,18 +18,26 @@ export async function getPostSlugs(username: string): Promise<IResponse> {
   });
 }
 
-export async function getPresignedS3URL(): Promise<IResponse | null> {
-  return HTTPService.makeAuthHttpReq(DBService.FILES, HttpRequest.GET, {
-    action: APIAction.GET_UPLOAD_KEY,
-  });
+export async function getPresignedS3URL(
+  signal?: AbortSignal
+): Promise<IResponse | null> {
+  return HTTPService.makeAuthHttpReq(
+    DBService.FILES,
+    HttpRequest.GET,
+    { action: APIAction.GET_UPLOAD_KEY },
+    { signal }
+  );
 }
 
-export async function getUploadedFileKey(image: any): Promise<string> {
+export async function getUploadedFileKey(
+  file: File,
+  signal?: AbortSignal
+): Promise<string> {
   let uploadURL = "";
   let key = "";
   return new Promise(async (resolve, reject) => {
-    if (!image) resolve("");
-    await getPresignedS3URL()
+    if (!file) resolve("");
+    await getPresignedS3URL(signal)
       .then((res) => {
         uploadURL = res?.data?.uploadURL;
         key = res?.data?.Key;
@@ -39,7 +47,7 @@ export async function getUploadedFileKey(image: any): Promise<string> {
         return;
       });
     if (uploadURL && key) {
-      await HTTPService.uploadFile(uploadURL, image)
+      await HTTPService.uploadFile(uploadURL, file, signal)
         .then(() => resolve(key))
         .catch(reject);
     } else {
@@ -48,20 +56,18 @@ export async function getUploadedFileKey(image: any): Promise<string> {
   });
 }
 
-export async function deleteFile(key: string): Promise<IResponse> {
-  if (!key) return;
-  return new Promise(async (resolve, reject) => {
-    HTTPService.makeAuthHttpReq(DBService.FILES, HttpRequest.DELETE, { key })
-      .then(resolve)
-      .catch(reject);
+export async function deleteFiles(keys: string[]) {
+  if (!keys?.length) return;
+  return HTTPService.makeAuthHttpReq(DBService.FILES, HttpRequest.DELETE, {
+    keys: JSON.stringify(keys),
   });
 }
 
 export function deletePost(post: IPost): Promise<IResponse> {
   const { id, username, isPrivate, imageKey } = post;
-  return new Promise(async (resolve, reject) => {
-    deleteFile(imageKey);
-    await HTTPService.makeAuthHttpReq(DBService.POSTS, HttpRequest.DELETE, {
+  return new Promise((resolve, reject) => {
+    deleteFiles([imageKey]);
+    HTTPService.makeAuthHttpReq(DBService.POSTS, HttpRequest.DELETE, {
       id,
       username,
       isPrivate,

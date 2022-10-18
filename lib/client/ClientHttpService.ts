@@ -89,7 +89,11 @@ class ClientHTTPService {
    * Localstack S3: ensure the same `Content-Type` header is sent when
    * generating the presigned-url as when uploading to it via PUT request
    */
-  uploadFile = async (presignedURL: string, file: any): Promise<Response> => {
+  uploadFile = async (
+    presignedURL: string,
+    file: any,
+    signal?: AbortSignal
+  ): Promise<Response> => {
     if (!presignedURL || !file) {
       return Promise.reject(new Error(ErrorMessage.F_UPLOAD_400));
     }
@@ -102,6 +106,7 @@ class ClientHTTPService {
           }
         : { "Content-Type": "multipart/form-data" },
       body: file,
+      signal,
     });
   };
 }

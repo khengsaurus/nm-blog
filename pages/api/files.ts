@@ -37,9 +37,10 @@ async function getS3UploadURL() {
 
 async function deleteCallback(req) {
   return new Promise(async (resolve, reject) => {
-    const { key } = req.query;
-    if (!key) reject(new ServerError(400));
-    await deleteFile(key).then(resolve).catch(reject);
+    let { keys } = req.query;
+    const _keys = JSON.parse(keys || []) as string[];
+    if (!_keys?.length) reject(new ServerError(400));
+    await deleteFile(_keys).then(resolve).catch(reject);
   });
 }
 

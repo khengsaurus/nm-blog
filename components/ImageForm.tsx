@@ -6,19 +6,18 @@ import { checkFileSize, checkFileType, checkOneFileSelected } from "utils";
 
 interface IImageForm {
   label: string;
-  hasImage: boolean;
-  setImage: (newImage: any) => void;
-  setImageKey: (newImageKey: string) => void;
-  newImage?: File;
+  hasImg: boolean;
+  setImg: (newImage: any) => void;
+  rmImg: () => void;
 }
 
-const ImageForm = ({ label, hasImage, setImage, setImageKey }: IImageForm) => {
+const ImageForm = ({ label, hasImg, setImg, rmImg }: IImageForm) => {
   const toastError = useCallback((msg: string) => toast.error(msg), []);
+
   function removeImage(e: React.MouseEvent) {
     e?.stopPropagation();
     e?.preventDefault();
-    setImage(null);
-    setImageKey("");
+    rmImg();
   }
 
   async function handleImage(event: React.ChangeEvent<HTMLInputElement>) {
@@ -28,7 +27,7 @@ const ImageForm = ({ label, hasImage, setImage, setImageKey }: IImageForm) => {
       checkFileType(event, toastError)
     ) {
       const file = event.target.files[0];
-      setImage(file);
+      setImg(file);
     }
   }
 
@@ -45,10 +44,10 @@ const ImageForm = ({ label, hasImage, setImage, setImageKey }: IImageForm) => {
           textTransform: "initial",
           marginLeft: 10,
         }}
-        onClick={hasImage ? removeImage : null}
+        onClick={hasImg ? removeImage : null}
       >
-        {`${hasImage ? "Remove" : "Add"} ${label.toLowerCase()}`}
-        {!hasImage && <input type="file" hidden onChange={handleImage} />}
+        {`${hasImg ? "Remove" : "Add"} ${label.toLowerCase()}`}
+        {!hasImg && <input type="file" hidden onChange={handleImage} />}
       </Button>
     </Row>
   );

@@ -5,6 +5,7 @@ import DynamicFlex from "./DynamicFlex";
 import EditPostButtons from "./EditPostButtons";
 import EditPreviewMarkdown from "./EditPreviewMarkdown";
 import EditProfileButtons from "./EditProfileButtons";
+import Files from "./Files";
 import ImageForm from "./ImageForm";
 import Input from "./Input";
 import Layout from "./Layout";
@@ -46,6 +47,7 @@ export {
   EditPreviewMarkdown,
   EditProfileButtons,
   EditPostButtons,
+  Files,
   HomeButton,
   ImageForm,
   Input,

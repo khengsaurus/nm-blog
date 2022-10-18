@@ -1,8 +1,9 @@
 import S3 from "aws-sdk/clients/s3";
-import { ServerInfo } from "enums";
-import { randomBytes } from "crypto";
-import { IObject } from "types";
 import { IS_DEV } from "consts";
+import { randomBytes } from "crypto";
+import { ServerInfo } from "enums";
+import { IObject } from "types";
+import ServerError from "./ServerError";
 
 const Bucket = process.env.ENV_AWS_BUCKET;
 
@@ -48,16 +49,31 @@ export function getFileStream(fileKey) {
   return s3.getObject(downloadParams).createReadStream();
 }
 
-export function deleteFile(imageKey: string) {
+export function deleteFile(keys: string[]) {
   return new Promise((resolve, reject) => {
-    s3.deleteObject({ Bucket, Key: imageKey }, function (err, _) {
-      if (err) reject(err);
-      else {
-        resolve({
-          status: 200,
-          message: ServerInfo.FILE_DELETED,
-        });
-      }
-    });
+    let allDeleted = true;
+    const failedDelete = [];
+    for (const Key of keys) {
+      s3.deleteObject({ Bucket, Key }, function (err, _) {
+        if (err) {
+          allDeleted = false;
+          failedDelete.push(Key);
+          console.error(err);
+        }
+      });
+    }
+    if (allDeleted) {
+      resolve({
+        status: 200,
+        message: ServerInfo.FILE_DELETED,
+      });
+    } else {
+      reject(
+        new ServerError(
+          500,
+          `Failed to delete S3 objects: ${JSON.stringify(failedDelete)}`
+        )
+      );
+    }
   });
 }

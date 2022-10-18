@@ -1,7 +1,7 @@
 import boto3
 
-REGION = 'us-east-1'
-BUCKET_NAME = 'notes-app-1-sg'
+REGION = 'ap-southeast-1'
+BUCKET_NAME = 'next-mongo'
 
 BUCKET_CONFIG = {'LocationConstraint': REGION}
 BUCKET_CORS_CONFIG = {
