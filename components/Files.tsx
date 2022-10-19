@@ -18,15 +18,20 @@ import { IPostFile } from "types";
 
 interface IFiles {
   files: IPostFile[];
-  handleRemoveFile: (file: IPostFile) => void;
+  disableDelete?: boolean;
+  handleRemoveFile?: (file: IPostFile) => void;
 }
 
-function Files({ files, handleRemoveFile }: IFiles) {
+function Files({
+  files,
+  disableDelete = false,
+  handleRemoveFile = null,
+}: IFiles) {
   const { theme } = useContext(AppContext);
 
   return (
     <div className="selected-files">
-      {files.map((file) => {
+      {files?.map((file) => {
         const { name, status, uploaded, key } = file;
         const isUploaded = status !== FileStatus.PENDING;
         const fileName = name || file.file?.name;
@@ -59,10 +64,12 @@ function Files({ files, handleRemoveFile }: IFiles) {
                   onClick={() => downloadFile(fileName, key, toast.error)}
                 />
               )}
-              <DeleteIcon
-                style={{ color: theme.highlightColor }}
-                onClick={() => handleRemoveFile(file)}
-              />
+              {!disableDelete && handleRemoveFile && (
+                <DeleteIcon
+                  style={{ color: theme.highlightColor }}
+                  onClick={() => handleRemoveFile(file)}
+                />
+              )}
             </Row>
           </Row>
         );

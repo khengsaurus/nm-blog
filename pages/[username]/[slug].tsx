@@ -7,6 +7,7 @@ import {
   DarkContainer,
   DarkText,
   DeletePostModal,
+  Files,
   PostBanner,
   Row,
   StyledText,
@@ -143,6 +144,7 @@ const Post = ({ post, username, slug }: IPostPage) => {
             <StyledText text={body} variant="body1" paragraph />
           </section>
         )}
+        <Files files={realtimePost?.files} disableDelete />
       </main>
       {/* Check for user to prevent showing on mount */}
       {user && user?.id === author?.id && (

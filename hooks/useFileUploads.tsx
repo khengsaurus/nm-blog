@@ -22,39 +22,43 @@ const useFileUploads = (user: IUser, post: IPost) => {
     setImgKey(post?.imageKey || "");
   }, [post]);
 
-  const uploadFile = useCallback(async (newFile: IPostFile) => {
-    const { file: _file, uploaded } = newFile;
-    const controllerKey = `${_file.name}-${uploaded}`;
-    if (uploadController.current.has(controllerKey)) return;
+  const uploadFile = useCallback(
+    async (newFile: IPostFile) => {
+      if (!user?.id) return;
+      const { file: _file, uploaded } = newFile;
+      const controllerKey = `${_file.name}-${uploaded}`;
+      if (uploadController.current.has(controllerKey)) return;
 
-    const controller = new AbortController();
-    uploadController.current.set(controllerKey, controller);
-    getUploadedFileKey(_file, controller.signal)
-      .then((key) => {
-        /* important: use updater fn */
-        setFiles((fs) =>
-          fs.map((f) =>
-            f.file === _file
-              ? {
-                  status: FileStatus.UPLOADED,
-                  uploaded: f.uploaded,
-                  name: _file.name,
-                  key,
-                }
-              : f
-          )
-        );
-        newFiles.current.add(key);
-        filesChanged.current = true;
-        toast.success(`Uploaded ${_file.name}`);
-      })
-      .catch((err) => {
-        console.error(err);
-        toast.error(`Failed to upload ${_file.name}`);
-        controller.abort();
-      })
-      .finally(() => uploadController.current.delete(controllerKey));
-  }, []);
+      const controller = new AbortController();
+      uploadController.current.set(controllerKey, controller);
+      getUploadedFileKey(user.id, _file, controller.signal)
+        .then((key) => {
+          /* important: use updater fn */
+          setFiles((fs) =>
+            fs.map((f) =>
+              f.file === _file
+                ? {
+                    status: FileStatus.UPLOADED,
+                    uploaded: f.uploaded,
+                    name: _file.name,
+                    key,
+                  }
+                : f
+            )
+          );
+          newFiles.current.add(key);
+          filesChanged.current = true;
+          toast.success(`Uploaded ${_file.name}`);
+        })
+        .catch((err) => {
+          console.error(err);
+          toast.error(`Failed to upload ${_file.name}`);
+          controller.abort();
+        })
+        .finally(() => uploadController.current.delete(controllerKey));
+    },
+    [user?.id]
+  );
 
   const handleAddFile = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,8 +135,9 @@ const useFileUploads = (user: IUser, post: IPost) => {
   };
 
   const setNewImg = (img: File) => {
+    if (!user?.id) return;
     _setNewImg(img);
-    getUploadedFileKey(img)
+    getUploadedFileKey(user.id, img)
       .then((key) => {
         setImgKey(key);
         removeSavedImg();

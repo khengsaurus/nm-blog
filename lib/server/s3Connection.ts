@@ -25,14 +25,17 @@ const s3 = new S3(
       }
 );
 
-export const generateUploadURL = async (): Promise<IObject<String>> => {
+export const generateUploadURL = async (
+  userId: string
+): Promise<IObject<String>> => {
   return new Promise(async (resolve, reject) => {
     const rawBytes = await randomBytes(16);
-    const Key = rawBytes.toString("hex");
+    const Key = `user_${userId}/${rawBytes.toString("hex")}`;
     const params = {
       Bucket,
       Key,
       Expires: 60,
+      Tagging: "",
     };
     await s3
       .getSignedUrlPromise("putObject", params)

@@ -411,13 +411,14 @@ textarea {
 }
 
 .add-files-label {
+  // some of these are being overriden in prod env
   align-self: flex-start;
-  justify-content: flex-start;
-  height: 40px;
+  justify-content: flex-start !important;
+  height: 40px !important;
   width: 200px;
-  margin-left: 10px;
-  padding: 0px;
-  text-transform: initial;
+  margin-left: 10px !important;
+  padding: 0px !important;
+  text-transform: initial !important;
 }
 
 .selected-files {

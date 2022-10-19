@@ -52,7 +52,7 @@ const EditProfile = () => {
         imageKey = user?.avatarKey || "";
       if (imageUpdated) {
         if (user?.avatarKey) deleteFiles([user.avatarKey]).catch(console.info);
-        await getUploadedFileKey(newImage)
+        await getUploadedFileKey(user.id, newImage)
           .then((key) => {
             imageKey = key;
           })

@@ -91,20 +91,26 @@ class ClientHTTPService {
    */
   uploadFile = async (
     presignedURL: string,
+    userId: string,
     file: any,
     signal?: AbortSignal
   ): Promise<Response> => {
     if (!presignedURL || !file) {
       return Promise.reject(new Error(ErrorMessage.F_UPLOAD_400));
     }
+    const tag = `user_id=${userId}&file_name=${file.name}`;
     return fetch(presignedURL, {
       method: HttpRequest.PUT,
       headers: IS_DEV
         ? {
             "Content-Type": "application/json",
             "x-amz-acl": "public-read-write",
+            "x-amz-tagging": tag,
           }
-        : { "Content-Type": "multipart/form-data" },
+        : {
+            "Content-Type": "multipart/form-data",
+            // "x-amz-tagging": tag,
+          },
       body: file,
       signal,
     });

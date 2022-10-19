@@ -20,55 +20,12 @@ export async function getPostSlugs(username: string): Promise<IResponse> {
   });
 }
 
-export async function getPresignedS3URL(
-  signal?: AbortSignal
-): Promise<IResponse | null> {
-  return HTTPService.makeAuthHttpReq(
-    DBService.FILES,
-    HttpRequest.GET,
-    { action: APIAction.GET_UPLOAD_KEY },
-    { signal }
-  );
-}
-
-export async function getUploadedFileKey(
-  file: File,
-  signal?: AbortSignal
-): Promise<string> {
-  let url = "";
-  let key = "";
-  return new Promise(async (resolve, reject) => {
-    if (!file) resolve("");
-    await getPresignedS3URL(signal)
-      .then((res) => {
-        url = res?.data?.url;
-        key = res?.data?.Key;
-      })
-      .catch((err) => {
-        reject(err);
-        return;
-      });
-    if (url && key) {
-      await HTTPService.uploadFile(url, file, signal)
-        .then(() => resolve(key))
-        .catch(reject);
-    } else {
-      reject(new Error(ErrorMessage.F_UPLOAD_500));
-    }
-  });
-}
-
-export async function deleteFiles(keys: string[]) {
-  if (!keys?.length) return;
-  return HTTPService.makeAuthHttpReq(DBService.FILES, HttpRequest.DELETE, {
-    keys: JSON.stringify(keys),
-  });
-}
-
 export function deletePost(post: IPost): Promise<IResponse> {
-  const { id, username, isPrivate, imageKey } = post;
+  const { id, username, isPrivate, imageKey, files = [] } = post;
   return new Promise((resolve, reject) => {
-    deleteFiles([imageKey]);
+    const fileKeys = files?.map((f) => f.key);
+    if (imageKey) fileKeys.push(imageKey);
+    if (fileKeys.length) deleteFiles(fileKeys);
     HTTPService.makeAuthHttpReq(DBService.POSTS, HttpRequest.DELETE, {
       id,
       username,
@@ -79,12 +36,52 @@ export function deletePost(post: IPost): Promise<IResponse> {
   });
 }
 
+export async function getPresignedS3URL(
+  userId: string,
+  signal?: AbortSignal
+): Promise<IResponse | null> {
+  return HTTPService.makeAuthHttpReq(
+    DBService.FILES,
+    HttpRequest.POST,
+    { action: APIAction.GET_UPLOAD_KEY, userId },
+    { signal }
+  );
+}
+
+export async function getUploadedFileKey(
+  userId: string,
+  file: File,
+  signal?: AbortSignal
+): Promise<string> {
+  let url = "";
+  let key = "";
+  return new Promise(async (resolve, reject) => {
+    if (!file) resolve("");
+    await getPresignedS3URL(userId, signal)
+      .then((res) => {
+        url = res?.data?.url;
+        key = res?.data?.Key;
+      })
+      .catch((err) => {
+        reject(err);
+        return;
+      });
+    if (url && key) {
+      await HTTPService.uploadFile(url, userId, file, signal)
+        .then(() => resolve(key))
+        .catch(reject);
+    } else {
+      reject(new Error(ErrorMessage.F_UPLOAD_500));
+    }
+  });
+}
+
 export async function downloadFile(
   name: string,
   key: string,
   errorHandler: (msg: string) => void
 ) {
-  HTTPService.makeAuthHttpReq(DBService.FILES, HttpRequest.GET, {
+  HTTPService.makeAuthHttpReq(DBService.FILES, HttpRequest.POST, {
     action: APIAction.GET_DOWNLOAD_KEY,
     key,
   })
@@ -105,4 +102,11 @@ export async function downloadFile(
         errorHandler(ErrorMessage.F_DOWNLOAD_FAILED);
       }
     });
+}
+
+export async function deleteFiles(keys: string[]) {
+  if (!keys?.length) return;
+  return HTTPService.makeAuthHttpReq(DBService.FILES, HttpRequest.DELETE, {
+    keys: JSON.stringify(keys),
+  });
 }
