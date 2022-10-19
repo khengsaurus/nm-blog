@@ -41,7 +41,7 @@ const Layout = ({ children }: ILayoutProps) => {
       <Toaster
         position="bottom-center"
         toastOptions={{
-          duration: 5000,
+          duration: 3500,
           style: {
             background: theme?.secondary,
             color: theme?.mainText,

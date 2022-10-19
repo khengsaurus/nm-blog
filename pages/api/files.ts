@@ -1,7 +1,12 @@
 import { EXPERIMENT_RUNTIME } from "consts";
 import { APIAction } from "enums";
 import { handleRequest } from "lib/middlewares";
-import { deleteFile, generateUploadURL, ServerError } from "lib/server";
+import {
+  deleteFile,
+  generateDownloadURL,
+  generateUploadURL,
+  ServerError,
+} from "lib/server";
 import { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from "next-connect";
 
@@ -18,10 +23,13 @@ const route = nextConnect({
 
 route.get("/*", async (req, res) => {
   const action = req.query.action;
-  if (action === APIAction.GET_UPLOAD_KEY) {
-    handleRequest(req, res, getS3UploadURL);
-  } else {
-    res.status(401);
+  switch (action) {
+    case APIAction.GET_UPLOAD_KEY:
+      return handleRequest(req, res, getS3UploadURL);
+    case APIAction.GET_DOWNLOAD_KEY:
+      return handleRequest(req, res, () => getS3DownloadURL(req));
+    default:
+      return res.status(400);
   }
 });
 
@@ -32,6 +40,19 @@ async function getS3UploadURL() {
     await generateUploadURL()
       .then((data) => resolve({ status: 200, data }))
       .catch((err) => reject(new ServerError(500, err?.message)));
+  });
+}
+
+async function getS3DownloadURL(req: NextApiRequest) {
+  return new Promise(async (resolve, reject) => {
+    const key = req.query.key;
+    if (key && typeof key === "string") {
+      generateDownloadURL(key)
+        .then((data) => resolve({ status: 200, data }))
+        .catch((err) => reject(new ServerError(500, err?.message)));
+    } else {
+      reject(new ServerError(400));
+    }
   });
 }
 

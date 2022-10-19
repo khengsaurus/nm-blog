@@ -4,7 +4,7 @@ import { getUploadedFileKey } from "lib/client";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { IPost, IPostFile, IUser } from "types";
-import { checkFileSize } from "utils";
+import { checkFileSize, sleep } from "utils";
 
 const maxFileSize = MAX_FILE_SIZE * 1000 * 1000;
 
@@ -58,19 +58,18 @@ const useFileUploads = (user: IUser, post: IPost) => {
 
   const handleAddFile = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (checkFileSize(event, toast.error)) {
-        const newFile: IPostFile = {
-          status: FileStatus.PENDING,
-          uploaded: new Date().valueOf(),
-          file: event.target.files[0],
-        };
-        uploadFile(newFile);
-        /* important: use updater fn */
-        setFiles((fs) => [...fs, newFile]);
-        filesChanged.current = true;
-      }
+      if (!isAdmin && !checkFileSize(event, toast.error)) return;
+      const newFile: IPostFile = {
+        status: FileStatus.PENDING,
+        uploaded: new Date().valueOf(),
+        file: event.target.files[0],
+      };
+      uploadFile(newFile);
+      /* important: use updater fn */
+      setFiles((fs) => [...fs, newFile]);
+      filesChanged.current = true;
     },
-    [uploadFile]
+    [isAdmin, uploadFile]
   );
 
   const handleRemoveFile = (file: IPostFile) => {

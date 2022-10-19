@@ -163,6 +163,9 @@ export enum ErrorMessage {
 
   F_UPLOAD_400 = "File upload missing required params",
   F_UPLOAD_500 = "File upload failed",
+  F_DOWNLOAD_404 = "File could not be found",
+  F_DOWNLOAD_500 = "Failed to retrieve download url",
+  F_DOWNLOAD_FAILED = "Failed to download file",
 }
 
 export enum APIAction {
@@ -172,6 +175,7 @@ export enum APIAction {
   USER_SET_USERNAME = "user-set-username",
   GET_POST_SLUGS = "get-post-slugs",
   GET_UPLOAD_KEY = "get-upload-key",
+  GET_DOWNLOAD_KEY = "get-download-key",
   READ = "read",
 }
 

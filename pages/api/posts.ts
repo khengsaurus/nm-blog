@@ -224,12 +224,12 @@ async function patchDoc(req: NextApiRequest): Promise<IResponse> {
     const { Post } = await MongoConnection();
     const post = await Post.findById(id);
     const wasPrivate = castAsBoolean(post.isPrivate);
-    // modify post
-    for (const key of Object.keys(_set)) post[key] = _set[key];
-    await post
-      .save()
-      .then((_post) => {
-        const post = processPostWithUser(_post);
+
+    Post.findByIdAndUpdate(id, _set, (err, res) => {
+      if (err) {
+        throwAPIError(reject, err, ErrorMessage.P_UPDATE_FAIL);
+      } else {
+        const post = processPostWithUser(res);
         const client = new RedisConnection();
         client.resetCache(
           post,
@@ -246,8 +246,8 @@ async function patchDoc(req: NextApiRequest): Promise<IResponse> {
           message: ServerInfo.POST_UPDATED,
           data: { post },
         });
-      })
-      .catch((err) => throwAPIError(reject, err, ErrorMessage.P_UPDATE_FAIL));
+      }
+    });
   });
 }
 

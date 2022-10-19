@@ -5,8 +5,10 @@ module.exports = {
   outputFileTracing: false,
   env: {
     BEARER: process.env.ENV_VERCEL_BEARER,
-    ENV_IMG_SRC: process.env.ENV_IMG_SRC,
     DEV: process.env.DEV,
+    ENV_AWS_BUCKET: process.env.ENV_AWS_BUCKET,
+    ENV_AWS_REGION: process.env.ENV_AWS_REGION,
+    ENV_IMG_SRC: process.env.ENV_IMG_SRC,
   },
   images: {
     domains: ["localhost", "localhost:3000", process.env.ENV_IMG_HOST],

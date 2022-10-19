@@ -36,7 +36,23 @@ export const generateUploadURL = async (): Promise<IObject<String>> => {
     };
     await s3
       .getSignedUrlPromise("putObject", params)
-      .then((uploadURL) => resolve({ uploadURL, Key }))
+      .then((url) => resolve({ url, Key }))
+      .catch(reject);
+  });
+};
+
+export const generateDownloadURL = async (
+  Key: string
+): Promise<IObject<String>> => {
+  return new Promise(async (resolve, reject) => {
+    const params = {
+      Bucket,
+      Key,
+      Expires: 60,
+    };
+    await s3
+      .getSignedUrlPromise("getObject", params)
+      .then((url) => resolve({ url }))
       .catch(reject);
   });
 };

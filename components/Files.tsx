@@ -10,8 +10,10 @@ import VideoFileIcon from "@mui/icons-material/VideoFile";
 import { CircleLoader, Column, Row, StyledText } from "components";
 import { FileStatus, Size } from "enums";
 import { AppContext } from "hooks";
+import { downloadFile } from "lib/client/tasks";
 import moment from "moment";
 import { useContext } from "react";
+import toast from "react-hot-toast";
 import { IPostFile } from "types";
 
 interface IFiles {
@@ -25,7 +27,9 @@ function Files({ files, handleRemoveFile }: IFiles) {
   return (
     <div className="selected-files">
       {files.map((file) => {
-        const fileName = file.name || file.file?.name;
+        const { name, status, uploaded, key } = file;
+        const isUploaded = status !== FileStatus.PENDING;
+        const fileName = name || file.file?.name;
         if (!fileName) return null;
 
         const FileIcon = getIcon(fileName);
@@ -36,23 +40,25 @@ function Files({ files, handleRemoveFile }: IFiles) {
               <StyledText text={fileName} variant="h6" />
               <StyledText
                 text={
-                  (file.status === FileStatus.PENDING ? (
-                    <CircleLoader size={Size.XS} strokeWidth={6} />
-                  ) : (
+                  (isUploaded ? (
                     <span style={{ display: "flex" }}>
                       <FileUploadIcon style={{ height: 14, width: 14 }} />
                       {moment(new Date(file.uploaded)).format("DD/MM/YY HH:mm")}
                     </span>
+                  ) : (
+                    <CircleLoader size={Size.XS} strokeWidth={6} />
                   )) as unknown as string
                 }
                 variant="body2"
               />
             </Column>
             <Row className="action-btns">
-              <DownloadIcon
-                style={{ color: theme.highlightColor }}
-                onClick={() => {}}
-              />
+              {isUploaded && key && (
+                <DownloadIcon
+                  style={{ color: theme.highlightColor }}
+                  onClick={() => downloadFile(fileName, key, toast.error)}
+                />
+              )}
               <DeleteIcon
                 style={{ color: theme.highlightColor }}
                 onClick={() => handleRemoveFile(file)}
