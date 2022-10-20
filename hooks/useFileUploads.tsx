@@ -36,7 +36,9 @@ const useFileUploads = (user: IUser, post: IPost) => {
           /* important: use updater fn */
           setFiles((fs) =>
             fs.map((f) =>
-              f.file === _file
+              f.status === FileStatus.PENDING &&
+              f.file?.name === _file?.name &&
+              f.uploaded === uploaded
                 ? {
                     status: FileStatus.UPLOADED,
                     uploaded: f.uploaded,
@@ -77,10 +79,14 @@ const useFileUploads = (user: IUser, post: IPost) => {
   );
 
   const handleRemoveFile = (file: IPostFile) => {
-    setFiles((fs) => fs.filter((f) => f !== file));
-    const { key } = file;
-    fileKeysToRm.current.add(key);
+    const { file: _file, name, key, status, uploaded } = file;
+    if (status === FileStatus.PENDING) {
+      const controllerKey = `${name || _file?.name}-${uploaded}`;
+      uploadController.current.get(controllerKey)?.abort();
+    }
+    if (key) fileKeysToRm.current.add(key);
     filesChanged.current = true;
+    setFiles((fs) => fs.filter((f) => f !== file));
   };
 
   function handleDropFiles(newFiles: File[]) {

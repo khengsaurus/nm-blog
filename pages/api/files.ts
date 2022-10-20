@@ -1,4 +1,4 @@
-import { EXPERIMENT_RUNTIME } from "consts";
+import { EXPERIMENTAL_RUNTIME } from "consts";
 import { APIAction, HttpRequest } from "enums";
 import { handleBadRequest, handleRequest } from "lib/middlewares";
 import {
@@ -9,9 +9,7 @@ import {
 } from "lib/server";
 import { NextApiRequest, NextApiResponse } from "next";
 
-// import nextConnect from "next-connect";
-
-export const config = EXPERIMENT_RUNTIME;
+export const config = EXPERIMENTAL_RUNTIME;
 
 export default async function handler(
   req: NextApiRequest,

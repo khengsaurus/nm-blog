@@ -1,4 +1,4 @@
-import { CACHE_DEFAULT, EXPERIMENT_RUNTIME } from "consts";
+import { CACHE_DEFAULT, EXPERIMENTAL_RUNTIME } from "consts";
 import { APIAction, ErrorMessage, HttpRequest, ServerInfo } from "enums";
 import {
   createUserObject,
@@ -17,7 +17,7 @@ import { isEmpty } from "lodash";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { IResponse, IUser, IUserReq } from "types";
 
-export const config = EXPERIMENT_RUNTIME;
+export const config = EXPERIMENTAL_RUNTIME;
 
 export default async function handler(
   req: NextApiRequest,
