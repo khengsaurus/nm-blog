@@ -1,3 +1,4 @@
+import { Dimension } from "enums";
 import styled from "styled-components";
 
 export const Column = styled.div`
@@ -25,6 +26,7 @@ export const RowCentered = styled(Row)`
 export const PostFeedDiv = styled(Row)`
   flex-wrap: wrap;
   justify-content: center;
+  min-width: ${Dimension.CARD_W + 12}px;
 `;
 
 export const Centered = styled(Column)`
