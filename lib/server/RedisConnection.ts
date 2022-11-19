@@ -1,10 +1,4 @@
-import {
-  CURR_STAMP,
-  DEFAULT_EXPIRE,
-  HOME,
-  IS_DEV,
-  PAGINATE_LIMIT,
-} from "consts";
+import { CURR, DEFAULT_EXPIRE_S, HOME, IS_DEV, PAGINATE_LIMIT } from "consts";
 import { DurationMS, Flag, ServerInfo } from "enums";
 import { isEmpty } from "lodash";
 import { createClient, RedisClientType } from "redis";
@@ -15,36 +9,41 @@ const redisUrl = IS_DEV ? process.env.DEV_REDIS_URL : process.env.ENV_REDIS_URL;
 
 class RedisConnection {
   private client: RedisClientType;
+  private closeTimeout: NodeJS.Timeout;
 
   constructor() {
     this.client = createClient({ url: redisUrl });
     this.connect();
   }
 
-  async connect() {
-    // console.info("-> RedisConnection.connect()");
+  connect() {
     return new Promise(async (resolve) => {
       if (this.client?.isOpen) resolve(1);
       else {
-        await this.client
+        this.client
           .connect()
           .then(() => resolve(1))
-          .catch(console.info);
+          .catch(console.error);
       }
     });
   }
 
-  close() {
-    if (this?.client?.isOpen) {
-      // console.info("-> RedisConnection.close()");
-      this.client.quit().catch(console.info);
+  setCloseTimeout(timeout = 3000) {
+    if (this.closeTimeout) {
+      clearTimeout(this.closeTimeout);
+      this.closeTimeout = undefined;
     }
+    this.closeTimeout = setTimeout(() => {
+      if (this.client.isOpen) {
+        this.client.quit().catch(console.error);
+      }
+    }, timeout);
   }
 
   async getCurrent(): Promise<string> {
     return new Promise((resolve) => {
       this.connect()
-        .then(() => this.client.get(CURR_STAMP))
+        .then(() => this.client.get(CURR))
         .then(resolve)
         .catch((err) => {
           console.info(err?.message);
@@ -59,10 +58,10 @@ class RedisConnection {
       const d1 = new Date();
       const d2 = new Date(d1.getTime() + DurationMS.MIN).valueOf(); // 1 min delay
       this.connect()
-        .then(() => this.client.set(CURR_STAMP, d2))
+        .then(() => this.client.set(CURR, d2))
         .then(resolve)
         .catch((err) => {
-          console.info(`${ServerInfo.REDIS_SET_FAIL}: ${CURR_STAMP}`);
+          console.info(`${ServerInfo.REDIS_SET_FAIL}: ${CURR}`);
           console.info(`Error: ${err?.message}`);
         });
     });
@@ -78,7 +77,7 @@ class RedisConnection {
             ? this.client.HSET(pKey, sKey, val)
             : this.client.set(pKey, val);
         })
-        .then(() => this.client.expire(pKey, DEFAULT_EXPIRE))
+        .then(() => this.client.expire(pKey, DEFAULT_EXPIRE_S))
         .then(resolve)
         .catch((err) => {
           const key = isHSet ? `${pKey}-${sKey}` : pKey;
@@ -118,7 +117,7 @@ class RedisConnection {
         .then((val) => {
           if (!val) resolve(defaultVal);
           else {
-            if (pKey !== HOME) this.client.expire(pKey, DEFAULT_EXPIRE);
+            if (pKey !== HOME) this.client.expire(pKey, DEFAULT_EXPIRE_S);
             resolve(JSON.parse(val) as T);
           }
         })
@@ -133,8 +132,8 @@ class RedisConnection {
 
   _hget<T = any>(key: string): Promise<T> {
     return new Promise((resolve) => {
-      this.client
-        .HGETALL(key)
+      this.connect()
+        .then(() => this.client.HGETALL(key))
         .then((res) => resolve(res as unknown as T))
         .catch((err) => {
           console.info(err?.message);
@@ -165,7 +164,7 @@ class RedisConnection {
 
   async get<T = any>(defaultVal: T, pKey: string, sKey?: string): Promise<T> {
     return setPromiseTimeout<T>(
-      () => this._get(defaultVal, pKey, sKey),
+      () => this.connect().then(() => this._get(defaultVal, pKey, sKey)),
       defaultVal
     );
   }
@@ -173,17 +172,19 @@ class RedisConnection {
   async getMaps<T = any>(keys: string | string[]): Promise<IObject<T>[]> {
     const _keys = typeof keys === "string" ? [keys] : keys;
     // console.info(`-> RedisConnection.getMaps(): ${JSON.stringify(_keys)}`);
-    return setPromiseTimeout(() => this._hgetall<T>([], _keys), []);
+    return setPromiseTimeout(
+      () => this.connect().then(() => this._hgetall<T>([], _keys)),
+      []
+    );
   }
 
   async del(keys: string | string[]): Promise<void> {
     // console.info(`-> RedisConnection.del(): ${JSON.stringify(_keys)}`);
     const _keys = typeof keys === "string" ? [keys] : keys;
     if (!_keys?.length) return;
-    await this.connect();
     return new Promise((resolve) => {
       try {
-        _keys.forEach((key) => this.client.del(key));
+        this.connect().then(() => _keys.forEach((key) => this.client.del(key)));
       } catch (err) {
         console.info(`${ServerInfo.REDIS_DEL_FAIL}: ${JSON.stringify(_keys)}`);
         console.info(`Error: ${err?.message}`);
@@ -198,8 +199,8 @@ class RedisConnection {
    */
   async hdel(pKey: string, sKey: string): Promise<number> {
     return new Promise((resolve) => {
-      this.client
-        .HDEL(pKey, sKey)
+      this.connect()
+        .then(() => this.client.HDEL(pKey, sKey))
         .then(resolve)
         .catch((err) => {
           console.info(err?.message);
@@ -218,10 +219,12 @@ class RedisConnection {
     const _date = date || (await this.getCurrent());
     const { pKey, sKey, fullKey } = this.getKeys(uN, pr, _date, search, limit);
     return new Promise((resolve) => {
-      this.getMaps<object>(pKey).then((maps) => {
-        if (isEmpty(maps) || !maps[0]?.[sKey]) resolve([]);
-        else this.get<IPost[]>([], fullKey).then(resolve);
-      });
+      this.connect()
+        .then(() => this.getMaps<object>(pKey))
+        .then((maps) => {
+          if (isEmpty(maps) || !maps[0]?.[sKey]) resolve([]);
+          else this.get<IPost[]>([], fullKey).then(resolve);
+        });
     });
   }
 
@@ -262,8 +265,8 @@ class RedisConnection {
    */
   resetCache(
     post: Partial<IPost>,
-    keepAlive = true,
-    privacyChange = 0
+    privacyChange = 0,
+    keepAlive = false
   ): Promise<void> {
     // console.info(`-> RedisConnection.resetCache(): ${post?.id}`);
     return new Promise((resolve) => {
@@ -292,10 +295,10 @@ class RedisConnection {
             privacyChange === 2 ? hKey : ""
           );
         })
-        .then((toDelete) => this.del([...toDelete, `${username}-${slug}`]))
+        .then((toDelete) => this.del([...toDelete, `NM_${username}-${slug}`]))
         .catch(console.info)
         .finally(() => {
-          if (!keepAlive) this.close();
+          if (!keepAlive) this.setCloseTimeout();
           resolve();
         });
     });
@@ -335,7 +338,7 @@ class RedisConnection {
     });
   }
 
-  newPostCreated(post: IPost, keepAlive = true): Promise<void> {
+  newPostCreated(post: IPost, keepAlive = false): Promise<void> {
     return new Promise((resolve) => {
       const { username, isPrivate } = post;
       const privateQUser = this.getPrimaryKey(username, isPrivate);
@@ -349,14 +352,14 @@ class RedisConnection {
         .then(async () => await this.updateCurrent())
         .catch(console.info)
         .finally(() => {
-          if (!keepAlive) this.close();
+          if (!keepAlive) this.setCloseTimeout();
           resolve();
         });
     });
   }
 
   getPrimaryKey(username: string, isPrivate: boolean, search = "") {
-    return `${Flag.USER_TAG}${username || ""}${Flag.PRIVATE_TAG}${
+    return `NM_${Flag.USER_TAG}${username || ""}${Flag.PRIVATE_TAG}${
       isPrivate || false
     }${Flag.SEARCH}${search}`;
   }
@@ -369,7 +372,7 @@ class RedisConnection {
     limit: number
   ) {
     const pKey = this.getPrimaryKey(username, isPrivate, search);
-    const sKey = `${date}` + `${Flag.LIMIT_TAG}${limit}`;
+    const sKey = `${date}${Flag.LIMIT_TAG}${limit}`;
     const fullKey = pKey + Flag.DATE_TAG + sKey;
     return { pKey, sKey, fullKey };
   }

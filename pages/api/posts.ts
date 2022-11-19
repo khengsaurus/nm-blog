@@ -1,6 +1,6 @@
 import {
   CACHE_DEFAULT,
-  DEFAULT_EXPIRE,
+  DEFAULT_EXPIRE_S,
   EXPERIMENTAL_RUNTIME,
   PAGINATE_LIMIT,
 } from "consts";
@@ -69,6 +69,7 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
 
   return new Promise(async (resolve, reject) => {
     const client = new RedisConnection();
+    // console.log("getPosts -> new RedisConnection()");
     let posts = await client.read(
       username,
       isPrivate,
@@ -77,7 +78,7 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
       limit
     );
     if (posts?.length) {
-      client.close();
+      client.setCloseTimeout();
       resolve({
         status: 200,
         message: ServerInfo.POST_RETRIEVED_CACHED,
@@ -95,7 +96,7 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
           { body: { $regex: search, $options: "i" } },
         ];
       const { Post } = await MongoConnection();
-      await Post.find(query)
+      Post.find(query)
         .select(["-user", "-files"])
         .sort({ createdAt: -1 })
         .limit(limit)
@@ -114,7 +115,7 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
           });
         })
         .catch((err) => reject(new ServerError(500, err?.message)))
-        .finally(client.close);
+        .finally(client.setCloseTimeout);
     }
   });
 }
@@ -125,12 +126,14 @@ async function getPost(params: Partial<IPostReq>): Promise<IResponse> {
     if (!id && !username && !slug) reject(new ServerError(400));
     else {
       const client = new RedisConnection();
+      // console.log("getPost -> new RedisConnection()");
       const _fresh = castAsBoolean(fresh);
       if (username && slug && !_fresh) {
         // Retrieve from cache if !_fresh
-        const key = `${username}-${slug}`;
-        const post = await client.get(null, key);
+        const redisKey = `NM_${username}-${slug}`;
+        const post = await client.get(null, redisKey);
         if (post) {
+          client.setCloseTimeout();
           return resolve({
             status: 200,
             message: ServerInfo.POST_RETRIEVED_CACHED,
@@ -139,7 +142,7 @@ async function getPost(params: Partial<IPostReq>): Promise<IResponse> {
         }
       }
       const { Post } = await MongoConnection();
-      await (id ? Post.findById(id) : Post.findOne({ username, slug }))
+      (id ? Post.findById(id) : Post.findOne({ username, slug }))
         .select(["-user"])
         .lean()
         .then((_post) => {
@@ -147,8 +150,8 @@ async function getPost(params: Partial<IPostReq>): Promise<IResponse> {
             reject(new ServerError(400, ServerInfo.POST_NA));
           } else {
             const post = processPostWithoutUser(_post);
-            const postKey = `${post.username}-${post.slug}`;
-            client.setKeyValue(postKey, post, DEFAULT_EXPIRE);
+            const redisKey = `NM_${post.username}-${post.slug}`;
+            client.setKeyValue(redisKey, post, DEFAULT_EXPIRE_S);
             resolve({
               status: 200,
               message: ServerInfo.POST_RETRIEVED,
@@ -156,26 +159,25 @@ async function getPost(params: Partial<IPostReq>): Promise<IResponse> {
             });
           }
         })
-        .catch((err) => {
-          throwAPIError(reject, err, ErrorMessage.P_RETRIEVE_FAIL);
-        });
+        .catch((err) =>
+          throwAPIError(reject, err, ErrorMessage.P_RETRIEVE_FAIL)
+        )
+        .finally(client.setCloseTimeout);
     }
   });
 }
 
 async function createDoc(req: NextApiRequest): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
-    let session: ClientSession = null;
-
     const { Post, User, mongoConnection } = await MongoConnection();
-    session = await mongoConnection.startSession();
-    await session.withTransaction(async () => {
+    let session = await mongoConnection.startSession();
+    session.withTransaction(async () => {
       const userId = req.headers["user-id"];
       const post: Partial<IPostReq> = req.body;
       const { isPrivate: _isPrivate, slug } = post;
       const isPrivate = castAsBoolean(_isPrivate);
       let newPost;
-      await Post.exists({ slug, user: userId })
+      Post.exists({ slug, user: userId })
         .then((exists) => {
           if (exists) {
             reject(new ServerError(200, ErrorMessage.P_SLUG_USED));
@@ -190,8 +192,8 @@ async function createDoc(req: NextApiRequest): Promise<IResponse> {
         })
         .then((res) => {
           if (res.id) {
-            const client = new RedisConnection();
-            client.newPostCreated(newPost, false);
+            // console.log("createDoc -> new RedisConnection()");
+            new RedisConnection().newPostCreated(newPost);
             User.findByIdAndUpdate(
               userId,
               { $push: { posts: { $each: [res.id], $position: 0 } } },
@@ -230,10 +232,9 @@ async function patchDoc(req: NextApiRequest): Promise<IResponse> {
         throwAPIError(reject, err, ErrorMessage.P_UPDATE_FAIL);
       } else {
         const post = processPostWithUser(res);
-        const client = new RedisConnection();
-        client.resetCache(
+        // console.log("patchDoc -> new RedisConnection()");
+        new RedisConnection().resetCache(
           post,
-          false,
           // Reset home keys if isPrivate changed
           _set.isPrivate === wasPrivate
             ? 0
@@ -266,8 +267,8 @@ async function deleteDoc(req: NextApiRequest): Promise<IResponse> {
       const isPrivate = castAsBoolean(_isPrivate);
       await Post.findByIdAndDelete(id)
         .then(() => {
-          const client = new RedisConnection();
-          client.resetCache({ id, username, isPrivate }, false);
+          // console.log("deleteDoc -> new RedisConnection()");
+          new RedisConnection().resetCache({ id, username, isPrivate });
           User.findByIdAndUpdate(
             userId,
             { $pullAll: { posts: [id] } },

@@ -12,6 +12,7 @@ interface IHomeProps {
 export async function getServerSideProps({ res }) {
   res.setHeader("Cache-Control", CACHE_DEFAULT);
   const client = new RedisConnection();
+  // console.log("getServerSideProps -> new RedisConnection()");
   let initPosts = await client.get([], HOME);
 
   if (!initPosts.length) {
@@ -24,6 +25,7 @@ export async function getServerSideProps({ res }) {
     initPosts = postQuery.map((post) => processPostWithUser(post));
     client.setKeyValue(HOME, initPosts);
   }
+  client.setCloseTimeout();
 
   return {
     props: { initPosts },

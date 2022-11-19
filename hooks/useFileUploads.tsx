@@ -1,4 +1,4 @@
-import { IS_DEV, MAX_FILES, MAX_FILES_A, MAX_FILE_SIZE } from "consts";
+import { IS_DEV, MAX_FILES, MAX_FILES_A, MAX_FILE_SIZE_MB } from "consts";
 import { FileStatus, ToastMessage } from "enums";
 import { getUploadedFileKey } from "lib/client";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import { IPost, IPostFile, IUser } from "types";
 import { checkFileSize, sleep } from "utils";
 
-const maxFileSize = MAX_FILE_SIZE * 1000 * 1000;
+const maxFileSize = MAX_FILE_SIZE_MB * 1000 * 1000;
 
 const useFileUploads = (user: IUser, post: IPost) => {
   const [files, setFiles] = useState<IPostFile[]>([]);
@@ -113,7 +113,7 @@ const useFileUploads = (user: IUser, post: IPost) => {
     setFiles(files2);
     filesChanged.current = true;
     if (sizeErr) {
-      toast.error(`The maximum file size is ${MAX_FILE_SIZE}MB`);
+      toast.error(`The maximum file size is ${MAX_FILE_SIZE_MB}MB`);
     } else if (files2.length - files.length < newFiles.length) {
       toast.error(`Max ${limitFiles} files per post`);
     }

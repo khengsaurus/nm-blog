@@ -1,5 +1,5 @@
 import { CircleLoader } from "components";
-import { MAX_FILE_SIZE } from "consts";
+import { MAX_FILE_SIZE_MB } from "consts";
 import { Dimension, Size, Status, ToastMessage } from "enums";
 import { IPost } from "types";
 
@@ -106,8 +106,8 @@ export function checkFileSize(
   errorHandler: (msg?: string) => void
 ) {
   let file = event.target.files[0];
-  if (file.size > MAX_FILE_SIZE * 1000 * 1000) {
-    errorHandler(`The maximum file size is ${MAX_FILE_SIZE}MB\n`);
+  if (file.size > MAX_FILE_SIZE_MB * 1000_000) {
+    errorHandler(`The maximum file size is ${MAX_FILE_SIZE_MB}MB\n`);
     event.target.value = null;
     return false;
   }
