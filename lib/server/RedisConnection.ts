@@ -10,9 +10,11 @@ const redisUrl = IS_DEV ? process.env.DEV_REDIS_URL : process.env.ENV_REDIS_URL;
 class RedisConnection {
   private client: RedisClientType;
   private closeTimeout: NodeJS.Timeout;
+  private id: Number;
 
   constructor() {
     this.client = createClient({ url: redisUrl });
+    this.id = Math.random();
     this.connect();
   }
 
@@ -25,15 +27,17 @@ class RedisConnection {
           .then(() => resolve(1))
           .catch(console.error);
       }
+      this.deferDisconnect();
     });
   }
 
-  setCloseTimeout(timeout = 3000) {
+  deferDisconnect(timeout = 8_000) {
+    // console.log(`-> RedisConnection.deferDisconnect(${this.id})`);
     if (this.closeTimeout) {
       clearTimeout(this.closeTimeout);
-      this.closeTimeout = undefined;
     }
     this.closeTimeout = setTimeout(() => {
+      // console.log(`-> RedisConnection close connection (${this.id})`);
       if (this.client.isOpen) {
         this.client.quit().catch(console.error);
       }
@@ -61,7 +65,9 @@ class RedisConnection {
         .then(() => this.client.set(CURR, d2))
         .then(resolve)
         .catch((err) => {
-          console.info(`${ServerInfo.REDIS_SET_FAIL}: ${CURR}`);
+          console.info(
+            `RedisConenction ${this.id} ${ServerInfo.REDIS_SET_FAIL}: ${CURR}`
+          );
           console.info(`Error: ${err?.message}`);
         });
     });
@@ -81,7 +87,9 @@ class RedisConnection {
         .then(resolve)
         .catch((err) => {
           const key = isHSet ? `${pKey}-${sKey}` : pKey;
-          console.info(`${ServerInfo.REDIS_SET_FAIL}: ${key}`);
+          console.info(
+            `RedisConenction ${this.id} ${ServerInfo.REDIS_SET_FAIL}: ${key}`
+          );
           console.info(`Error: ${err?.message}`);
           resolve(-1);
         });
@@ -100,7 +108,9 @@ class RedisConnection {
         })
         .then(() => resolve(1))
         .catch((err) => {
-          console.info(`${ServerInfo.REDIS_SET_FAIL}: ${key}`);
+          console.info(
+            `RedisConenction ${this.id} ${ServerInfo.REDIS_SET_FAIL}: ${key}`
+          );
           console.info(`Error: ${err?.message}`);
           resolve(-1);
         });
@@ -123,7 +133,9 @@ class RedisConnection {
         })
         .catch((err) => {
           const key = isHGet ? `${pKey}-${sKey}` : pKey;
-          console.info(`${ServerInfo.REDIS_GET_FAIL}: ${key}`);
+          console.info(
+            `RedisConenction ${this.id} ${ServerInfo.REDIS_GET_FAIL}: ${key}`
+          );
           console.info(`Error: ${err?.message}`);
           resolve(defaultVal);
         });
@@ -154,7 +166,9 @@ class RedisConnection {
         })
         .catch((err) => {
           console.info(
-            `${ServerInfo.REDIS_HGETALL_FAIL}: ${JSON.stringify(keys)}`
+            `RedisConenction ${this.id} ${
+              ServerInfo.REDIS_HGETALL_FAIL
+            }: ${JSON.stringify(keys)}`
           );
           console.info(`Error: ${err?.message}`);
           resolve(defaultVal);
@@ -263,11 +277,7 @@ class RedisConnection {
    * @param privacyChange:
    *  0 (no change); 1 (public -> private); 2 (private -> public)
    */
-  resetCache(
-    post: Partial<IPost>,
-    privacyChange = 0,
-    keepAlive = false
-  ): Promise<void> {
+  resetCache(post: Partial<IPost>, privacyChange = 0): Promise<void> {
     // console.info(`-> RedisConnection.resetCache(): ${post?.id}`);
     return new Promise((resolve) => {
       const { id, isPrivate, slug, username } = post;
@@ -297,10 +307,7 @@ class RedisConnection {
         })
         .then((toDelete) => this.del([...toDelete, `NM_${username}-${slug}`]))
         .catch(console.info)
-        .finally(() => {
-          if (!keepAlive) this.setCloseTimeout();
-          resolve();
-        });
+        .finally(resolve);
     });
   }
 
@@ -338,7 +345,7 @@ class RedisConnection {
     });
   }
 
-  newPostCreated(post: IPost, keepAlive = false): Promise<void> {
+  newPostCreated(post: IPost): Promise<void> {
     return new Promise((resolve) => {
       const { username, isPrivate } = post;
       const privateQUser = this.getPrimaryKey(username, isPrivate);
@@ -351,10 +358,7 @@ class RedisConnection {
       this.del(toDelete)
         .then(async () => await this.updateCurrent())
         .catch(console.info)
-        .finally(() => {
-          if (!keepAlive) this.setCloseTimeout();
-          resolve();
-        });
+        .finally(resolve);
     });
   }
 
@@ -378,4 +382,5 @@ class RedisConnection {
   }
 }
 
-export default RedisConnection;
+var RedisClient = new RedisConnection();
+export default RedisClient;

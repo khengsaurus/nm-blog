@@ -1,7 +1,7 @@
 import { PostFeed } from "components";
 import { CACHE_DEFAULT, HOME, PAGINATE_LIMIT } from "consts";
 import { useNavShortcuts, usePageReady } from "hooks";
-import { MongoConnection, RedisConnection } from "lib/server";
+import { MongoConnection, RedisClient } from "lib/server";
 import { IPost } from "types";
 import { processPostWithUser } from "utils";
 
@@ -11,9 +11,8 @@ interface IHomeProps {
 
 export async function getServerSideProps({ res }) {
   res.setHeader("Cache-Control", CACHE_DEFAULT);
-  const client = new RedisConnection();
   // console.log("getServerSideProps -> new RedisConnection()");
-  let initPosts = await client.get([], HOME);
+  let initPosts = await RedisClient.get([], HOME);
 
   if (!initPosts.length) {
     const { Post } = await MongoConnection();
@@ -23,9 +22,8 @@ export async function getServerSideProps({ res }) {
       .limit(PAGINATE_LIMIT)
       .lean();
     initPosts = postQuery.map((post) => processPostWithUser(post));
-    client.setKeyValue(HOME, initPosts);
+    RedisClient.setKeyValue(HOME, initPosts);
   }
-  client.setCloseTimeout();
 
   return {
     props: { initPosts },

@@ -12,7 +12,7 @@ import {
   handleRequest,
 } from "lib/middlewares";
 import { throwAPIError } from "lib/middlewares/util";
-import { MongoConnection, RedisConnection, ServerError } from "lib/server";
+import { MongoConnection, RedisClient, ServerError } from "lib/server";
 import { isEmpty } from "lodash";
 import { ClientSession } from "mongoose";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -68,9 +68,7 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
   const isPrivate = castAsBoolean(_isPrivate);
 
   return new Promise(async (resolve, reject) => {
-    const client = new RedisConnection();
-    // console.log("getPosts -> new RedisConnection()");
-    let posts = await client.read(
+    let posts = await RedisClient.read(
       username,
       isPrivate,
       createdAt,
@@ -78,7 +76,6 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
       limit
     );
     if (posts?.length) {
-      client.setCloseTimeout();
       resolve({
         status: 200,
         message: ServerInfo.POST_RETRIEVED_CACHED,
@@ -104,7 +101,14 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
         .then((_posts) => {
           if (_posts?.length) {
             posts = processPostsWithoutUser(_posts);
-            client.write(posts, username, isPrivate, createdAt, search, limit);
+            RedisClient.write(
+              posts,
+              username,
+              isPrivate,
+              createdAt,
+              search,
+              limit
+            );
           }
           resolve({
             status: 200,
@@ -114,8 +118,7 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
             data: { posts },
           });
         })
-        .catch((err) => reject(new ServerError(500, err?.message)))
-        .finally(client.setCloseTimeout);
+        .catch((err) => reject(new ServerError(500, err?.message)));
     }
   });
 }
@@ -125,15 +128,12 @@ async function getPost(params: Partial<IPostReq>): Promise<IResponse> {
     const { fresh, id, slug, username } = params;
     if (!id && !username && !slug) reject(new ServerError(400));
     else {
-      const client = new RedisConnection();
-      // console.log("getPost -> new RedisConnection()");
       const _fresh = castAsBoolean(fresh);
       if (username && slug && !_fresh) {
         // Retrieve from cache if !_fresh
         const redisKey = `NM_${username}-${slug}`;
-        const post = await client.get(null, redisKey);
+        const post = await RedisClient.get(null, redisKey);
         if (post) {
-          client.setCloseTimeout();
           return resolve({
             status: 200,
             message: ServerInfo.POST_RETRIEVED_CACHED,
@@ -151,7 +151,7 @@ async function getPost(params: Partial<IPostReq>): Promise<IResponse> {
           } else {
             const post = processPostWithoutUser(_post);
             const redisKey = `NM_${post.username}-${post.slug}`;
-            client.setKeyValue(redisKey, post, DEFAULT_EXPIRE_S);
+            RedisClient.setKeyValue(redisKey, post, DEFAULT_EXPIRE_S);
             resolve({
               status: 200,
               message: ServerInfo.POST_RETRIEVED,
@@ -161,8 +161,7 @@ async function getPost(params: Partial<IPostReq>): Promise<IResponse> {
         })
         .catch((err) =>
           throwAPIError(reject, err, ErrorMessage.P_RETRIEVE_FAIL)
-        )
-        .finally(client.setCloseTimeout);
+        );
     }
   });
 }
@@ -192,8 +191,7 @@ async function createDoc(req: NextApiRequest): Promise<IResponse> {
         })
         .then((res) => {
           if (res.id) {
-            // console.log("createDoc -> new RedisConnection()");
-            new RedisConnection().newPostCreated(newPost);
+            RedisClient.newPostCreated(newPost);
             User.findByIdAndUpdate(
               userId,
               { $push: { posts: { $each: [res.id], $position: 0 } } },
@@ -232,8 +230,7 @@ async function patchDoc(req: NextApiRequest): Promise<IResponse> {
         throwAPIError(reject, err, ErrorMessage.P_UPDATE_FAIL);
       } else {
         const post = processPostWithUser(res);
-        // console.log("patchDoc -> new RedisConnection()");
-        new RedisConnection().resetCache(
+        RedisClient.resetCache(
           post,
           // Reset home keys if isPrivate changed
           _set.isPrivate === wasPrivate
@@ -267,8 +264,11 @@ async function deleteDoc(req: NextApiRequest): Promise<IResponse> {
       const isPrivate = castAsBoolean(_isPrivate);
       await Post.findByIdAndDelete(id)
         .then(() => {
-          // console.log("deleteDoc -> new RedisConnection()");
-          new RedisConnection().resetCache({ id, username, isPrivate });
+          RedisClient.resetCache({
+            id,
+            username,
+            isPrivate,
+          });
           User.findByIdAndUpdate(
             userId,
             { $pullAll: { posts: [id] } },
