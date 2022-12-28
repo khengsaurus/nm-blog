@@ -1,3 +1,4 @@
+import { SEARCHBOX_ID } from "consts";
 import { PageRoute } from "enums";
 import { useCallback, useContext } from "react";
 import { AppContext } from "./context";
@@ -34,6 +35,9 @@ const useNavShortcuts = () => {
           return userSessionActive && currRoute !== PageRoute.MY_PROFILE
             ? routerPush(PageRoute.MY_PROFILE)
             : null;
+        case "s":
+          e.preventDefault();
+          return document.getElementById(SEARCHBOX_ID)?.focus();
         default:
           return;
       }

@@ -8,6 +8,7 @@ import { ChangeEventHandler, CSSProperties } from "react";
 interface IInput {
   label: string;
   value: string | number;
+  id?: string;
   marginTop?: number;
   maxWidth?: boolean;
   width?: string | number;

@@ -7,7 +7,7 @@ import {
   StyledButton,
   WindowLoaded,
 } from "components";
-import { PAGINATE_LIMIT } from "consts";
+import { PAGINATE_LIMIT, SEARCHBOX_ID } from "consts";
 import { Dimension, Size, Status } from "enums";
 import { usePaginatePosts, useWindowDimensions, useWindowLoaded } from "hooks";
 import { useQueryState } from "next-usequerystate";
@@ -75,6 +75,7 @@ const PostFeed = ({
             <DarkText text={title} variant="h3" />
             {hasSearch && (
               <Input
+                id={SEARCHBOX_ID}
                 label="Search"
                 value={searchStr || ""}
                 onChange={(e) =>

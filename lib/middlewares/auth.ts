@@ -19,8 +19,7 @@ export function generateToken(
       username,
       isAdmin,
     },
-    secretKey,
-    { expiresIn: "30d" }
+    secretKey
   );
 }
 

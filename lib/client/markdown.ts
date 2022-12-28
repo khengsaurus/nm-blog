@@ -5,9 +5,9 @@ function getCodeTheme(themeName: string) {
   switch (themeName) {
     case "blue":
       return "colorBrewer";
-    case "dark":
     case "embers":
       return "github";
+    case "dark":
     case "lavendar":
       return "dracula";
     case "light":

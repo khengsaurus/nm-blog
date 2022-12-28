@@ -2,35 +2,38 @@
 
 NextJS, MongoDB, AWS S3, Redis
 
-<br/>
+<hr/>
 
-### Using LocalStack S3 with Docker Compose
+### Running LocalStack S3 with Docker Compose
 
-###### Requirements: LocalStack CLI, Docker Compose, Python 3
-
-```bash
-> pip install awscli-local
-> docker compose down && docker compose up --build
-> python3 ls_s3_setup.py # bucket-name specified in this file
-```
-
-###### More bash commands
+Requirements: [LS CLI](https://github.com/localstack/awscli-local), Docker Compose, Python 3
 
 ```bash
-> awslocal s3 ls # check LS S3 buckets
-> awslocal s3 ls <bucket-name> # check contents of LS S3 bucket
-> awslocal s3api get-object-tagging --bucket <bucket-name> --key <object-key> # check tags of LS S3 object
+# Running via Docker Compose
+> docker compose down && docker compose up
+
+# Start LS S3
+> python3 scripts/ls_s3_setup.py
+
+# List LS S3 buckets
+> awslocal s3 ls
+
+# List contents of LS S3 bucket
+> awslocal s3 ls <bucket-name>
+
+# Show tags of LS S3 object
+> awslocal s3api get-object-tagging --bucket <bucket-name> --key <object-key>
 ```
 
-##### See
+<hr/>
 
-- [AWS-CLI documentation](https://docs.localstack.cloud/integrations/aws-cli/#aws-cli)
-- [Commands](https://alojea.com/how-to-create-an-aws-local-bucket/)
+### Issues
 
-<br/>
-
-### Known issues
+- Adding header `x-amz-tagging` works in LS but results in 403 for AWS
 
 - [Localstack docs](https://docs.localstack.cloud/localstack/persistence-mechanism/): "_...please note that persistence in LocalStack, as currently intended, is a Pro only feature..._" 😕
 
-- Adding header `x-amz-tagging` works in LS but results in 403 for AWS
+### See
+
+- [AWS-CLI docs](https://docs.localstack.cloud/integrations/aws-cli/#aws-cli)
+- [Setting up LS S3](https://alojea.com/how-to-create-an-aws-local-bucket/)

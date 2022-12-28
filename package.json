@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000",
-    "dev_local": "python3 ls_s3_setup.py && DEV=1 npm run dev",
+    "dev_local": "python3 scripts/ls_s3_setup.py && DEV=1 npm run dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
