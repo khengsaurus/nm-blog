@@ -1,4 +1,5 @@
 import Button from "@mui/material/Button";
+import Tooltip from "@mui/material/Tooltip";
 import {
   Column,
   DeletePostModal,
@@ -11,12 +12,10 @@ import {
   PostCard,
   StyledText,
 } from "components";
-import { IS_DEV, MAX_POSTS_PER_USER } from "consts";
+import { MAX_POSTS_PER_USER } from "consts";
 import {
-  APIAction,
   DBService,
   ErrorMessage,
-  FileStatus,
   Flag,
   HttpRequest,
   PageRoute,
@@ -55,13 +54,14 @@ const EditPost = ({ id }: IPostPage) => {
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [body, setBody] = useState("");
-  const [isPrivate, setIsPrivate] = useState(false);
+  const [isPrivate, setIsPrivate] = useState(true);
   const [hasMarkdown, setHasMarkdown] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
   const deleteOnUnloadRef = useRef(true);
   const hasEditedSlug = useRef(false);
   const isNewPost = id === "new";
-  const isAdmin = user?.isAdmin || IS_DEV;
+  const isAdmin = Boolean(user?.isAdmin);
+
   const {
     newImg,
     imageKey,
@@ -222,38 +222,49 @@ const EditPost = ({ id }: IPostPage) => {
           maxWidth
         />
         <br />
-        <Dropzone onDrop={handleDropFiles} noClick>
-          {({ getRootProps, isDragActive }) => (
-            <div
-              {...getRootProps()}
-              className="file-drop-zone"
-              style={{
-                borderColor: isDragActive
-                  ? theme?.highlightColor
-                  : "transparent",
-              }}
-            >
-              <EditPreviewMarkdown
-                label="Body"
-                body={body}
-                markdown={hasMarkdown}
-                setBody={setBody}
-                style={{ opacity: isDragActive ? 0.2 : 1 }}
-              />
-              {isDragActive && (
-                <StyledText
-                  text={"Drop here to upload"}
-                  variant="h2"
-                  className="label"
-                  style={{
-                    color:
-                      theme.name === "light" ? "black" : theme?.highlightColor,
-                  }}
+        {isAdmin ? (
+          <Dropzone onDrop={handleDropFiles} noClick>
+            {({ getRootProps, isDragActive }) => (
+              <div
+                {...getRootProps()}
+                className="file-drop-zone"
+                style={{
+                  borderColor: isDragActive
+                    ? theme?.highlightColor
+                    : "transparent",
+                }}
+              >
+                <EditPreviewMarkdown
+                  label="Body"
+                  body={body}
+                  markdown={hasMarkdown}
+                  setBody={setBody}
+                  style={{ opacity: isDragActive ? 0.2 : 1 }}
                 />
-              )}
-            </div>
-          )}
-        </Dropzone>
+                {isDragActive && (
+                  <StyledText
+                    text="Drop here to upload"
+                    variant="h2"
+                    className="label"
+                    style={{
+                      color:
+                        theme.name === "light"
+                          ? "black"
+                          : theme?.highlightColor,
+                    }}
+                  />
+                )}
+              </div>
+            )}
+          </Dropzone>
+        ) : (
+          <EditPreviewMarkdown
+            label="Body"
+            body={body}
+            markdown={hasMarkdown}
+            setBody={setBody}
+          />
+        )}
         <Files files={files} handleRemoveFile={handleRemoveFile} />
         <DynamicFlex>
           <PostCard
@@ -278,17 +289,34 @@ const EditPost = ({ id }: IPostPage) => {
               setImg={setNewImg}
               rmImg={rmImg}
             />
-            <Button disableRipple component="label" className="add-files-label">
-              Add file
-              <input type="file" hidden onChange={handleAddFile} />
-            </Button>
+            <Tooltip
+              title={isAdmin ? "" : "Only admin users can add files"}
+              followCursor={!isAdmin}
+            >
+              <div style={{ alignSelf: "flex-start" }}>
+                <Button
+                  disabled={!isAdmin}
+                  component="label"
+                  className="add-files-label"
+                  disableRipple
+                >
+                  Add file
+                  <input
+                    type="file"
+                    hidden
+                    onChange={isAdmin ? handleAddFile : null}
+                  />
+                </Button>
+              </div>
+            </Tooltip>
             <EditPostButtons
+              privateOnly={!isAdmin}
               isPrivate={isPrivate}
+              togglePrivate={isAdmin ? () => setIsPrivate((b) => !b) : null}
               markdown={hasMarkdown}
               saveButtonLabel={getStatusLabel(saveStatus)}
               saveDisabled={saveDisabled}
               isEdit={!isNewPost}
-              togglePrivate={() => setIsPrivate((b) => !b)}
               toggleMarkdown={() => setHasMarkdown((b) => !b)}
               handleSave={handleSave}
               handleCancel={() => deleteFiles(getAddedFileKeys())}

@@ -24,7 +24,7 @@ const EditProfileButtons = ({
   return (
     <Row style={{ justifyContent: "flex-end" }}>
       <StyledButton
-        label={"Cancel"}
+        label="Cancel"
         onClick={() => routerPush(PageRoute.MY_PROFILE)}
         style={lastButtonStyle}
       />

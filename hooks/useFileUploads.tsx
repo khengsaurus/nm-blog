@@ -15,7 +15,7 @@ const useFileUploads = (user: IUser, post: IPost) => {
   const imgKeysToRm = useRef<Set<string>>(new Set());
   const uploadController = useRef<Map<string, AbortController>>(new Map());
   const filesChanged = useRef(false);
-  const isAdmin = user?.isAdmin || IS_DEV;
+  const isAdmin = user?.isAdmin;
 
   useEffect(() => {
     setFiles(post?.files || []);
@@ -24,8 +24,8 @@ const useFileUploads = (user: IUser, post: IPost) => {
 
   const uploadFile = useCallback(
     async (newFile: IPostFile) => {
-      if (!user?.id) return;
       const { file: _file, uploaded } = newFile;
+      if (!user?.id || !_file) return;
       const controllerKey = `${_file.name}-${uploaded}`;
       if (uploadController.current.has(controllerKey)) return;
 

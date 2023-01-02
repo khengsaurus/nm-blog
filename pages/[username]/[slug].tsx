@@ -124,10 +124,10 @@ const Post = ({ post, username, slug }: IPostPage) => {
             <DarkContainer>
               <AuthorLink username={username} title />
             </DarkContainer>
-            {user?.avatarKey && (
+            {author?.avatarKey && (
               <Avatar
                 alt={`${author?.username}-avatar`}
-                src={getAvatarMedium(user.avatarKey)}
+                src={getAvatarMedium(author.avatarKey)}
                 sx={{ height: "40px", width: "40px", marginLeft: "10px" }}
               />
             )}

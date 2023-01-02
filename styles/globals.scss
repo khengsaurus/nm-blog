@@ -431,7 +431,7 @@ textarea {
   transition: $speed-medium;
 
   .file-card {
-    $file-card-w: 190px;
+    $file-card-w: 194px;
     $file-icon-w: 38px;
     @mixin text-content {
       @include ellipsis;

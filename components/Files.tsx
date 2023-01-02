@@ -40,7 +40,9 @@ function Files({
         const FileIcon = getIcon(fileName);
         return (
           <Row key={`${fileName}-${file.uploaded}`} className="file-card">
-            <FileIcon style={{ color: theme.highlightColor }} />
+            <FileIcon
+              style={{ color: theme.highlightColor, marginRight: "4px" }}
+            />
             <Column className="text">
               <StyledText text={fileName} variant="h6" />
               <StyledText

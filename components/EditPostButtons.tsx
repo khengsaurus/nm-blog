@@ -1,7 +1,8 @@
+import Tooltip from "@mui/material/Tooltip";
 import { Row, StyledButton } from "components";
 import { PageRoute } from "enums";
 import { AppContext } from "hooks";
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import CheckBox from "./CheckBox";
 
 interface IEditPostButtons {
@@ -10,6 +11,7 @@ interface IEditPostButtons {
   saveButtonLabel: any;
   saveDisabled: boolean;
   isEdit: boolean;
+  privateOnly?: boolean;
   togglePrivate: () => void;
   toggleMarkdown: () => void;
   handleSave: () => Promise<any>;
@@ -23,6 +25,7 @@ const EditPostButtons = ({
   isEdit,
   saveButtonLabel,
   saveDisabled,
+  privateOnly = true,
   togglePrivate,
   toggleMarkdown,
   handleSave,
@@ -35,7 +38,7 @@ const EditPostButtons = ({
     return (
       <>
         <StyledButton
-          label={"Cancel"}
+          label="Cancel"
           onClick={() => {
             handleCancel();
             routerPush(PageRoute.MY_POSTS);
@@ -58,13 +61,19 @@ const EditPostButtons = ({
 
   return (
     <>
-      <div className={"row"}>
-        <CheckBox
-          value={isPrivate}
-          toggleValue={togglePrivate}
-          label="Private"
-        />
-      </div>
+      <Tooltip
+        title={privateOnly ? "Only admin users can create public posts" : ""}
+        followCursor={privateOnly}
+      >
+        <div className="row">
+          <CheckBox
+            value={privateOnly || isPrivate}
+            toggleValue={togglePrivate}
+            label="Private"
+            disabled={privateOnly}
+          />
+        </div>
+      </Tooltip>
       <div className="row">
         <CheckBox
           value={markdown}

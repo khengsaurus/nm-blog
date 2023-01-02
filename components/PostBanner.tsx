@@ -39,7 +39,7 @@ const PostBanner = ({ imageKey }: IPostBanner) => {
         </motion.div>
       </header>
       <Fade in={view} unmountOnExit onClick={hideImage}>
-        <div className={"transparent-overlay"}>
+        <div className="transparent-overlay">
           <Image
             alt="post-full-image"
             src={`${process.env.ENV_IMG_SRC}${imageKey}`}
