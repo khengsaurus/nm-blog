@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000",
-    "dev_local": "python3 scripts/ls_s3_setup.py && DEV=1 npm run dev",
+    "dev_local": "python3 scripts/ls_s3_setup.py && DEV=1 npm run dev --turbo",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -28,7 +28,7 @@
     "marked": "^4.0.16",
     "moment": "^2.29.3",
     "mongoose": "^6.3.0",
-    "next": "^12.1.6",
+    "next": "13.3.1",
     "next-usequerystate": "^1.7.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -55,7 +55,7 @@
     "@types/react-dom": "^18.0.4",
     "@types/sanitize-html": "^2.6.2",
     "eslint": "8.8.0",
-    "eslint-config-next": "12.0.10",
+    "eslint-config-next": "13.3.1",
     "typescript": "^4.5.5"
   }
 }
