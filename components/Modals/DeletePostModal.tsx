@@ -32,8 +32,9 @@ const DeletePostModal = ({
     () => deletePost(post),
     () => {
       updatePostSlugs(user);
-      routerPush(PageRoute.MY_POSTS);
       toast.success(ToastMessage.POST_DELETED);
+      // give server time to reset posts cache as this is not awaited in delete handler
+      setTimeout(() => routerPush(PageRoute.MY_POSTS), 1000);
     },
     (r: IResponse) => r.status === 200,
     false

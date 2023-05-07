@@ -1,8 +1,8 @@
 {
-  "name": "next-mongo-blog",
-  "private": true,
+  "name": "nm-blog",
   "scripts": {
     "dev": "next dev -p 3000",
+    "dev_s": "DEV_S=1 npm run dev -p 3000",
     "dev_local": "python3 scripts/ls_s3_setup.py && DEV=1 npm run dev",
     "build": "next build",
     "start": "next start",

@@ -2,6 +2,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { Avatar, Fab } from "@mui/material";
 import Container from "@mui/system/Container";
+import axios from "axios";
 import {
   AuthorLink,
   DarkContainer,
@@ -12,6 +13,7 @@ import {
   Row,
   StyledText,
 } from "components";
+import { SERVER_URL } from "consts";
 import { PageRoute } from "enums";
 import {
   AppContext,
@@ -26,7 +28,7 @@ import { GetStaticPropsResult } from "next";
 import FourOFour from "pages/404";
 import { useContext, useMemo, useState } from "react";
 import { IPost } from "types";
-import { getAvatarMedium, processPostWithUser } from "utils";
+import { getAvatarMedium } from "utils";
 
 interface IPostPage {
   post: IPost;
@@ -38,40 +40,39 @@ export async function getStaticProps({
   params,
 }): Promise<GetStaticPropsResult<IPostPage>> {
   const { username, slug } = params;
-  let _post: IPost = null;
-  try {
-    const { Post } = await MongoConnection();
-    _post = await Post.findOne({ username, slug }).select(["-user"]).lean();
-  } catch (err) {
-    console.info(
-      `Error in [${username}]/[${slug}] getStaticProps: ` + err.message
-    );
-  }
+
+  const post = await axios
+    .get(`${SERVER_URL}/post`, { params })
+    .then((res) => {
+      const { message, post, error } = res?.data;
+      if (error) throw new Error(message);
+      return post;
+    })
+    .catch((err) => {
+      console.error(
+        `Error in [${username}]/[${slug}] getStaticProps: ${err?.message}`
+      );
+      return {};
+    });
 
   return {
-    props: {
-      username,
-      slug,
-      post: processPostWithUser(_post),
-    },
+    props: { username, slug, post },
     revalidate: 60,
   };
 }
 
 export async function getStaticPaths() {
-  const { Post } = await MongoConnection();
-  const posts = await Post.find()
-    .sort({ createdAt: -1 })
-    .limit(100)
-    .lean()
-    .exec();
-  const paths =
-    posts.map((post) => {
-      const { username, slug } = post;
-      return {
-        params: { username, slug },
-      };
-    }) || [];
+  const paths = await axios
+    .get(`${SERVER_URL}/posts/recent`)
+    .then((res) => {
+      const { message, paths, error } = res?.data;
+      if (error) throw new Error(message);
+      return paths;
+    })
+    .catch((err) => {
+      console.error(`Error in [slug] getStaticPaths: ${err?.message}`);
+      return [];
+    });
 
   return {
     paths,

@@ -1,9 +1,8 @@
+import axios from "axios";
 import { PostFeed } from "components";
-import { CACHE_DEFAULT, HOME, PAGINATE_LIMIT } from "consts";
+import { CACHE_DEFAULT, SERVER_URL } from "consts";
 import { useNavShortcuts, usePageReady } from "hooks";
-import { MongoConnection, RedisClient } from "lib/server";
 import { IPost } from "types";
-import { processPostWithUser } from "utils";
 
 interface IHomeProps {
   initPosts: IPost[];
@@ -11,19 +10,18 @@ interface IHomeProps {
 
 export async function getServerSideProps({ res }) {
   res.setHeader("Cache-Control", CACHE_DEFAULT);
-  // console.log("getServerSideProps -> new RedisConnection()");
-  let initPosts = await RedisClient.get([], HOME);
 
-  if (!initPosts.length) {
-    const { Post } = await MongoConnection();
-    const postQuery = await Post.find({ isPrivate: false })
-      .select(["-user"])
-      .sort({ createdAt: -1 })
-      .limit(PAGINATE_LIMIT)
-      .lean();
-    initPosts = postQuery.map((post) => processPostWithUser(post));
-    RedisClient.setKeyValue(HOME, initPosts);
-  }
+  const initPosts = await axios
+    .get(`${SERVER_URL}/posts/home`)
+    .then((res) => {
+      const { message, posts, error } = res?.data;
+      if (error) throw new Error(message);
+      return posts;
+    })
+    .catch((err) => {
+      console.error(`Error building home page: ${err?.message}`);
+      return [];
+    });
 
   return {
     props: { initPosts },

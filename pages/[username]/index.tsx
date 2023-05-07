@@ -1,11 +1,11 @@
 import { Avatar } from "@mui/material";
+import axios from "axios";
 import { Column, DarkText, PostFeed } from "components";
-import { CACHE_DEFAULT, PAGINATE_LIMIT } from "consts";
+import { CACHE_DEFAULT, SERVER_URL } from "consts";
 import { useNavShortcuts, usePageReady } from "hooks";
 import { avatarStyles } from "lib/client";
-import { MongoConnection } from "lib/server";
 import { IUser } from "types";
-import { getAvatarLarge, processPostWithUser, userDocToObj } from "utils";
+import { getAvatarLarge } from "utils";
 import FourOFour from "../404";
 
 interface IUserPageProps {
@@ -16,20 +16,19 @@ export async function getServerSideProps({ params, res }) {
   const { username } = params;
   res.setHeader("Cache-Control", CACHE_DEFAULT);
 
-  const { Post, User } = await MongoConnection();
-
-  const userQuery = await User.findOne({ username })
-    .select(["-password -posts"])
-    .lean();
-  const user = userDocToObj(userQuery);
-  await Post.find({ username, isPrivate: false })
-    .sort({ createdAt: -1 })
-    .limit(PAGINATE_LIMIT)
-    .populate("user", "-createdAt -updatedAt -email -password -posts")
-    .lean()
-    .then((posts) => {
-      const _posts = posts.map((post) => processPostWithUser(post));
-      if (user) user.posts = _posts;
+  const user = await axios
+    .get(`${SERVER_URL}/posts/user`, {
+      params: { username },
+    })
+    .then((res) => {
+      const { message, user, error } = res?.data;
+      if (error) {
+        console.error(
+          `Error building [username] getServerSideProps: ${message}`
+        );
+        return {};
+      }
+      return user;
     });
 
   return {

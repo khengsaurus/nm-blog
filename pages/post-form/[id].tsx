@@ -66,11 +66,11 @@ const EditPost = ({ id }: IPostPage) => {
     newImg,
     imageKey,
     imgUpdated,
+    files,
+    filesChanged,
     setNewImg,
     rmImg,
     resetRefs,
-    files,
-    filesChanged,
     getAddedFileKeys,
     getRemovedFileKeys,
     handleAddFile,
@@ -113,12 +113,12 @@ const EditPost = ({ id }: IPostPage) => {
   const _handlePut = () => {
     return new Promise((resolve, reject) => {
       // If existing post with new slug || new post -> check if slug avail
-      if (isNewPost || slug.trim() !== realtimePost?.slug?.trim()) {
-        if (!!user?.posts?.find((post) => post.slug === slug)) {
-          reject(new Error(ErrorMessage.P_SLUG_USED));
-          return;
-        }
-      }
+      // if (isNewPost || slug.trim() !== realtimePost?.slug?.trim()) {
+      //   if (!!user?.posts?.find((post) => post.slug === slug)) {
+      //     reject(new Error(ErrorMessage.P_SLUG_USED));
+      //     return;
+      //   }
+      // }
       const post = {
         id: isNewPost ? "" : realtimePost?.id,
         username: user?.username,

@@ -156,10 +156,10 @@ export enum ErrorMessage {
   U_DELETE_FAILED = "Failed to delete user",
 
   P_SLUG_USED = "Slug already used",
+  P_RETRIEVE_FAIL = "Failed to retrieve post(s)",
   P_CREATE_FAIL = "Failed to create post",
-  P_DELETE_FAIL = "Failed to delete post",
-  P_RETRIEVE_FAIL = "Failed to retrieve post",
   P_UPDATE_FAIL = "Failed to update post",
+  P_DELETE_FAIL = "Failed to delete post",
 
   F_UPLOAD_400 = "File upload missing required params",
   F_UPLOAD_500 = "File upload failed",

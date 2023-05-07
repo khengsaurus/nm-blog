@@ -1,5 +1,4 @@
 import { NextRouter } from "next/router";
-import { RedisClientType } from "redis";
 import { APIAction, FileStatus, Status } from "./enums";
 
 export type AlertStatus = "success" | "info" | "warning" | "error";

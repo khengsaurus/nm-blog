@@ -1,5 +1,4 @@
 import MongoConnection from "./MongoConnection";
-import RedisClient from "./RedisConnection";
 import {
   deleteFile,
   generateDownloadURL,
@@ -16,7 +15,6 @@ export {
   generateUploadURL,
   hashPassword,
   MongoConnection,
-  RedisClient,
   ServerError,
   verifyPassword,
 };
