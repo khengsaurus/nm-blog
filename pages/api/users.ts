@@ -1,7 +1,7 @@
-import { CACHE_DEFAULT, EXPERIMENTAL_RUNTIME } from "consts";
+import axios from "axios";
+import { CACHE_DEFAULT, EXPERIMENTAL_RUNTIME, SERVER_URL } from "consts";
 import { APIAction, ErrorMessage, HttpRequest, ServerInfo } from "enums";
 import {
-  createUserObject,
   decodeToken,
   forwardResponse,
   generateToken,
@@ -12,7 +12,7 @@ import {
   verify,
 } from "lib/middlewares";
 import { throwAPIError } from "lib/middlewares/util";
-import { hashPassword, MongoConnection, ServerError } from "lib/server";
+import { MongoConnection, ServerError } from "lib/server";
 import { isEmpty } from "lodash";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { IResponse, IUser, IUserReq } from "types";
@@ -42,27 +42,52 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
   if (!reqQuery.username) {
     return forwardResponse(res, {
       status: 200,
-      message: ServerInfo.POST_NA,
+      message: ServerInfo.USER_NA,
       data: { user: {} },
     });
   } else {
-    const isGetSlugs = reqQuery.action === APIAction.GET_POST_SLUGS;
-    res.setHeader("Cache-Control", isGetSlugs ? "no-cache" : CACHE_DEFAULT);
-    return (isGetSlugs ? getPostSlugs(reqQuery) : getDoc(reqQuery))
+    const getSlugs = reqQuery.action === APIAction.GET_POST_SLUGS;
+    res.setHeader("Cache-Control", getSlugs ? "no-cache" : CACHE_DEFAULT);
+
+    return getUser(reqQuery)
       .then((payload) => forwardResponse(res, payload))
       .catch((err) => handleAPIError(res, err));
   }
 }
 
+function getUser(
+  params: Partial<IUserReq>,
+  isPrivate = false
+): Promise<IResponse> {
+  return new Promise((resolve, reject) => {
+    axios
+      .get(`${SERVER_URL}/user`, { params: { ...params, isPrivate } })
+      .then((res) => {
+        const { message, error, user } = res?.data;
+        if (error) throw new Error(message);
+
+        resolve({
+          status: res?.status || 500,
+          message,
+          data: { user },
+        });
+      })
+      .catch((err) =>
+        throwAPIError(reject, err, ErrorMessage.U_RETRIEVE_FAILED)
+      );
+  });
+}
+
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
-  const reqBody = req.body as Partial<IUserReq>;
-  const { email = "", username = "", password = "", action = "" } = reqBody;
+  const { action, ...reqBody } = req.body as Partial<IUserReq>;
+  const { email = "", username = "", password = "" } = reqBody;
   if (action === APIAction.USER_TOKEN_LOGIN) {
+    console.log("-> USER_TOKEN_LOGIN");
     return handleTokenLogin(req, res);
   } else if ((!email && !username) || !password) {
     return handleBadRequest(res);
   } else {
-    (action === APIAction.LOGIN
+    await (action === APIAction.LOGIN
       ? handleLogin(reqBody)
       : handleRegister(reqBody)
     )
@@ -76,64 +101,29 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
  * Handle login and register depending on login arg.
  * @resolve {..., token: JWT, user: user object without username}
  */
-async function handleRegister(reqBody: Partial<IUserReq>): Promise<IResponse> {
+function handleRegister(reqBody: Partial<IUserReq>): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
-    const { email, password } = reqBody;
-    const { User } = await MongoConnection();
-    await User?.exists({ email }).then((exists) => {
-      if (exists) {
-        resolve({ status: 200, message: ServerInfo.EMAIL_USED });
-      } else {
-        // Create acc without setting username
-        const user = createUserObject({
-          email,
-          password: hashPassword(password),
-        });
-        User?.create(user)
-          .then((res) => {
-            if (res.id) {
-              const token = generateToken(res.id, email, email);
-              resolve({
-                status: 200,
-                message: ServerInfo.USER_REGISTERED,
-                data: { token, user: processUserData(user, res.id, true) },
-              });
-            } else {
-              reject(new ServerError());
-            }
-          })
-          .catch((err) => {
-            throwAPIError(reject, err, ErrorMessage.U_REGISTER_FAILED);
-          });
-      }
-    });
-  });
-}
-
-async function getDoc(
-  params: Partial<IUserReq>,
-  forSelf = false
-): Promise<IResponse> {
-  return new Promise(async (resolve, reject) => {
-    const { User } = await MongoConnection();
-    await (params?.id ? User.findById(params.id) : User.findOne(params))
-      .then((userData) => {
-        const user = userData?._doc;
-        if (isEmpty(user)) {
-          resolve({ status: 200, message: ServerInfo.USER_NA });
+    await axios
+      .post(`${SERVER_URL}/user`, reqBody)
+      .then((res) => {
+        const { message, user, token, error } = res?.data;
+        if (error || !token || !user) {
+          if (message === ServerInfo.EMAIL_USED) {
+            return resolve({ status: 200, message: ServerInfo.EMAIL_USED });
+          } else {
+            throw new Error(message);
+          }
         } else {
-          resolve({
+          return resolve({
             status: 200,
-            message: ServerInfo.USER_RETRIEVED,
-            data: {
-              user: processUserData(user, user._id, forSelf),
-            },
+            message: ServerInfo.USER_REGISTERED,
+            data: { token, user },
           });
         }
       })
-      .catch((err) => {
-        throwAPIError(reject, err, ErrorMessage.U_RETRIEVE_FAILED);
-      });
+      .catch((err) =>
+        throwAPIError(reject, err, ErrorMessage.U_REGISTER_FAILED)
+      );
   });
 }
 
@@ -175,32 +165,6 @@ async function handleLogin(reqBody: Partial<IUserReq>): Promise<IResponse> {
   });
 }
 
-async function getPostSlugs(reqBody: Partial<IUserReq>): Promise<IResponse> {
-  return new Promise(async (resolve, reject) => {
-    const { username } = reqBody;
-    try {
-      const { User } = await MongoConnection();
-      await User.findOne({ username })
-        .populate(
-          "posts",
-          "-__v -user -username -title -body -isPrivate -createdAt -updatedAt -imageKey"
-        )
-        .then((userData) => {
-          const user = userData?._doc;
-          resolve({
-            status: 200,
-            message: ServerInfo.POST_SLUGS_RETRIEVED,
-            data: {
-              user: processUserData(user, user._id),
-            },
-          });
-        });
-    } catch (err) {
-      reject(new ServerError(500, err.message));
-    }
-  });
-}
-
 async function handleTokenLogin(
   req: NextApiRequest,
   res: NextApiResponse<IResponse | any>
@@ -209,7 +173,7 @@ async function handleTokenLogin(
   if (!id) {
     handleAPIError(res, new ServerError(401));
   } else {
-    await getDoc({ _id: id }, true)
+    await getUser({ _id: id }, true)
       .then((payload) => forwardResponse(res, payload))
       .catch((err) => handleAPIError(res, err));
   }

@@ -45,7 +45,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
     .catch((err) => handleAPIError(res, err));
 }
 
-async function getPost(
+function getPost(
   params: Pick<IPostReq, "id" | "slug" | "username" | "fresh">
 ): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
@@ -55,7 +55,7 @@ async function getPost(
     axios
       .get(`${SERVER_URL}/post`, { params })
       .then((res) => {
-        const { message, post, error } = res.data;
+        const { message, post, error } = res?.data;
         if (error) throw new Error(message);
 
         resolve({ status: res.status, message, data: { post } });
@@ -64,12 +64,12 @@ async function getPost(
   });
 }
 
-async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
+function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     axios
       .get(`${SERVER_URL}/posts`, { params })
       .then((res) => {
-        const { message, posts, error } = res.data;
+        const { message, posts, error } = res?.data;
         if (error) throw new Error(message);
 
         resolve({ status: res.status, message, data: { posts } });
@@ -78,7 +78,7 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
   });
 }
 
-async function createDoc(req: NextApiRequest): Promise<IResponse> {
+function createDoc(req: NextApiRequest): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     const userId = req.headers["user-id"];
     if (!userId) return reject(new ServerError(400));
@@ -86,7 +86,7 @@ async function createDoc(req: NextApiRequest): Promise<IResponse> {
     axios
       .post(`${SERVER_URL}/post`, { ...req.body, userId })
       .then((res) => {
-        const { message, post, error } = res.data;
+        const { message, post, error } = res?.data;
         if (error) throw new Error(message);
 
         resolve({ status: res.status, message, data: { post } });
@@ -95,12 +95,12 @@ async function createDoc(req: NextApiRequest): Promise<IResponse> {
   });
 }
 
-async function patchDoc(req: NextApiRequest): Promise<IResponse> {
+function patchDoc(req: NextApiRequest): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     axios
       .put(`${SERVER_URL}/post`, req.body)
       .then((res) => {
-        const { error, message, post } = res.data;
+        const { error, message, post } = res?.data;
         if (error) throw new Error(message);
 
         resolve({
@@ -113,7 +113,7 @@ async function patchDoc(req: NextApiRequest): Promise<IResponse> {
   });
 }
 
-async function deleteDoc(req: NextApiRequest): Promise<IResponse> {
+function deleteDoc(req: NextApiRequest): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     const userId = req.headers["user-id"];
     if (!userId) return reject(new ServerError(400));
@@ -123,7 +123,7 @@ async function deleteDoc(req: NextApiRequest): Promise<IResponse> {
         data: { ...req.query, userId },
       })
       .then((res) => {
-        const { error, message } = res.data;
+        const { error, message } = res?.data;
         if (error) {
           throw new Error(message);
         } else {
