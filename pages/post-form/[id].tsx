@@ -15,7 +15,6 @@ import {
 import { MAX_POSTS_PER_USER } from "consts";
 import {
   DBService,
-  ErrorMessage,
   Flag,
   HttpRequest,
   PageRoute,
@@ -31,7 +30,7 @@ import {
   usePreviewImg,
   useRealtimePost,
 } from "hooks";
-import { deleteFiles, HTTPService } from "lib/client";
+import { HTTPService, deleteFiles } from "lib/client";
 import { ServerError } from "lib/server";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import Dropzone from "react-dropzone";
@@ -154,7 +153,7 @@ const EditPost = ({ id }: IPostPage) => {
         .catch((err) => {
           toast.error(
             isNewPost
-              ? ToastMessage.POST_CREATED_FAIL
+              ? ToastMessage.POST_CREATE_FAILED
               : ToastMessage.POST_EDITED_FAIL
           );
           reject(err);

@@ -1,24 +1,4 @@
-import { decodeToken, generateToken, validateAuth, verify } from "./auth";
-import {
-  createUserObject,
-  errorHandler,
-  forwardResponse,
-  handleAPIError,
-  handleBadRequest,
-  handleRequest,
-  processUserData,
-} from "./util";
+import { decodeToken } from "./auth";
+import { forwardResponse, handleAPIError, handleAuthRequest } from "./util";
 
-export {
-  createUserObject,
-  decodeToken,
-  errorHandler,
-  forwardResponse,
-  generateToken,
-  handleAPIError,
-  handleBadRequest,
-  handleRequest,
-  processUserData,
-  validateAuth,
-  verify,
-};
+export { decodeToken, forwardResponse, handleAPIError, handleAuthRequest };

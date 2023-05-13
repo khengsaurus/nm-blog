@@ -1,19 +1,20 @@
 import axios from "axios";
 import { CACHE_DEFAULT, EXPERIMENTAL_RUNTIME, SERVER_URL } from "consts";
-import { APIAction, ErrorMessage, HttpRequest, ServerInfo } from "enums";
+import {
+  APIAction,
+  ErrorMessage,
+  HttpRequest,
+  HttpResponse,
+  ServerInfo,
+} from "enums";
 import {
   decodeToken,
   forwardResponse,
-  generateToken,
   handleAPIError,
-  handleBadRequest,
-  handleRequest,
-  processUserData,
-  verify,
+  handleAuthRequest,
 } from "lib/middlewares";
 import { throwAPIError } from "lib/middlewares/util";
-import { MongoConnection, ServerError } from "lib/server";
-import { isEmpty } from "lodash";
+import { ServerError } from "lib/server";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { IResponse, IUser, IUserReq } from "types";
 
@@ -29,11 +30,11 @@ export default async function handler(
     case HttpRequest.POST:
       return handlePost(req, res);
     case HttpRequest.PATCH:
-      return handleRequest(req, res, patchDoc);
+      return handleAuthRequest(req, res, authPatchDoc);
     case HttpRequest.DELETE:
-      return handleRequest(req, res, deleteDoc);
+      return handleAuthRequest(req, res, authDeleteDoc);
     default:
-      return handleBadRequest(res);
+      return res.status(405);
   }
 }
 
@@ -79,21 +80,57 @@ function getUser(
 }
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
-  const { action, ...reqBody } = req.body as Partial<IUserReq>;
-  const { email = "", username = "", password = "" } = reqBody;
+  const {
+    action,
+    email = "",
+    username = "",
+    password = "",
+  } = req.body as Partial<IUserReq>;
+
   if (action === APIAction.USER_TOKEN_LOGIN) {
-    console.log("-> USER_TOKEN_LOGIN");
     return handleTokenLogin(req, res);
   } else if ((!email && !username) || !password) {
-    return handleBadRequest(res);
+    return res.status(400).json({ message: HttpResponse._400 });
   } else {
     await (action === APIAction.LOGIN
-      ? handleLogin(reqBody)
-      : handleRegister(reqBody)
+      ? handleLogin(req.body)
+      : handleRegister(req.body)
     )
       .then((payload) => forwardResponse(res, payload))
       .catch((err) => handleAPIError(res, err));
   }
+}
+
+async function handleTokenLogin(
+  req: NextApiRequest,
+  res: NextApiResponse<IResponse | any>
+) {
+  const user = decodeToken<Partial<IUser>>(req);
+  const { id } = user;
+  if (!id) {
+    handleAPIError(res, new ServerError(401));
+  } else {
+    return getUser({ _id: id }, true)
+      .then((payload) => forwardResponse(res, payload))
+      .catch((err) => handleAPIError(res, err));
+  }
+}
+
+/**
+ * @param reqBody: username, password, login, ...
+ * Handle login and register depending on login arg.
+ * @resolve {..., token: JWT}
+ */
+async function handleLogin(reqBody: Partial<IUserReq>): Promise<IResponse> {
+  return new Promise(async (resolve, reject) => {
+    axios
+      .post(`${SERVER_URL}/user`, reqBody)
+      .then((res) => {
+        const { message, data } = res?.data;
+        resolve({ status: res.status, message, data });
+      })
+      .catch((err) => throwAPIError(reject, err, ErrorMessage.U_LOGIN_FAILED));
+  });
 }
 
 /**
@@ -109,7 +146,7 @@ function handleRegister(reqBody: Partial<IUserReq>): Promise<IResponse> {
         const { message, user, token, error } = res?.data;
         if (error || !token || !user) {
           if (message === ServerInfo.EMAIL_USED) {
-            return resolve({ status: 200, message: ServerInfo.EMAIL_USED });
+            return resolve({ status: 200, message });
           } else {
             throw new Error(message);
           }
@@ -127,119 +164,36 @@ function handleRegister(reqBody: Partial<IUserReq>): Promise<IResponse> {
   });
 }
 
-/**
- * @param reqBody: username, password, login, ...
- * Handle login and register depending on login arg.
- * @resolve {..., token: JWT}
- */
-async function handleLogin(reqBody: Partial<IUserReq>): Promise<IResponse> {
-  return new Promise(async (resolve, reject) => {
-    const { username, password } = reqBody;
-    const { User } = await MongoConnection();
-    User.findOne({ username })
-      .then((userData) => {
-        const user = userData?._doc;
-        if (isEmpty(user) || !verify({ username, password }, user)) {
-          resolve({
-            status: 200,
-            message: ServerInfo.USER_BAD_LOGIN,
-            data: { token: null },
-          });
-        } else {
-          resolve({
-            status: 200,
-            message: ServerInfo.USER_LOGIN,
-            data: {
-              token: generateToken(
-                user._id,
-                user.email,
-                username,
-                user.isAdmin
-              ),
-              user: processUserData(user, user._id, true),
-            },
-          });
-        }
-      })
-      .catch((err) => throwAPIError(reject, err, ErrorMessage.U_LOGIN_FAILED));
-  });
-}
-
-async function handleTokenLogin(
-  req: NextApiRequest,
-  res: NextApiResponse<IResponse | any>
-) {
-  const { id } = decodeToken<Partial<IUser>>(req);
-  if (!id) {
-    handleAPIError(res, new ServerError(401));
-  } else {
-    await getUser({ _id: id }, true)
-      .then((payload) => forwardResponse(res, payload))
-      .catch((err) => handleAPIError(res, err));
-  }
-}
-
-async function patchDoc(req: NextApiRequest): Promise<IResponse> {
+async function authPatchDoc(req: NextApiRequest): Promise<IResponse> {
   const reqBody: Partial<IUserReq> = req.body;
   return new Promise(async (resolve, reject) => {
     const userId = req.headers["user-id"];
-    const { action, ..._existingUser } = reqBody;
-    const { email, username } = _existingUser;
-    try {
-      const { User } = await MongoConnection();
-      let user;
-      if (action === APIAction.USER_SET_USERNAME) {
-        await User.exists({ username }).then(async (exists) => {
-          if (exists) {
-            resolve({
-              status: 200,
-              message: ServerInfo.USERNAME_TAKEN,
-            });
-            return;
-          }
-        });
-        user = await User.findById(userId);
-        user.username = username;
-      } else {
-        user = await User.findById(userId);
-        for (const key of Object.keys(_existingUser))
-          user[key] = _existingUser[key];
-      }
-      await user
-        .save()
-        .then((userData) => {
-          const user = userData?._doc;
-          const token = generateToken(user._id, email, username, user.isAdmin);
-          resolve({
-            status: 200,
-            message: ServerInfo.USER_UPDATED,
-            data: {
-              user: processUserData(user, user._id, true),
-              token,
-            },
-          });
-        })
-        .catch((err) => reject(new ServerError(500, err.message)));
-    } catch (err) {
-      throwAPIError(reject, err, ErrorMessage.U_UPDATE_FAILED);
-    } finally {
-      resolve({ status: 200 });
-    }
+
+    axios
+      .patch(`${SERVER_URL}/user`, { ...reqBody, userId })
+      .then((res) => {
+        const { error, message, user, token } = res?.data;
+        if (error) {
+          throw new Error(message);
+        }
+        return resolve({ status: res.status, message, data: { user, token } });
+      })
+      .catch((err) => throwAPIError(reject, err, ErrorMessage.U_UPDATE_FAILED));
   });
 }
 
-async function deleteDoc(req: NextApiRequest) {
+async function authDeleteDoc(req: NextApiRequest) {
   const userId = req.headers["user-id"];
+
   return new Promise(async (resolve, reject) => {
-    const { User } = await MongoConnection();
-    User.findByIdAndDelete(userId, (err, _, __) => {
-      if (!!err) {
-        reject(new ServerError(500, err.message));
-      } else {
-        resolve({ status: 200, message: ServerInfo.USER_DELETED });
-      }
-    }).catch((err) => {
-      throwAPIError(reject, err, ErrorMessage.U_DELETE_FAILED);
-    });
+    axios
+      .delete(`${SERVER_URL}/user`, { data: { userId } })
+      .then((res) => {
+        const { message } = res?.data;
+        resolve({ status: res.status, message });
+      })
+      .catch((err) => {
+        throwAPIError(reject, err, ErrorMessage.U_DELETE_FAILED);
+      });
   });
 }

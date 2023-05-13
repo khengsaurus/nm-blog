@@ -22,7 +22,6 @@ import {
   usePageReady,
   useRealtimePost,
 } from "hooks";
-import { MongoConnection } from "lib/server";
 import moment from "moment";
 import { GetStaticPropsResult } from "next";
 import FourOFour from "pages/404";

@@ -1,27 +1,9 @@
 import { APIAction } from "enums";
 import jwt from "jsonwebtoken";
 import { NextApiRequest } from "next";
-import { IUserReq } from "types";
-import { ServerError, verifyPassword } from "../server";
+import { ServerError } from "../server";
 
 const secretKey = process.env.SECRET_KEY;
-
-export function generateToken(
-  id: string,
-  email: string,
-  username: string,
-  isAdmin = false
-) {
-  return jwt.sign(
-    {
-      id,
-      email,
-      username,
-      isAdmin,
-    },
-    secretKey
-  );
-}
 
 export function decodeToken<T>(req: NextApiRequest) {
   let { action, token } = req.body;
@@ -44,11 +26,4 @@ export async function validateAuth(req: NextApiRequest): Promise<boolean> {
     if (userToken?.id === userId) resolve(true);
     else reject(new ServerError(401));
   });
-}
-
-export function verify(req: Partial<IUserReq>, user: any) {
-  return (
-    req.username === user.username &&
-    verifyPassword(req.password, user.password)
-  );
 }

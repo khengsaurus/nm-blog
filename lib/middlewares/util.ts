@@ -1,11 +1,10 @@
-import { ErrorMessage, HttpResponse } from "enums";
-import { extend } from "lodash";
+import { ErrorMessage } from "enums";
 import { NextApiRequest, NextApiResponse } from "next";
-import { IResponse, IUser } from "types";
+import { IResponse } from "types";
 import { ServerError } from "../server";
 import { validateAuth } from "./auth";
 
-export async function handleRequest(
+export async function handleAuthRequest(
   req: NextApiRequest,
   res: NextApiResponse,
   callback: (p: NextApiRequest) => Promise<IResponse>
@@ -33,71 +32,8 @@ export function throwAPIError(
   reject(new ServerError(500, message));
 }
 
-export function handleBadRequest(res: NextApiResponse, err?: Error) {
-  return Promise.resolve().then(() => {
-    err && console.info(err?.message);
-    res.status(400).json({ message: HttpResponse._400 });
-  });
-}
-
 export function handleAPIError(res: NextApiResponse, err?: ServerError) {
   err && console.info(err.status + " : " + err.message);
   res.status(err.status).json({ message: err.message });
   return;
-}
-
-export function errorHandler(
-  err: Error,
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  switch (err.message) {
-    case HttpResponse._500:
-      console.info(err.message);
-      console.info("Request URL: " + req.url);
-      console.info("Query: " + JSON.stringify(req.query));
-      console.info("Body: " + JSON.stringify(req.body));
-      forwardResponse(res, { status: 500, message: HttpResponse._500 });
-      break;
-    case HttpResponse._400:
-      forwardResponse(res, { status: 400, message: HttpResponse._400 });
-  }
-}
-
-export function processUserData(
-  user: any,
-  id: string,
-  forSelf = false
-): Partial<IUser> {
-  const posts = [];
-  if (user.posts?.length > 0) {
-    try {
-      user.posts.forEach(({ slug, _id }) => {
-        posts.push(new Object({ slug, id: _id.toString() }));
-      });
-    } catch (err) {
-      console.info("Failed to parse user data: " + err.message);
-    }
-  }
-  const _user = {
-    id,
-    email: user.email,
-    username: user.username,
-    avatarKey: user.avatarKey || "",
-    bio: user.bio || "",
-    posts: posts,
-  };
-  return forSelf ? { ..._user, isAdmin: user.isAdmin } : _user;
-}
-
-export function createUserObject(params: Object) {
-  const baseUser = {
-    avatar: "",
-    bio: "",
-    email: "",
-    password: "",
-    username: "",
-    posts: [],
-  };
-  return extend(baseUser, params);
 }

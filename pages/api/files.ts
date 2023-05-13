@@ -1,11 +1,11 @@
 import { EXPERIMENTAL_RUNTIME } from "consts";
 import { APIAction, HttpRequest } from "enums";
-import { handleBadRequest, handleRequest } from "lib/middlewares";
+import { handleAuthRequest } from "lib/middlewares";
 import {
+  ServerError,
   deleteFile,
   generateDownloadURL,
   generateUploadURL,
-  ServerError,
 } from "lib/server";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -20,16 +20,16 @@ export default async function handler(
       const action = req.body.action;
       switch (action) {
         case APIAction.GET_UPLOAD_KEY:
-          return handleRequest(req, res, () => getS3UploadURL(req));
+          return handleAuthRequest(req, res, () => getS3UploadURL(req));
         case APIAction.GET_DOWNLOAD_KEY:
-          return handleRequest(req, res, () => getS3DownloadURL(req));
+          return handleAuthRequest(req, res, () => getS3DownloadURL(req));
         default:
           return res.status(400);
       }
     case HttpRequest.DELETE:
-      return handleRequest(req, res, deleteCallback);
+      return handleAuthRequest(req, res, deleteCallback);
     default:
-      return handleBadRequest(res);
+      return res.status(405);
   }
 }
 

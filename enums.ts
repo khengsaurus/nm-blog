@@ -83,67 +83,33 @@ export enum HttpResponse {
   _401 = "Unauthorized request",
   _404 = "Failed to find resource",
   _500 = "Internal server error",
-  BAD_LOGIN = "Incorrect username or password",
-  SERVER_LISTENING = "Server listening on port ",
-  USERNAME_TAKEN = "Username already taken",
 }
 
 export enum ToastMessage {
   POST_EDITED = "Post edited successfully",
-  POST_CREATED = "Post created successfully",
-  POST_DELETED = "Post deleted successfully",
-
   POST_EDITED_FAIL = "Failed to edit post",
-  POST_CREATED_FAIL = "Failed to create post",
-  POST_DELETED_FAIL = "Failed to delete post",
 
-  PROFILE_SAVE = "Profile saved successfully",
-  PROFILE_SAVE_FAIL = "Failed to save profile",
+  POST_CREATED = "Post created successfully",
+  POST_CREATE_FAILED = "Failed to create post",
+
+  POST_DELETED = "Post deleted successfully",
+  POST_DELETE_FAILED = "Failed to delete post",
+
+  PROFILE_SAVED = "Profile saved successfully",
+  PROFILE_SAVE_FAILED = "Failed to save profile",
 
   PW_NOT_MATCHING = "Passwords do not match",
-  I_ONE_ONLY = "Only 1 image can be uploaded",
 
+  I_ONE_ONLY = "Only 1 image can be uploaded",
   I_UPLOAD_FAIL = "Failed to upload image",
 }
 
 export enum ServerInfo {
   EMAIL_USED = "Email already used",
-  USER_LOGIN = "User logged in successfully",
-  USER_DELETED = "User deleted successfully",
   USER_NA = "User does not exist",
   USER_REGISTERED = "User registered",
-  USER_RETRIEVED = "User retrieved",
-  USER_UPDATED = "User updated",
-  USERNAME_TAKEN = "Username already taken",
-  USER_BAD_LOGIN = "Incorrect username or password",
-
-  POST_CREATED = "Post created",
-  POST_DELETED = "Post deleted",
-  POST_RETRIEVED = "Post(s) retrieved",
-  POST_RETRIEVED_CACHED = "Post(s) retrieved from cache",
-  POST_UPDATED = "Post updated",
-  POST_SLUGS_RETRIEVED = "Post slugs retrieved",
   POST_NA = "No post(s) found",
-
   FILE_DELETED = "File deleted",
-  REQUEST_FAILED = "Server request failed",
-
-  REDIS_SET_SUCCESS = "Redis - successful set",
-  REDIS_GET_SUCCESS = "Redis - successful get",
-  REDIS_DEL_SUCCESS = "Redis - successful del",
-
-  REDIS_SET_FAIL = "Redis - failed set",
-  REDIS_GET_FAIL = "Redis - failed get",
-  REDIS_DEL_FAIL = "Redis - failed del",
-
-  REDIS_HSET_SUCCESS = "Redis - successful hset",
-  REDIS_HGET_SUCCESS = "Redis - successful hget",
-  REDIS_HGETALL_SUCCESS = "Redis - successful hgetall",
-  REDIS_HDEL_SUCCESS = "Redis - successful hdel",
-
-  REDIS_HSET_FAIL = "Redis - failed hset",
-  REDIS_HGETALL_FAIL = "Redis - failed hgetall",
-  REDIS_HDEL_FAIL = "Redis - failed hdel",
 }
 
 export enum ErrorMessage {

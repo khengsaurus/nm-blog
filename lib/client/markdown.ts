@@ -1,5 +1,5 @@
-import { marked } from "marked";
 import hljs from "highlight.js";
+import { marked } from "marked";
 
 function getCodeTheme(themeName: string) {
   switch (themeName) {

@@ -17,10 +17,10 @@ import {
   usePreviewImg,
 } from "hooks";
 import {
+  HTTPService,
   avatarStyles,
   deleteFiles,
   getUploadedFileKey,
-  HTTPService,
 } from "lib/client";
 import { ServerError } from "lib/server";
 import { useContext, useState } from "react";
@@ -70,11 +70,11 @@ const EditProfile = () => {
             if (res.data?.token && res.data?.user) {
               handleUser(res.data.token, res.data.user);
             }
-            toast.success(ToastMessage.PROFILE_SAVE);
+            toast.success(ToastMessage.PROFILE_SAVED);
             resolve(res);
           })
           .catch((err) => {
-            toast.error(ToastMessage.PROFILE_SAVE_FAIL);
+            toast.error(ToastMessage.PROFILE_SAVE_FAILED);
             reject(err);
           });
       }

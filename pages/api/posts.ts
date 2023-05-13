@@ -1,11 +1,10 @@
 import axios from "axios";
 import { CACHE_DEFAULT, EXPERIMENTAL_RUNTIME, SERVER_URL } from "consts";
-import { ErrorMessage, HttpRequest, ServerInfo } from "enums";
+import { ErrorMessage, HttpRequest } from "enums";
 import {
   forwardResponse,
   handleAPIError,
-  handleBadRequest,
-  handleRequest,
+  handleAuthRequest,
 } from "lib/middlewares";
 import { throwAPIError } from "lib/middlewares/util";
 import { ServerError } from "lib/server";
@@ -22,13 +21,13 @@ export default async function handler(
     case HttpRequest.GET:
       return handleGet(req, res);
     case HttpRequest.POST:
-      return handleRequest(req, res, createDoc);
+      return handleAuthRequest(req, res, createDoc);
     case HttpRequest.PATCH:
-      return handleRequest(req, res, patchDoc);
+      return handleAuthRequest(req, res, patchDoc);
     case HttpRequest.DELETE:
-      return handleRequest(req, res, deleteDoc);
+      return handleAuthRequest(req, res, deleteDoc);
     default:
-      return handleBadRequest(res);
+      return res.status(405);
   }
 }
 
@@ -104,8 +103,8 @@ function patchDoc(req: NextApiRequest): Promise<IResponse> {
         if (error) throw new Error(message);
 
         resolve({
-          status: 200,
-          message: ServerInfo.POST_UPDATED,
+          status: res.status,
+          message,
           data: { post },
         });
       })
@@ -127,7 +126,7 @@ function deleteDoc(req: NextApiRequest): Promise<IResponse> {
         if (error) {
           throw new Error(message);
         } else {
-          resolve({ status: 200, message: ServerInfo.POST_DELETED });
+          resolve({ status: res.status, message });
         }
       })
       .catch((err) => throwAPIError(reject, err, ErrorMessage.P_UPDATE_FAIL));

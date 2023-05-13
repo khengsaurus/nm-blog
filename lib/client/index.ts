@@ -1,14 +1,14 @@
 import ClientHTTPService from "./ClientHttpService";
+import { HomeTheme, avatarStyles } from "./MuiStyles";
 import markdown from "./markdown";
 import {
+  deleteFiles,
+  deletePost,
   getPostSlugs,
   getPresignedS3URL,
   getUploadedFileKey,
-  deleteFiles,
-  deletePost,
 } from "./tasks";
 import themes from "./themes";
-import { avatarStyles, HomeTheme } from "./MuiStyles";
 
 const HTTPService = new ClientHTTPService();
 

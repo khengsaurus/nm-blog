@@ -12,12 +12,8 @@ export const MAX_FILES_A = 10;
 export const IS_DEV = process.env.DEV === "1";
 export const SEARCHBOX_ID = "search-box";
 
-// redis keys
-export const CURR = "NM_CURR";
-export const HOME = "NM_HOME";
-
 //
 export const SERVER_URL =
-  process.env.DEV === "1" || process.env.DEV_S === "1"
-    ? process.env.SERVER_DEV
-    : process.env.SERVER_DEV;
+  process.env.DEV_S === "1"
+    ? process.env.DEV_SERVER_URL
+    : process.env.SERVER_URL;
