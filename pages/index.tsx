@@ -11,7 +11,6 @@ interface IHomeProps {
 
 export async function getServerSideProps({ res }) {
   res.setHeader("Cache-Control", CACHE_DEFAULT);
-  // console.log("getServerSideProps -> new RedisConnection()");
   let initPosts = await RedisClient.get([], HOME);
 
   if (!initPosts.length) {

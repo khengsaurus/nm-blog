@@ -32,12 +32,10 @@ class RedisConnection {
   }
 
   deferDisconnect(timeout = 8_000) {
-    // console.log(`-> RedisConnection.deferDisconnect(${this.id})`);
     if (this.closeTimeout) {
       clearTimeout(this.closeTimeout);
     }
     this.closeTimeout = setTimeout(() => {
-      // console.log(`-> RedisConnection close connection (${this.id})`);
       if (this.client.isOpen) {
         this.client.quit().catch(console.error);
       }
@@ -57,7 +55,6 @@ class RedisConnection {
   }
 
   async updateCurrent() {
-    // console.info("-> RedisConnection.updateCurrent()");
     return new Promise(async (resolve) => {
       const d1 = new Date();
       const d2 = new Date(d1.getTime() + DurationMS.MIN).valueOf(); // 1 min delay
@@ -97,12 +94,10 @@ class RedisConnection {
   }
 
   async setKeyValue(key: string, value: any, ttl?: number): Promise<number> {
-    // console.info(`-> RedisConnection.setKeyValue(): ${key}`);
     const val = typeof value === "string" ? value : JSON.stringify(value);
     return new Promise(async (resolve) => {
       this.connect()
         .then(() => {
-          // console.info(`RedisConnection: set ${key}`);
           this.client.set(key, val);
           if (ttl) this.client.expire(key, ttl);
         })
@@ -185,7 +180,6 @@ class RedisConnection {
 
   async getMaps<T = any>(keys: string | string[]): Promise<IObject<T>[]> {
     const _keys = typeof keys === "string" ? [keys] : keys;
-    // console.info(`-> RedisConnection.getMaps(): ${JSON.stringify(_keys)}`);
     return setPromiseTimeout(
       () => this.connect().then(() => this._hgetall<T>([], _keys)),
       []
@@ -193,7 +187,6 @@ class RedisConnection {
   }
 
   async del(keys: string | string[]): Promise<void> {
-    // console.info(`-> RedisConnection.del(): ${JSON.stringify(_keys)}`);
     const _keys = typeof keys === "string" ? [keys] : keys;
     if (!_keys?.length) return;
     return new Promise((resolve) => {
@@ -278,7 +271,6 @@ class RedisConnection {
    *  0 (no change); 1 (public -> private); 2 (private -> public)
    */
   resetCache(post: Partial<IPost>, privacyChange = 0): Promise<void> {
-    // console.info(`-> RedisConnection.resetCache(): ${post?.id}`);
     return new Promise((resolve) => {
       const { id, isPrivate, slug, username } = post;
       if (!id) return;
