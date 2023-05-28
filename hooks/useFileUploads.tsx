@@ -1,10 +1,10 @@
-import { IS_DEV, MAX_FILES, MAX_FILES_A, MAX_FILE_SIZE_MB } from "consts";
+import { MAX_FILES, MAX_FILES_A, MAX_FILE_SIZE_MB } from "consts";
 import { FileStatus, ToastMessage } from "enums";
 import { getUploadedFileKey } from "lib/client";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { IPost, IPostFile, IUser } from "types";
-import { checkFileSize, sleep } from "utils";
+import { checkFileSize } from "utils";
 
 const maxFileSize = MAX_FILE_SIZE_MB * 1000 * 1000;
 

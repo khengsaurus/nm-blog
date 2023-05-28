@@ -16,6 +16,7 @@ import {
 import { throwAPIError } from "lib/middlewares/util";
 import { ServerError } from "lib/server";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { getClientIp } from "request-ip";
 import { IResponse, IUser, IUserReq } from "types";
 
 export const config = EXPERIMENTAL_RUNTIME;
@@ -50,7 +51,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
     const getSlugs = reqQuery.action === APIAction.GET_POST_SLUGS;
     res.setHeader("Cache-Control", getSlugs ? "no-cache" : CACHE_DEFAULT);
 
-    return getUser(reqQuery)
+    return getUser(reqQuery, getClientIp(req))
       .then((payload) => forwardResponse(res, payload))
       .catch((err) => handleAPIError(res, err));
   }
@@ -58,11 +59,15 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
 
 function getUser(
   params: Partial<IUserReq>,
+  clientIp: string,
   isPrivate = false
 ): Promise<IResponse> {
   return new Promise((resolve, reject) => {
     axios
-      .get(`${SERVER_URL}/user`, { params: { ...params, isPrivate } })
+      .get(`${SERVER_URL}/user`, {
+        params: { ...params, isPrivate },
+        headers: { "x-client-ip": clientIp },
+      })
       .then((res) => {
         const { message, error, user } = res?.data;
         if (error) throw new Error(message);
@@ -92,9 +97,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   } else if ((!email && !username) || !password) {
     return res.status(400).json({ message: HttpResponse._400 });
   } else {
+    const clientIp = getClientIp(req);
     await (action === APIAction.LOGIN
-      ? handleLogin(req.body)
-      : handleRegister(req.body)
+      ? handleLogin(req.body, clientIp)
+      : handleRegister(req.body, clientIp)
     )
       .then((payload) => forwardResponse(res, payload))
       .catch((err) => handleAPIError(res, err));
@@ -110,7 +116,7 @@ async function handleTokenLogin(
   if (!id) {
     handleAPIError(res, new ServerError(401));
   } else {
-    return getUser({ _id: id }, true)
+    return getUser({ _id: id }, getClientIp(req), true)
       .then((payload) => forwardResponse(res, payload))
       .catch((err) => handleAPIError(res, err));
   }
@@ -121,10 +127,15 @@ async function handleTokenLogin(
  * Handle login and register depending on login arg.
  * @resolve {..., token: JWT}
  */
-async function handleLogin(reqBody: Partial<IUserReq>): Promise<IResponse> {
+async function handleLogin(
+  reqBody: Partial<IUserReq>,
+  clientIp: string
+): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     axios
-      .post(`${SERVER_URL}/user`, reqBody)
+      .post(`${SERVER_URL}/user`, reqBody, {
+        headers: { "x-client-ip": clientIp },
+      })
       .then((res) => {
         const { message, data } = res?.data;
         resolve({ status: res.status, message, data });
@@ -138,7 +149,10 @@ async function handleLogin(reqBody: Partial<IUserReq>): Promise<IResponse> {
  * Handle login and register depending on login arg.
  * @resolve {..., token: JWT, user: user object without username}
  */
-function handleRegister(reqBody: Partial<IUserReq>): Promise<IResponse> {
+function handleRegister(
+  reqBody: Partial<IUserReq>,
+  clientIp: string
+): Promise<IResponse> {
   return new Promise(async (resolve, reject) => {
     await axios
       .post(`${SERVER_URL}/user`, reqBody)
@@ -166,16 +180,19 @@ function handleRegister(reqBody: Partial<IUserReq>): Promise<IResponse> {
 
 async function authPatchDoc(req: NextApiRequest): Promise<IResponse> {
   const reqBody: Partial<IUserReq> = req.body;
+
   return new Promise(async (resolve, reject) => {
     const userId = req.headers["user-id"];
 
     axios
-      .patch(`${SERVER_URL}/user`, { ...reqBody, userId })
+      .patch(
+        `${SERVER_URL}/user`,
+        { ...reqBody, userId },
+        { headers: { "x-client-ip": getClientIp(req) } }
+      )
       .then((res) => {
         const { error, message, user, token } = res?.data;
-        if (error) {
-          throw new Error(message);
-        }
+        if (error) throw new Error(message);
         return resolve({ status: res.status, message, data: { user, token } });
       })
       .catch((err) => throwAPIError(reject, err, ErrorMessage.U_UPDATE_FAILED));
@@ -187,13 +204,13 @@ async function authDeleteDoc(req: NextApiRequest) {
 
   return new Promise(async (resolve, reject) => {
     axios
-      .delete(`${SERVER_URL}/user`, { data: { userId } })
-      .then((res) => {
-        const { message } = res?.data;
-        resolve({ status: res.status, message });
+      .delete(`${SERVER_URL}/user`, {
+        data: { userId },
+        headers: { "x-client-ip": getClientIp(req) },
       })
-      .catch((err) => {
-        throwAPIError(reject, err, ErrorMessage.U_DELETE_FAILED);
-      });
+      .then((res) =>
+        resolve({ status: res.status, message: res?.data?.message })
+      )
+      .catch((err) => throwAPIError(reject, err, ErrorMessage.U_DELETE_FAILED));
   });
 }
