@@ -14,7 +14,7 @@
   border-radius: 4px;
 }
 
-@mixin no-scroll {
+@mixin no-scrollbar {
   &::-webkit-scrollbar {
     display: none;
   }
@@ -50,6 +50,7 @@ main {
   @include orientate-contents-(center);
   font-family: "Roboto", sans-serif;
   margin: $main-margin $main-margin 120px;
+
   &.left {
     @include orientate-contents-(flex-start);
   }
@@ -62,6 +63,7 @@ main {
   &.transparent {
     background-color: transparent;
   }
+
   header {
     &.banner-image {
       position: absolute;
@@ -105,7 +107,6 @@ main {
       p {
         padding: 0px;
         margin: 8px 0px;
-        overflow-y: scroll;
       }
     }
   }
@@ -120,26 +121,31 @@ h1 {
   font-size: 38px !important;
   margin: 0;
 }
+
 h2 {
   padding: 6px 0px !important;
   font-size: 32px !important;
   margin: 0;
 }
+
 h3 {
   padding: 4px 0px !important;
   font-size: 26px !important;
   margin: 0;
 }
+
 h4 {
   padding: 3px 0px !important;
   font-size: 22px !important;
   margin: 0;
 }
+
 h5 {
   padding: 2px 0px !important;
   font-size: 19px !important;
   margin: 0;
 }
+
 h6 {
   @include ellipsis;
   font-size: 18px;
@@ -147,9 +153,11 @@ h6 {
   padding: 0px !important;
   margin: 0;
 }
+
 p {
   margin: 3px 0px;
   white-space: break-spaces;
+
   &.author {
     font-size: 16px;
     margin-right: 10px;
@@ -165,16 +173,17 @@ p {
 }
 
 textarea {
-  @include no-scroll;
+  @include no-scrollbar;
 }
 
 .background {
+  @include no-scrollbar;
   position: fixed;
   top: 0;
   left: 0;
   height: 100vh;
   width: 100vw;
-  overflow: scroll;
+  overflow: auto;
 }
 
 .card-content {
@@ -182,9 +191,11 @@ textarea {
   @include ellipsis;
   text-align: left;
   max-height: 188px;
+
   &.has-image {
     max-height: 108px;
   }
+
   p {
     &.body {
       @include ellipsis;
@@ -192,6 +203,7 @@ textarea {
       font-size: 14px;
       display: -webkit-box;
       -webkit-box-orient: vertical;
+
       &.short {
         -webkit-line-clamp: 3;
       }
@@ -206,6 +218,7 @@ textarea {
   @include flex-(row);
   align-items: center;
   justify-content: center;
+
   @media only screen and (max-width: 520px) {
     @include flex-(column);
   }
@@ -226,6 +239,7 @@ textarea {
   bottom: 10px;
   right: 10px;
   transition: $speed-medium;
+
   .edit-button {
     height: $big-button-dim;
     width: $big-button-dim;
@@ -245,12 +259,13 @@ textarea {
 
 .markdown-preview {
   @include round-border;
-  @include no-scroll;
+  @include no-scrollbar;
   position: relative;
   background-color: transparent !important;
   border: 1px solid transparent;
   overflow-y: scroll;
   transition: 400ms;
+
   &.hide {
     border: none !important;
     padding: 0px !important;
@@ -266,6 +281,7 @@ textarea {
 .markdown-view {
   background-color: transparent !important;
   border: none !important;
+
   &.card {
     padding: 0px !important;
     p {
@@ -284,6 +300,7 @@ textarea {
   $nav-size: 60px;
   $border: 1px solid inherit;
   $padding: 6px;
+
   ul {
     list-style: none;
     margin: 0;
@@ -331,11 +348,13 @@ textarea {
       align-items: center;
       transition: background $speed-medium;
       padding: $padding;
-      .right {
-        margin-left: auto;
-      }
+
       &:hover {
         background-color: rgba(0, 0, 0, 0.12);
+      }
+
+      .right {
+        margin-left: auto;
       }
     }
   }
@@ -347,6 +366,7 @@ textarea {
   justify-content: flex-start;
   height: 40px;
   width: 100%;
+
   &.end {
     justify-content: flex-end;
   }
@@ -374,24 +394,30 @@ textarea {
   position: absolute;
   transform: translateX(-110%);
 }
+
 .menu-primary-enter-active {
   transform: translateX(0%);
   transition: all $speed-medium;
 }
+
 .menu-primary-exit {
   position: absolute;
 }
+
 .menu-primary-exit-active {
   transform: translateX(-110%);
   transition: all $speed-medium;
 }
+
 .menu-secondary-enter {
   transform: translateX(110%);
 }
+
 .menu-secondary-enter-active {
   transform: translateX(0%);
   transition: all $speed-medium;
 }
+
 .menu-secondary-exit-active {
   transform: translateX(110%);
   transition: all $speed-medium;
@@ -402,6 +428,7 @@ textarea {
   border: 5px dashed transparent;
   border-radius: 4px;
   transition: $speed-medium;
+
   .label {
     position: absolute;
     top: 410px;
@@ -433,21 +460,25 @@ textarea {
   .file-card {
     $file-card-w: 194px;
     $file-icon-w: 38px;
+
     @mixin text-content {
       @include ellipsis;
       width: $file-card-w - $file-icon-w;
       white-space: nowrap;
     }
+
     align-items: center;
     height: $file-icon-w + 2px;
     width: $file-card-w;
     margin-right: 4px;
+
     svg {
       height: $file-icon-w;
       width: $file-icon-w;
     }
     .text {
       transition: $speed-medium;
+
       h6 {
         @include text-content;
         font-size: 14px;
@@ -468,6 +499,7 @@ textarea {
       opacity: 0;
       transition: $speed-medium;
       transform: translateX(-80%);
+
       svg {
         height: 100%;
         width: 24px;
@@ -489,6 +521,7 @@ textarea {
 // Markdown styling.
 pre {
   margin: 0;
+
   code {
     &.hljs {
       @include round-border;
@@ -525,6 +558,7 @@ pre {
       }
     }
   }
+
   // Atom one dark
   .atomOneDark-comment,
   .atomOneDark-quote {
