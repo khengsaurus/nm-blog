@@ -1,22 +1,34 @@
 import { DBService, ErrorMessage } from "enums";
 import { HTTPService } from "lib/client";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useContext, useRef, useState } from "react";
 import { IPost, IUser } from "types";
 import { processPostWithUser } from "utils";
+import { AppContext } from "./context";
 import useIsoEffect from "./useIsoEffect";
 
 const useRealtimePost = (post: IPost, fresh = false) => {
-  const [realtimePost, setRealtimePost] = useState(post);
   const { id: postId, username, user: author } = post || {};
+  const [realtimePost, setRealtimePost] = useState(post);
+  const { getFromQueryCache, setToQueryCache } = useContext(AppContext);
   const isFetching = useRef(false);
 
   const fetchAuthor = useCallback((): Promise<IUser> => {
     return new Promise((resolve) => {
+      if (!author?.id) resolve(null);
+
+      const authorKey = `user-${author.id}`;
+      const cachedAuthor = getFromQueryCache(authorKey);
+      if (cachedAuthor) return resolve(cachedAuthor);
+
       HTTPService.makeGetReq(DBService.USERS, {
-        id: author?.id,
+        id: author.id,
         username,
       })
-        .then((res) => resolve(res?.data?.user))
+        .then((res) => {
+          const user = res?.data?.user;
+          if (user?.id) setToQueryCache(authorKey, user);
+          resolve(user);
+        })
         .catch((err) => {
           console.info(err);
           resolve(author);

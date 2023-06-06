@@ -94,7 +94,7 @@ async function getPosts(params: Partial<IPostReq>): Promise<IResponse> {
         ];
       const { Post } = await MongoConnection();
       Post.find(query)
-        .select(["-user", "-files"])
+        .select(["-files"])
         .sort({ createdAt: -1 })
         .limit(limit)
         .lean()
@@ -143,7 +143,6 @@ async function getPost(params: Partial<IPostReq>): Promise<IResponse> {
       }
       const { Post } = await MongoConnection();
       (id ? Post.findById(id) : Post.findOne({ username, slug }))
-        .select(["-user"])
         .lean()
         .then((_post) => {
           if (isEmpty(_post)) {

@@ -26,36 +26,12 @@ import { GetStaticPropsResult } from "next";
 import FourOFour from "pages/404";
 import { useContext, useMemo, useState } from "react";
 import { IPost } from "types";
-import { getAvatarMedium, processPostWithUser } from "utils";
+import { getAvatarMedium, processPostWithoutUser } from "utils";
 
 interface IPostPage {
   post: IPost;
   username: string;
   slug: string;
-}
-
-export async function getStaticProps({
-  params,
-}): Promise<GetStaticPropsResult<IPostPage>> {
-  const { username, slug } = params;
-  let _post: IPost = null;
-  try {
-    const { Post } = await MongoConnection();
-    _post = await Post.findOne({ username, slug }).select(["-user"]).lean();
-  } catch (err) {
-    console.info(
-      `Error in [${username}]/[${slug}] getStaticProps: ` + err.message
-    );
-  }
-
-  return {
-    props: {
-      username,
-      slug,
-      post: processPostWithUser(_post),
-    },
-    revalidate: 60,
-  };
 }
 
 export async function getStaticPaths() {
@@ -79,7 +55,31 @@ export async function getStaticPaths() {
   };
 }
 
-const Post = ({ post, username, slug }: IPostPage) => {
+export async function getStaticProps({
+  params,
+}): Promise<GetStaticPropsResult<IPostPage>> {
+  const { username, slug } = params;
+  let _post: IPost = null;
+  try {
+    const { Post } = await MongoConnection();
+    _post = await Post.findOne({ username, slug }).lean();
+  } catch (err) {
+    console.info(
+      `Error in [${username}]/[${slug}] getStaticProps: ` + err.message
+    );
+  }
+
+  return {
+    props: {
+      username,
+      slug,
+      post: processPostWithoutUser(_post),
+    },
+    revalidate: 60,
+  };
+}
+
+const Post = ({ post, slug, username }: IPostPage) => {
   const { theme, user, routerPush } = useContext(AppContext);
   const [showDelete, setShowDelete] = useState(false);
   const { realtimePost } = useRealtimePost(post || { username, slug });

@@ -3,7 +3,7 @@ import { CACHE_DEFAULT, HOME, PAGINATE_LIMIT } from "consts";
 import { useNavShortcuts, usePageReady } from "hooks";
 import { MongoConnection, RedisClient } from "lib/server";
 import { IPost } from "types";
-import { processPostWithUser } from "utils";
+import { processPostWithoutUser } from "utils";
 
 interface IHomeProps {
   initPosts: IPost[];
@@ -16,11 +16,10 @@ export async function getServerSideProps({ res }) {
   if (!initPosts.length) {
     const { Post } = await MongoConnection();
     const postQuery = await Post.find({ isPrivate: false })
-      .select(["-user"])
       .sort({ createdAt: -1 })
       .limit(PAGINATE_LIMIT)
       .lean();
-    initPosts = postQuery.map((post) => processPostWithUser(post));
+    initPosts = postQuery.map(processPostWithoutUser);
     RedisClient.setKeyValue(HOME, initPosts);
   }
 

@@ -58,19 +58,27 @@ export function processPostWithUser(data: any): IPost {
   return post;
 }
 
+/**
+ * @return post with minimal user info: {id, username}
+ */
 export function processPostWithoutUser(_post: any): IPost {
-  const { _id, __v, createdAt, updatedAt, isPrivate, ...post } = _post;
-  post.id = _id?.toString() || post.id;
-  post.createdAt = createdAt?.toString();
-  post.updatedAt = updatedAt?.toString();
-  post.isPrivate = castAsBoolean(isPrivate);
-  return post;
+  const { _id, __v, user, createdAt, updatedAt, isPrivate, ...post } = _post;
+  return {
+    ...post,
+    id: _id?.toString() || post.id || "",
+    createdAt: createdAt?.toString(),
+    updatedAt: updatedAt?.toString(),
+    isPrivate: castAsBoolean(isPrivate),
+    user: {
+      id: user?.toString() || "",
+      username: post.username || "",
+    },
+  };
 }
 
-// each post coming in as { ...IPost, _id, __v } -> this will give a POJO IPost without user
 export function processPostsWithoutUser(_posts: any[]): IPost[] {
-  if (!_posts) return [];
-  return _posts.map((_post) => processPostWithoutUser(_post));
+  if (!_posts?.length) return [];
+  return _posts.map(processPostWithoutUser);
 }
 
 export function userDocToObj(data: any) {
