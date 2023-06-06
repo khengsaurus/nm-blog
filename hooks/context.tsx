@@ -17,13 +17,15 @@ const initialContext: IAppContext = {
   router: null,
   history: [],
   theme: themes[DEFAULT_THEME],
-  setPageReady: null,
-  handleUser: null,
-  logout: null,
-  routerPush: null,
-  routerBack: null,
-  setThemeName: null,
-  updatePostSlugs: null,
+  setPageReady: () => null,
+  handleUser: () => null,
+  logout: () => null,
+  routerPush: () => null,
+  routerBack: () => null,
+  setThemeName: () => null,
+  updatePostSlugs: () => null,
+  getFromQueryCache: () => null,
+  setToQueryCache: () => null,
 };
 
 export const AppContext = createContext<IAppContext>(initialContext);
@@ -34,8 +36,17 @@ const AppContextProvider = (props: any) => {
   const [userSessionActive, setUserSessionActive] = useState(true);
   const [userToken, setUserToken] = useLocalStorage("userToken", "");
   const [theme, setThemeName] = useTheme();
+  const queryCacheRef = useRef(new Map());
   const historyRef = useRef([]);
   const router = useRouter();
+
+  function getFromQueryCache(key: string) {
+    return queryCacheRef.current.get(key);
+  }
+
+  function setToQueryCache(key: string, value: any) {
+    return queryCacheRef.current.set(key, value);
+  }
 
   /* -------------------- Start Router stuff -------------------- */
   const routerPush = useCallback(
@@ -154,6 +165,8 @@ const AppContextProvider = (props: any) => {
         routerPush,
         setThemeName,
         updatePostSlugs,
+        getFromQueryCache,
+        setToQueryCache,
       }}
       {...props}
     />

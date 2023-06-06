@@ -32,6 +32,8 @@ export interface IAppContext {
   routerBack: () => void;
   setThemeName: (theme?: string) => void;
   updatePostSlugs: (user: IUser) => void;
+  getFromQueryCache: (key: string) => any;
+  setToQueryCache: (key: string, value: any) => void;
 }
 
 export interface ITheme {

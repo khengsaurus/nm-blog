@@ -35,6 +35,25 @@ interface IPostPage {
   slug: string;
 }
 
+export async function getStaticPaths() {
+  const paths = await axios
+    .get(`${SERVER_URL}/posts/recent`)
+    .then((res) => {
+      const { message, paths, error } = res?.data;
+      if (error) throw new Error(message);
+      return paths;
+    })
+    .catch((err) => {
+      console.error(`Error in [slug] getStaticPaths: ${err?.message}`);
+      return [];
+    });
+
+  return {
+    paths,
+    fallback: "blocking", // fall back to SSR
+  };
+}
+
 export async function getStaticProps({
   params,
 }): Promise<GetStaticPropsResult<IPostPage>> {
@@ -60,26 +79,7 @@ export async function getStaticProps({
   };
 }
 
-export async function getStaticPaths() {
-  const paths = await axios
-    .get(`${SERVER_URL}/posts/recent`)
-    .then((res) => {
-      const { message, paths, error } = res?.data;
-      if (error) throw new Error(message);
-      return paths;
-    })
-    .catch((err) => {
-      console.error(`Error in [slug] getStaticPaths: ${err?.message}`);
-      return [];
-    });
-
-  return {
-    paths,
-    fallback: "blocking", // fall back to SSR
-  };
-}
-
-const Post = ({ post, username, slug }: IPostPage) => {
+const Post = ({ post, slug, username }: IPostPage) => {
   const { theme, user, routerPush } = useContext(AppContext);
   const [showDelete, setShowDelete] = useState(false);
   const { realtimePost } = useRealtimePost(post || { username, slug });
