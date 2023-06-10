@@ -1,5 +1,5 @@
 import { EXPERIMENTAL_RUNTIME } from "consts";
-import { APIAction, HttpRequest } from "enums";
+import { ApiAction, HttpRequest } from "enums";
 import { handleAuthRequest } from "lib/middlewares";
 import {
   ServerError,
@@ -19,9 +19,9 @@ export default async function handler(
     case HttpRequest.POST:
       const action = req.body.action;
       switch (action) {
-        case APIAction.GET_UPLOAD_KEY:
+        case ApiAction.GET_UPLOAD_KEY:
           return handleAuthRequest(req, res, () => getS3UploadURL(req));
-        case APIAction.GET_DOWNLOAD_KEY:
+        case ApiAction.GET_DOWNLOAD_KEY:
           return handleAuthRequest(req, res, () => getS3DownloadURL(req));
         default:
           return res.status(400);

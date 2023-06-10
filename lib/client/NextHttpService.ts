@@ -1,10 +1,11 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { IS_DEV } from "consts";
-import { APIAction, DBService, ErrorMessage, HttpRequest } from "enums";
+import { ApiAction, DbService, ErrorMessage, HttpRequest } from "enums";
+import { IFileReq, IPostReq, IUserReq } from "types";
 
 const authBearer = { Authorization: `Bearer ${process.env.BEARER}` };
 
-class ClientHTTPService {
+class NextHttpService {
   private instance: AxiosInstance;
 
   constructor() {
@@ -23,9 +24,9 @@ class ClientHTTPService {
   }
 
   handleTokenLogin(token: string) {
-    return this.makeAuthHttpReq(DBService.USERS, HttpRequest.POST, {
+    return this.makeAuthHttpReq(DbService.USERS, HttpRequest.POST, {
       token,
-      action: APIAction.USER_TOKEN_LOGIN,
+      action: ApiAction.USER_TOKEN_LOGIN,
     });
   }
 
@@ -34,9 +35,9 @@ class ClientHTTPService {
    * Headers will contain user-id & user-token if user is logged in
    */
   makeAuthHttpReq(
-    service: DBService,
+    service: DbService,
     method: HttpRequest,
-    bodyOrParams?: object,
+    bodyOrParams?: Partial<IPostReq | IUserReq | IFileReq>,
     config?: AxiosRequestConfig<any>
   ) {
     const reqConfig = {
@@ -70,8 +71,8 @@ class ClientHTTPService {
   }
 
   makeGetReq(
-    service: DBService,
-    params?: object,
+    service: DbService,
+    params?: Partial<IPostReq>,
     config: AxiosRequestConfig = {}
   ) {
     return this.instance.get(service, {
@@ -116,4 +117,4 @@ class ClientHTTPService {
   };
 }
 
-export default ClientHTTPService;
+export default NextHttpService;

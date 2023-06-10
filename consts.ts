@@ -12,8 +12,8 @@ export const MAX_FILES_A = 10;
 export const IS_DEV = process.env.DEV === "1";
 export const SEARCHBOX_ID = "search-box";
 
-//
+// point to public for both server & client access
 export const SERVER_URL =
-  process.env.DEV_S === "1"
-    ? process.env.DEV_SERVER_URL
-    : process.env.SERVER_URL;
+  process.env.DEV_S === "1" || process.env.NEXT_PUBLIC_DEV_S === "1"
+    ? process.env.NEXT_PUBLIC_DEV_SERVER_URL
+    : process.env.NEXT_PUBLIC_SERVER_URL;

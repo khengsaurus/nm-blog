@@ -32,7 +32,7 @@ export async function setPromiseTimeout<T>(
     ])
       .then((res) => resolve(res || val))
       .catch((err) => {
-        console.info(err.message);
+        console.error(err);
         resolve(val);
       });
   });
@@ -42,49 +42,20 @@ export async function sleepSync(ms = 1000): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export function processPostWithUser(data: any): IPost {
+export function processPost(data: any): IPost {
   if (!data) return null;
-  const { _id, user, createdAt, updatedAt, isPrivate, ...post } =
+  const { id, _id, user, createdAt, updatedAt, isPrivate, __v, ...post } =
     data._doc || data;
-  post.id = _id?.toString() || post.id;
-  post.createdAt = createdAt?.toString();
-  post.updatedAt = updatedAt?.toString();
+  post.id = id || _id?.toString();
+  post.createdAt = createdAt?.toString() || "";
+  post.updatedAt = updatedAt?.toString() || "";
   post.isPrivate = castAsBoolean(isPrivate);
-  if (user?._id) {
-    const { _id, updatedAt, createdAt, ..._user } = user;
-    _user.id = _id.toString();
+  if (user?._id || user?.id) {
+    const { id, _id, updatedAt, createdAt, __v, ..._user } = user;
+    _user.id = id || _id.toString();
     post.user = _user;
   }
   return post;
-}
-
-export function processPostWithoutUser(_post: any): IPost {
-  const { _id, __v, createdAt, updatedAt, isPrivate, ...post } = _post;
-  post.id = _id?.toString() || post.id;
-  post.createdAt = createdAt?.toString();
-  post.updatedAt = updatedAt?.toString();
-  post.isPrivate = castAsBoolean(isPrivate);
-  return post;
-}
-
-// each post coming in as { ...IPost, _id, __v } -> this will give a POJO IPost without user
-export function processPostsWithoutUser(_posts: any[]): IPost[] {
-  if (!_posts) return [];
-  return _posts.map((_post) => processPostWithoutUser(_post));
-}
-
-export function userDocToObj(data: any) {
-  if (data === null) return data;
-  const { _id, posts, createdAt, updatedAt, ...user } = data;
-  if (_id) {
-    user.id = _id.toString();
-  }
-  const processedPosts: IPost[] = [];
-  for (let i = 0; i < posts?.length; i++) {
-    processedPosts.push(processPostWithUser(posts[i]));
-  }
-  user.posts = processedPosts;
-  return user;
 }
 
 export function checkOneFileSelected(

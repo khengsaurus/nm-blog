@@ -1,4 +1,4 @@
-import { APIAction } from "enums";
+import { ApiAction } from "enums";
 import jwt from "jsonwebtoken";
 import { NextApiRequest } from "next";
 import { ServerError } from "../server";
@@ -7,7 +7,7 @@ const secretKey = process.env.SECRET_KEY;
 
 export function decodeToken<T>(req: NextApiRequest) {
   let { action, token } = req.body;
-  if (action !== APIAction.USER_TOKEN_LOGIN) {
+  if (action !== ApiAction.USER_TOKEN_LOGIN) {
     token = req.headers?.usertoken as string;
   }
   return jwt.verify(token, secretKey) as T;

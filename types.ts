@@ -1,5 +1,5 @@
 import { NextRouter } from "next/router";
-import { APIAction, FileStatus, Status } from "./enums";
+import { ApiAction, FileStatus, Status } from "./enums";
 
 export type AlertStatus = "success" | "info" | "warning" | "error";
 
@@ -32,8 +32,6 @@ export interface IAppContext {
   routerBack: () => void;
   setThemeName: (theme?: string) => void;
   updatePostSlugs: (user: IUser) => void;
-  getFromQueryCache: (key: string) => any;
-  setToQueryCache: (key: string, value: any) => void;
 }
 
 export interface ITheme {
@@ -57,7 +55,8 @@ export interface IAlert {
 }
 
 interface IRequest {
-  userId: string;
+  userId?: string;
+  action?: ApiAction;
 }
 
 interface IHasId {
@@ -120,5 +119,10 @@ export interface IUser extends IHasId, Partial<IHasTimestamps> {
 
 export interface IUserReq extends IUser, IRequest {
   login: boolean;
-  action: APIAction;
+  token?: string;
+}
+
+export interface IFileReq extends IRequest {
+  key?: string;
+  keys?: string;
 }

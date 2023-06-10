@@ -1,4 +1,4 @@
-import ClientHTTPService from "./ClientHttpService";
+import NextHttpService from "./NextHttpService";
 import { HomeTheme, avatarStyles } from "./MuiStyles";
 import markdown from "./markdown";
 import {
@@ -10,11 +10,11 @@ import {
 } from "./tasks";
 import themes from "./themes";
 
-const HTTPService = new ClientHTTPService();
+const nextHttpService = new NextHttpService();
 
 export {
   avatarStyles,
-  HTTPService,
+  nextHttpService,
   themes,
   HomeTheme,
   getPostSlugs,

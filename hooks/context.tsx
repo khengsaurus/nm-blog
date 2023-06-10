@@ -1,6 +1,6 @@
 import { DEFAULT_THEME } from "consts";
 import { PageRoute, Status } from "enums";
-import { getPostSlugs, HTTPService, themes } from "lib/client";
+import { getPostSlugs, nextHttpService, themes } from "lib/client";
 import { useRouter } from "next/router";
 import { createContext, useCallback, useEffect, useRef, useState } from "react";
 import { IAppContext, IUser } from "types";
@@ -24,8 +24,6 @@ const initialContext: IAppContext = {
   routerBack: () => null,
   setThemeName: () => null,
   updatePostSlugs: () => null,
-  getFromQueryCache: () => null,
-  setToQueryCache: () => null,
 };
 
 export const AppContext = createContext<IAppContext>(initialContext);
@@ -36,17 +34,8 @@ const AppContextProvider = (props: any) => {
   const [userSessionActive, setUserSessionActive] = useState(true);
   const [userToken, setUserToken] = useLocalStorage("userToken", "");
   const [theme, setThemeName] = useTheme();
-  const queryCacheRef = useRef(new Map());
   const historyRef = useRef([]);
   const router = useRouter();
-
-  function getFromQueryCache(key: string) {
-    return queryCacheRef.current.get(key);
-  }
-
-  function setToQueryCache(key: string, value: any) {
-    return queryCacheRef.current.set(key, value);
-  }
 
   /* -------------------- Start Router stuff -------------------- */
   const routerPush = useCallback(
@@ -92,7 +81,7 @@ const AppContextProvider = (props: any) => {
 
   const handleUser = useCallback(
     (token: string, user: IUser) => {
-      HTTPService.setBearer(token, user.id);
+      nextHttpService.setBearer(token, user.id);
       setUserToken(token);
       setUser(user);
       updatePostSlugs(user);
@@ -103,15 +92,21 @@ const AppContextProvider = (props: any) => {
   const userTokenLogin = useCallback(async () => {
     return new Promise((resolve) => {
       if (userToken) {
-        HTTPService.setBearer(userToken, user?.id);
-        HTTPService.handleTokenLogin(userToken).then((res) => {
-          if (res.status === 200 && res.data?.user) {
-            handleUser(userToken, res.data.user);
-            resolve(true);
-          } else {
+        nextHttpService.setBearer(userToken, user?.id);
+        nextHttpService
+          .handleTokenLogin(userToken)
+          .then((res) => {
+            if (res.status === 200 && res.data?.user) {
+              handleUser(userToken, res.data.user);
+              resolve(true);
+            } else {
+              resolve(false);
+            }
+          })
+          .catch((err) => {
+            console.error(err);
             resolve(false);
-          }
-        });
+          });
       } else {
         resolve(false);
       }
@@ -138,7 +133,7 @@ const AppContextProvider = (props: any) => {
 
   const logout = useCallback(
     (login = false) => {
-      HTTPService.setBearer("", "");
+      nextHttpService.setBearer("", "");
       setUserToken("");
       setUser(null);
       if (login) {
@@ -165,8 +160,6 @@ const AppContextProvider = (props: any) => {
         routerPush,
         setThemeName,
         updatePostSlugs,
-        getFromQueryCache,
-        setToQueryCache,
       }}
       {...props}
     />

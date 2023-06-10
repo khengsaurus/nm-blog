@@ -1,8 +1,8 @@
 import { Collapse } from "@mui/material";
 import { CenteredMain, Input, Row, StyledButton } from "components";
 import {
-  APIAction,
-  DBService,
+  ApiAction,
+  DbService,
   HttpRequest,
   PageRoute,
   ToastMessage,
@@ -13,7 +13,7 @@ import {
   useKeyListener,
   usePageReady,
 } from "hooks";
-import { HTTPService } from "lib/client";
+import { nextHttpService } from "lib/client";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
 import { IResponse } from "types";
@@ -66,10 +66,10 @@ const Login = () => {
   );
 
   const handleLogin = useCallback(() => {
-    HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequest.POST, {
+    nextHttpService.makeAuthHttpReq(DbService.USERS, HttpRequest.POST, {
       username,
       password,
-      action: APIAction.LOGIN,
+      action: ApiAction.LOGIN,
     })
       .then((res) => {
         if (res.status === 200 && res?.data?.token) {
@@ -83,10 +83,10 @@ const Login = () => {
 
   const handleRegister = useCallback(() => {
     if (password === confirmPassword) {
-      HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequest.POST, {
+      nextHttpService.makeAuthHttpReq(DbService.USERS, HttpRequest.POST, {
         email,
         password,
-        action: APIAction.REGISTER,
+        action: ApiAction.REGISTER,
       }).then((res) => {
         if (res?.data?.token) {
           cleanup(res, PageRoute.NEW_USER);

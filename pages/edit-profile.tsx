@@ -8,7 +8,7 @@ import {
   StyledText,
 } from "components";
 import { IS_DEV } from "consts";
-import { DBService, Flag, HttpRequest, Status, ToastMessage } from "enums";
+import { DbService, Flag, HttpRequest, Status, ToastMessage } from "enums";
 import {
   AppContext,
   useAsync,
@@ -17,7 +17,7 @@ import {
   usePreviewImg,
 } from "hooks";
 import {
-  HTTPService,
+  nextHttpService,
   avatarStyles,
   deleteFiles,
   getUploadedFileKey,
@@ -51,7 +51,7 @@ const EditProfile = () => {
       let imageError = false,
         imageKey = user?.avatarKey || "";
       if (imageUpdated) {
-        if (user?.avatarKey) deleteFiles([user.avatarKey]).catch(console.info);
+        if (user?.avatarKey) deleteFiles([user.avatarKey]).catch(console.error);
         await getUploadedFileKey(user.id, newImage)
           .then((key) => {
             imageKey = key;
@@ -62,10 +62,11 @@ const EditProfile = () => {
           });
       }
       if (!imageError) {
-        await HTTPService.makeAuthHttpReq(DBService.USERS, HttpRequest.PATCH, {
-          bio,
-          avatarKey: imageKey,
-        })
+        await nextHttpService
+          .makeAuthHttpReq(DbService.USERS, HttpRequest.PATCH, {
+            bio,
+            avatarKey: imageKey,
+          })
           .then((res) => {
             if (res.data?.token && res.data?.user) {
               handleUser(res.data.token, res.data.user);

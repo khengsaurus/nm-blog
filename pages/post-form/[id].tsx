@@ -14,7 +14,8 @@ import {
 } from "components";
 import { MAX_POSTS_PER_USER } from "consts";
 import {
-  DBService,
+  DbService,
+  ErrorMessage,
   Flag,
   HttpRequest,
   PageRoute,
@@ -30,7 +31,7 @@ import {
   usePreviewImg,
   useRealtimePost,
 } from "hooks";
-import { HTTPService, deleteFiles } from "lib/client";
+import { nextHttpService, deleteFiles } from "lib/client";
 import { ServerError } from "lib/server";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import Dropzone from "react-dropzone";
@@ -94,11 +95,22 @@ const EditPost = ({ id }: IPostPage) => {
     }
   }, [title]);
 
+  const updateOkRef = useRef(true);
+  const updateOkTimer = useRef(null);
   useEffect(() => {
+    if (updateOkTimer.current) {
+      clearTimeout(updateOkTimer.current);
+    }
+    updateOkTimer.current = setTimeout(() => {
+      updateOkRef.current = false;
+    }, 1000);
+
     if (isNewPost) {
       if (user?.posts?.length >= MAX_POSTS_PER_USER && !isAdmin)
         routerPush(PageRoute.HOME);
     } else {
+      if (!updateOkRef.current) return;
+
       const { title, slug, body, isPrivate, hasMarkdown } = realtimePost || {};
       setTitle(title);
       setSlug(slug);
@@ -112,12 +124,13 @@ const EditPost = ({ id }: IPostPage) => {
   const _handlePut = () => {
     return new Promise((resolve, reject) => {
       // If existing post with new slug || new post -> check if slug avail
-      // if (isNewPost || slug.trim() !== realtimePost?.slug?.trim()) {
-      //   if (!!user?.posts?.find((post) => post.slug === slug)) {
-      //     reject(new Error(ErrorMessage.P_SLUG_USED));
-      //     return;
-      //   }
-      // }
+      if (isNewPost || slug.trim() !== realtimePost?.slug?.trim()) {
+        if (!!user?.posts?.find((post) => post.slug === slug)) {
+          reject(new Error(ErrorMessage.P_SLUG_USED));
+          return;
+        }
+      }
+
       const post = {
         id: isNewPost ? "" : realtimePost?.id,
         username: user?.username,
@@ -137,11 +150,12 @@ const EditPost = ({ id }: IPostPage) => {
             };
           }),
       };
-      HTTPService.makeAuthHttpReq(
-        DBService.POSTS,
-        isNewPost ? HttpRequest.POST : HttpRequest.PATCH,
-        post
-      )
+      nextHttpService
+        .makeAuthHttpReq(
+          DbService.POSTS,
+          isNewPost ? HttpRequest.POST : HttpRequest.PATCH,
+          post
+        )
         .then((res) => {
           toast.success(
             isNewPost ? ToastMessage.POST_CREATED : ToastMessage.POST_EDITED
@@ -152,7 +166,7 @@ const EditPost = ({ id }: IPostPage) => {
         })
         .catch((err) => {
           toast.error(
-            isNewPost
+            err?.message || isNewPost
               ? ToastMessage.POST_CREATE_FAILED
               : ToastMessage.POST_EDITED_FAIL
           );

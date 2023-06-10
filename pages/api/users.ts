@@ -1,7 +1,7 @@
 import axios from "axios";
 import { CACHE_DEFAULT, EXPERIMENTAL_RUNTIME, SERVER_URL } from "consts";
 import {
-  APIAction,
+  ApiAction,
   ErrorMessage,
   HttpRequest,
   HttpResponse,
@@ -48,7 +48,7 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
       data: { user: {} },
     });
   } else {
-    const getSlugs = reqQuery.action === APIAction.GET_POST_SLUGS;
+    const getSlugs = reqQuery.action === ApiAction.GET_POST_SLUGS;
     res.setHeader("Cache-Control", getSlugs ? "no-cache" : CACHE_DEFAULT);
 
     return getUser(reqQuery, getClientIp(req))
@@ -92,13 +92,13 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     password = "",
   } = req.body as Partial<IUserReq>;
 
-  if (action === APIAction.USER_TOKEN_LOGIN) {
+  if (action === ApiAction.USER_TOKEN_LOGIN) {
     return handleTokenLogin(req, res);
   } else if ((!email && !username) || !password) {
     return res.status(400).json({ message: HttpResponse._400 });
   } else {
     const clientIp = getClientIp(req);
-    await (action === APIAction.LOGIN
+    await (action === ApiAction.LOGIN
       ? handleLogin(req.body, clientIp)
       : handleRegister(req.body, clientIp)
     )
@@ -116,7 +116,7 @@ async function handleTokenLogin(
   if (!id) {
     handleAPIError(res, new ServerError(401));
   } else {
-    return getUser({ _id: id }, getClientIp(req), true)
+    await getUser({ id }, getClientIp(req), true)
       .then((payload) => forwardResponse(res, payload))
       .catch((err) => handleAPIError(res, err));
   }

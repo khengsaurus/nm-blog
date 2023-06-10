@@ -1,20 +1,22 @@
 import axios from "axios";
-import { APIAction, DBService, ErrorMessage, HttpRequest } from "enums";
+import { ApiAction, DbService, ErrorMessage, HttpRequest } from "enums";
 import fileDownload from "js-file-download";
 import { IPost, IResponse } from "types";
-import { HTTPService } from ".";
+import { nextHttpService } from ".";
 
 // Tasks to be run as non-render-blocking
 
 export async function getPostSlugs(username: string): Promise<IResponse> {
   return new Promise((resolve, reject) => {
     try {
-      HTTPService.makeGetReq(DBService.USERS, {
-        username,
-        action: APIAction.GET_POST_SLUGS,
-      }).then(resolve);
+      nextHttpService
+        .makeGetReq(DbService.USERS, {
+          username,
+          action: ApiAction.GET_POST_SLUGS,
+        })
+        .then(resolve);
     } catch (err) {
-      console.info(err);
+      console.error(err);
       reject(new Error(err.message));
     }
   });
@@ -26,11 +28,12 @@ export function deletePost(post: IPost): Promise<IResponse> {
     const fileKeys = files?.map((f) => f.key);
     if (imageKey) fileKeys.push(imageKey);
     if (fileKeys.length) deleteFiles(fileKeys);
-    HTTPService.makeAuthHttpReq(DBService.POSTS, HttpRequest.DELETE, {
-      id,
-      username,
-      isPrivate,
-    })
+    nextHttpService
+      .makeAuthHttpReq(DbService.POSTS, HttpRequest.DELETE, {
+        id,
+        username,
+        isPrivate,
+      })
       .then(resolve)
       .catch(reject);
   });
@@ -40,10 +43,10 @@ export async function getPresignedS3URL(
   userId: string,
   signal?: AbortSignal
 ): Promise<IResponse | null> {
-  return HTTPService.makeAuthHttpReq(
-    DBService.FILES,
+  return nextHttpService.makeAuthHttpReq(
+    DbService.FILES,
     HttpRequest.POST,
-    { action: APIAction.GET_UPLOAD_KEY, userId },
+    { action: ApiAction.GET_UPLOAD_KEY, userId },
     { signal }
   );
 }
@@ -67,7 +70,8 @@ export async function getUploadedFileKey(
         return;
       });
     if (url && key) {
-      await HTTPService.uploadFile(url, userId, file, signal)
+      await nextHttpService
+        .uploadFile(url, userId, file, signal)
         .then(() => resolve(key))
         .catch(reject);
     } else {
@@ -81,10 +85,11 @@ export async function downloadFile(
   key: string,
   errorHandler: (msg: string) => void
 ) {
-  HTTPService.makeAuthHttpReq(DBService.FILES, HttpRequest.POST, {
-    action: APIAction.GET_DOWNLOAD_KEY,
-    key,
-  })
+  nextHttpService
+    .makeAuthHttpReq(DbService.FILES, HttpRequest.POST, {
+      action: ApiAction.GET_DOWNLOAD_KEY,
+      key,
+    })
     .then((res) => {
       const url = res?.data?.url;
       if (!url) {
@@ -106,7 +111,7 @@ export async function downloadFile(
 
 export async function deleteFiles(keys: string[]) {
   if (!keys?.length) return;
-  return HTTPService.makeAuthHttpReq(DBService.FILES, HttpRequest.DELETE, {
+  return nextHttpService.makeAuthHttpReq(DbService.FILES, HttpRequest.DELETE, {
     keys: JSON.stringify(keys),
   });
 }

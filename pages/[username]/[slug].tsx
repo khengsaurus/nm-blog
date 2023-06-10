@@ -13,7 +13,7 @@ import {
   Row,
   StyledText,
 } from "components";
-import { SERVER_URL } from "consts";
+import { IS_DEV, SERVER_URL } from "consts";
 import { PageRoute } from "enums";
 import {
   AppContext,
@@ -27,7 +27,7 @@ import { GetStaticPropsResult } from "next";
 import FourOFour from "pages/404";
 import { useContext, useMemo, useState } from "react";
 import { IPost } from "types";
-import { getAvatarMedium } from "utils";
+import { getAvatarMedium, processPost } from "utils";
 
 interface IPostPage {
   post: IPost;
@@ -64,7 +64,8 @@ export async function getStaticProps({
     .then((res) => {
       const { message, post, error } = res?.data;
       if (error) throw new Error(message);
-      return post;
+      const _post = processPost(post);
+      return _post;
     })
     .catch((err) => {
       console.error(
@@ -80,7 +81,7 @@ export async function getStaticProps({
 }
 
 const Post = ({ post, slug, username }: IPostPage) => {
-  const { theme, user, routerPush } = useContext(AppContext);
+  const { theme, user: currUser, routerPush } = useContext(AppContext);
   const [showDelete, setShowDelete] = useState(false);
   const { realtimePost } = useRealtimePost(post || { username, slug });
   const {
@@ -114,40 +115,39 @@ const Post = ({ post, slug, username }: IPostPage) => {
     setShowDelete(true);
   }
 
-  return realtimePost ? (
-    <>
-      <main className="left">
-        {imageKey && <PostBanner imageKey={imageKey} />}
-        <section className={`header column ${imageKey ? "pad-top" : ""}`}>
-          <DarkText text={title} variant="h2" />
-          <Row style={{ justifyContent: "flex-start", alignItems: "flex-end" }}>
-            <DarkContainer>
-              <AuthorLink username={username} title />
-            </DarkContainer>
-            {author?.avatarKey && (
-              <Avatar
-                alt={`${author?.username}-avatar`}
-                src={getAvatarMedium(author.avatarKey)}
-                sx={{ height: "40px", width: "40px", marginLeft: "10px" }}
-              />
-            )}
-          </Row>
-          <DarkText text={dateText} variant="h4" />
+  const enableEdit = IS_DEV || currUser?.id === author?.id;
+
+  return realtimePost?.id ? (
+    <main className="left">
+      {imageKey && <PostBanner imageKey={imageKey} />}
+      <section className={`header column ${imageKey ? "pad-top" : ""}`}>
+        <DarkText text={title} variant="h2" />
+        <Row style={{ justifyContent: "flex-start", alignItems: "flex-end" }}>
+          <DarkContainer>
+            <AuthorLink username={username} title />
+          </DarkContainer>
+          {author?.avatarKey && (
+            <Avatar
+              alt={`${author?.username}-avatar`}
+              src={getAvatarMedium(author.avatarKey)}
+              sx={{ height: "40px", width: "40px", marginLeft: "10px" }}
+            />
+          )}
+        </Row>
+        <DarkText text={dateText} variant="h4" />
+      </section>
+      {realtimePost?.hasMarkdown ? (
+        <Container
+          className="markdown-view"
+          dangerouslySetInnerHTML={{ __html: markdown }}
+        />
+      ) : (
+        <section className="post-body">
+          <StyledText text={body} variant="body1" paragraph />
         </section>
-        {realtimePost?.hasMarkdown ? (
-          <Container
-            className="markdown-view"
-            dangerouslySetInnerHTML={{ __html: markdown }}
-          />
-        ) : (
-          <section className="post-body">
-            <StyledText text={body} variant="body1" paragraph />
-          </section>
-        )}
-        <Files files={realtimePost?.files} disableDelete />
-      </main>
-      {/* Check for user to prevent showing on mount */}
-      {user && user?.id === author?.id && (
+      )}
+      <Files files={realtimePost?.files} disableDelete />
+      {enableEdit && (
         <div className="edit-container">
           <Fab className="edit-button" onClick={handleEdit} disableRipple>
             <EditIcon style={{ width: 40, height: 40 }} />
@@ -166,7 +166,7 @@ const Post = ({ post, slug, username }: IPostPage) => {
         showDelete={showDelete}
         setShowDelete={setShowDelete}
       />
-    </>
+    </main>
   ) : (
     <FourOFour />
   );

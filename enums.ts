@@ -6,7 +6,7 @@ export enum Status {
   SUCCESS,
 }
 
-export enum DBService {
+export enum DbService {
   FILES = "files",
   POSTS = "posts",
   USERS = "users",
@@ -134,7 +134,7 @@ export enum ErrorMessage {
   F_DOWNLOAD_FAILED = "Failed to download file",
 }
 
-export enum APIAction {
+export enum ApiAction {
   LOGIN = "login",
   REGISTER = "register",
   USER_TOKEN_LOGIN = "user-token-login",
