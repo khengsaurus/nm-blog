@@ -20,6 +20,7 @@
     "framer-motion": "^6.2.8",
     "fs": "^0.0.1-security",
     "highlight.js": "^11.5.1",
+    "ip": "^1.1.8",
     "jquery": "^3.6.0",
     "js-file-download": "^0.4.12",
     "jsonwebtoken": "^8.5.1",

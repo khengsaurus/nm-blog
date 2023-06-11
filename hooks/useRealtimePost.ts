@@ -1,5 +1,4 @@
-import axios from "axios";
-import { SERVER_URL } from "consts";
+import { ClientHttpService } from "lib/client";
 import { useCallback, useRef, useState } from "react";
 import { IPost } from "types";
 import { processPost } from "utils";
@@ -15,8 +14,8 @@ const useRealtimePost = (post: IPost, fresh = false) => {
         const { id, slug, username } = post;
         const reqTime = new Date().valueOf(); // prevent loading disk cached
         const params = { id, slug, username, fresh, reqTime };
-        axios
-          .get(`${SERVER_URL}/post`, { params })
+        new ClientHttpService()
+          .get("post", { params })
           .then((res) => resolve(processPost(res.data?.post)))
           .catch((err) => {
             console.error(err);

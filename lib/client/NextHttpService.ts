@@ -70,18 +70,6 @@ class NextHttpService {
     }
   }
 
-  makeGetReq(
-    service: DbService,
-    params?: Partial<IPostReq>,
-    config: AxiosRequestConfig = {}
-  ) {
-    return this.instance.get(service, {
-      params,
-      headers: authBearer,
-      ...config,
-    });
-  }
-
   /**
    * Upload a file to S3 via a presigned `PutObject` URL.
    * Invokes a PUT fetch with header "Content-Type": "multipart/form-data"

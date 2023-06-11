@@ -1,9 +1,8 @@
 import { Avatar } from "@mui/material";
-import axios from "axios";
 import { Column, DarkText, PostFeed } from "components";
-import { CACHE_DEFAULT, SERVER_URL } from "consts";
+import { CACHE_DEFAULT } from "consts";
 import { useNavShortcuts, usePageReady } from "hooks";
-import { avatarStyles } from "lib/client";
+import { avatarStyles, ClientHttpService } from "lib/client";
 import { IUser } from "types";
 import { getAvatarLarge } from "utils";
 import FourOFour from "../404";
@@ -16,8 +15,8 @@ export async function getServerSideProps({ params, res }) {
   const { username } = params;
   res.setHeader("Cache-Control", CACHE_DEFAULT);
 
-  const user = await axios
-    .get(`${SERVER_URL}/posts/user`, {
+  const user = await new ClientHttpService()
+    .get("posts/user", {
       params: { username },
     })
     .then((res) => {

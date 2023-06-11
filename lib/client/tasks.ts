@@ -10,7 +10,7 @@ export async function getPostSlugs(username: string): Promise<IResponse> {
   return new Promise((resolve, reject) => {
     try {
       nextHttpService
-        .makeGetReq(DbService.USERS, {
+        .makeAuthHttpReq(DbService.USERS, HttpRequest.GET, {
           username,
           action: ApiAction.GET_POST_SLUGS,
         })

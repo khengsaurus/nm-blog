@@ -1,5 +1,6 @@
-import NextHttpService from "./NextHttpService";
+import ClientHttpService from "./ClientHttpService";
 import { HomeTheme, avatarStyles } from "./MuiStyles";
+import NextHttpService from "./NextHttpService";
 import markdown from "./markdown";
 import {
   deleteFiles,
@@ -13,14 +14,15 @@ import themes from "./themes";
 const nextHttpService = new NextHttpService();
 
 export {
-  avatarStyles,
-  nextHttpService,
-  themes,
+  ClientHttpService,
   HomeTheme,
+  avatarStyles,
+  deleteFiles,
+  deletePost,
   getPostSlugs,
   getPresignedS3URL,
   getUploadedFileKey,
-  deleteFiles,
-  deletePost,
   markdown,
+  nextHttpService,
+  themes,
 };

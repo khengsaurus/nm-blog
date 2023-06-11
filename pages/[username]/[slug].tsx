@@ -2,7 +2,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { Avatar, Fab } from "@mui/material";
 import Container from "@mui/system/Container";
-import axios from "axios";
 import {
   AuthorLink,
   DarkContainer,
@@ -13,7 +12,7 @@ import {
   Row,
   StyledText,
 } from "components";
-import { IS_DEV, SERVER_URL } from "consts";
+import { IS_DEV } from "consts";
 import { PageRoute } from "enums";
 import {
   AppContext,
@@ -22,6 +21,7 @@ import {
   usePageReady,
   useRealtimePost,
 } from "hooks";
+import { ClientHttpService } from "lib/client";
 import moment from "moment";
 import { GetStaticPropsResult } from "next";
 import FourOFour from "pages/404";
@@ -36,8 +36,8 @@ interface IPostPage {
 }
 
 export async function getStaticPaths() {
-  const paths = await axios
-    .get(`${SERVER_URL}/posts/recent`)
+  const paths = await new ClientHttpService()
+    .get("posts/recent")
     .then((res) => {
       const { message, paths, error } = res?.data;
       if (error) throw new Error(message);
@@ -59,8 +59,8 @@ export async function getStaticProps({
 }): Promise<GetStaticPropsResult<IPostPage>> {
   const { username, slug } = params;
 
-  const post = await axios
-    .get(`${SERVER_URL}/post`, { params })
+  const post = await new ClientHttpService()
+    .get("post", { params })
     .then((res) => {
       const { message, post, error } = res?.data;
       if (error) throw new Error(message);

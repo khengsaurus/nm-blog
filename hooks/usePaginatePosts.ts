@@ -1,6 +1,6 @@
 import { PAGINATE_LIMIT } from "consts";
-import { DbService, ServerInfo, Status } from "enums";
-import { nextHttpService } from "lib/client";
+import { DbService, HttpRequest, ServerInfo, Status } from "enums";
+import { ClientHttpService, nextHttpService } from "lib/client";
 import debounce from "lodash/debounce";
 import {
   MutableRefObject,
@@ -71,9 +71,18 @@ const usePaginatePosts = (
       if (publicPosts) query.isPrivate = false;
       if (search) query.search = search;
 
-      nextHttpService.makeGetReq(DbService.POSTS, query, {
-        signal: newAbortController.signal,
-      }).then((res) => {
+      (publicPosts
+        ? new ClientHttpService().get("posts", {
+            params: query,
+            signal: newAbortController.signal,
+          })
+        : nextHttpService.makeAuthHttpReq(
+            DbService.POSTS,
+            HttpRequest.GET,
+            query,
+            { signal: newAbortController.signal }
+          )
+      ).then((res) => {
         abortControllerRef.current = null;
         const { posts: newPosts, message } = res?.data || {};
         if (res.status === 200) {

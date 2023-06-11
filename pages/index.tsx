@@ -1,20 +1,22 @@
-import axios from "axios";
 import { PostFeed } from "components";
-import { CACHE_DEFAULT, SERVER_URL } from "consts";
+import { CACHE_DEFAULT } from "consts";
 import { useNavShortcuts, usePageReady } from "hooks";
+import { ClientHttpService } from "lib/client";
 import { IPost } from "types";
 
 interface IHomeProps {
   initPosts: IPost[];
 }
 
-export async function getServerSideProps({ res }) {
+export async function getServerSideProps(args) {
+  const { res } = args;
   res.setHeader("Cache-Control", CACHE_DEFAULT);
 
-  const initPosts = await axios
-    .get(`${SERVER_URL}/posts/home`)
+  const initPosts = await new ClientHttpService()
+    .get("posts/home")
     .then((res) => {
       const { message, posts, error } = res?.data;
+      console.log(message);
       if (error) throw new Error(message);
       return posts;
     })
