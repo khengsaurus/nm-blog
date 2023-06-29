@@ -85,6 +85,7 @@ const PostFeed = ({
                   })
                 }
                 inputProps={{ maxLength: 50 }}
+                style={{ marginLeft: "12px" }}
               />
             )}
           </section>

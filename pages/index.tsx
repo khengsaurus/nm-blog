@@ -16,7 +16,6 @@ export async function getServerSideProps(args) {
     .get("posts/home")
     .then((res) => {
       const { message, posts, error } = res?.data;
-      console.log(message);
       if (error) throw new Error(message);
       return posts;
     })

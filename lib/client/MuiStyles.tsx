@@ -383,7 +383,18 @@ function newMuiTheme(theme: ITheme) {
 }
 
 export const avatarStyles = {
-  small: { width: Dimension.AVATAR_S, height: Dimension.AVATAR_S },
-  medium: { width: Dimension.AVATAR_M, height: Dimension.AVATAR_M },
-  large: { width: Dimension.AVATAR_L, height: Dimension.AVATAR_L },
+  small: {
+    width: Dimension.AVATAR_S,
+    height: Dimension.AVATAR_S,
+  },
+  medium: {
+    width: Dimension.AVATAR_M,
+    height: Dimension.AVATAR_M,
+  },
+  large: {
+    width: Dimension.AVATAR_L,
+    height: Dimension.AVATAR_L,
+    maxHeight: "30vw",
+    maxWidth: "30vw",
+  },
 };

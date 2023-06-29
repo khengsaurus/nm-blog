@@ -17,7 +17,7 @@ const MyProfile = () => {
     <main className="pad-top">
       {user ? (
         <>
-          <section className="header center">
+          <section className="header intro">
             {avatarKey && (
               <Avatar
                 alt={`${username}-avatar`}

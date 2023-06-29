@@ -45,12 +45,12 @@ const UserPage = (props: IUserPageProps) => {
 
   return visitingUser ? (
     <main>
-      <section className="header center">
+      <section className="header intro">
         {avatarKey && (
           <Avatar
             alt={`${username}-avatar`}
             src={getAvatarLarge(avatarKey)}
-            sx={{ ...avatarStyles.large, marginRight: "20px" }}
+            sx={{ ...avatarStyles.large, marginRight: "12px" }}
           />
         )}
         <Column

@@ -10,6 +10,10 @@ class ClientHttpService {
     this.instance.defaults.headers.common["x-client-ip"] = ip.address();
   }
 
+  head(url: string, config?: AxiosRequestConfig) {
+    return this.instance.head(url, config);
+  }
+
   get(url: string, config?: AxiosRequestConfig) {
     return this.instance.get(url, config);
   }
