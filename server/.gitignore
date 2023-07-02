@@ -1,0 +1,4 @@
+web
+.env
+build
+*.DS_store

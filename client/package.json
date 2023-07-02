@@ -1,5 +1,5 @@
 {
-  "name": "nm-blog",
+  "name": "nm-blog-client",
   "scripts": {
     "dev": "next dev -p 3000",
     "dev_s": "DEV_S=1 NEXT_PUBLIC_DEV_S=1 next dev -p 3000",

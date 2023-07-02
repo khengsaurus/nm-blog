@@ -1,0 +1,34 @@
+version: "3.7"
+name: ls-m-r
+
+services:
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379
+
+  mongo:
+    image: mongo:latest
+    restart: always
+    ports:
+      - 27017:27017
+    command: mongod --quiet --logpath /dev/null
+    volumes:
+      - mongodata:/data/db
+
+  localstack:
+    image: localstack/localstack
+    ports:
+      - 4566:4566
+      - 4510-4559:4510-4559
+    environment:
+      - SERVICES=s3
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=ap-southeast-1
+      - DEBUG=2
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+volumes:
+  mongodata: {}
