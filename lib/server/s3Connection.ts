@@ -1,5 +1,5 @@
 import S3 from "aws-sdk/clients/s3";
-import { IS_DEV } from "consts";
+import { IS_DEV_S } from "consts";
 import { randomBytes } from "crypto";
 import { ServerInfo } from "enums";
 import { IObject } from "types";
@@ -8,7 +8,7 @@ import ServerError from "./ServerError";
 const Bucket = process.env.ENV_AWS_BUCKET;
 
 const s3 = new S3(
-  IS_DEV
+  IS_DEV_S
     ? {
         endpoint: process.env.DEV_AWS_S3,
         region: process.env.ENV_AWS_REGION,

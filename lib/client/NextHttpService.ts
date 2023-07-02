@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
-import { IS_DEV } from "consts";
+import { IS_DEV_S } from "consts";
 import { ApiAction, DbService, ErrorMessage, HttpRequest } from "enums";
 import { IFileReq, IPostReq, IUserReq } from "types";
 
@@ -89,7 +89,7 @@ class NextHttpService {
     }
     return fetch(presignedURL, {
       method: HttpRequest.PUT,
-      headers: IS_DEV
+      headers: IS_DEV_S
         ? {
             "Content-Type": "application/json",
             "x-amz-acl": "public-read-write",

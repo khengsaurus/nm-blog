@@ -1,1 +1,0 @@
-awslocal s3 rm --recursive s3://next-mongo && awslocal s3api delete-bucket --bucket next-mongo
