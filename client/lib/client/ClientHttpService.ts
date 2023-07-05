@@ -17,6 +17,10 @@ class ClientHttpService {
   get(url: string, config?: AxiosRequestConfig) {
     return this.instance.get(url, config);
   }
+
+  delete(url: string, config?: AxiosRequestConfig) {
+    return this.instance.delete(url, config);
+  }
 }
 
 export default ClientHttpService;

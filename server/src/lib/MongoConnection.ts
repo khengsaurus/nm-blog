@@ -118,7 +118,11 @@ class MongoConnection extends ConnectionInstance {
   }
 
   deleteUser(id: string) {
-    return this.user.findByIdAndDelete(id);
+    return this.findUserById(id).then((user) => {
+      if (!user) return Promise.resolve();
+      if (!user.username) return this.user.findByIdAndDelete(id); // no username, can delete
+      return Promise.reject(401); // has username
+    });
   }
 
   // -------------------- Post --------------------

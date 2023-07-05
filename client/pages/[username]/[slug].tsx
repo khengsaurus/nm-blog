@@ -21,7 +21,7 @@ import {
   usePageReady,
   useRealtimePost,
 } from "hooks";
-import { ClientHttpService } from "lib/client";
+import { clientHttpService } from "lib/client";
 import moment from "moment";
 import { GetStaticPropsResult } from "next";
 import FourOFour from "pages/404";
@@ -36,7 +36,7 @@ interface IPostPage {
 }
 
 export async function getStaticPaths() {
-  const paths = await new ClientHttpService()
+  const paths = await clientHttpService
     .get("posts/recent")
     .then((res) => {
       const { message, paths, error } = res?.data;
@@ -59,7 +59,7 @@ export async function getStaticProps({
 }): Promise<GetStaticPropsResult<IPostPage>> {
   const { username, slug } = params;
 
-  const post = await new ClientHttpService()
+  const post = await clientHttpService
     .get("post", { params })
     .then((res) => {
       const { message, post, error } = res?.data;

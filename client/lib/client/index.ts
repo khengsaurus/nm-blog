@@ -12,11 +12,12 @@ import {
 import themes from "./themes";
 
 const nextHttpService = new NextHttpService();
+const clientHttpService = new ClientHttpService();
 
 export {
-  ClientHttpService,
   HomeTheme,
   avatarStyles,
+  clientHttpService,
   deleteFiles,
   deletePost,
   getPostSlugs,

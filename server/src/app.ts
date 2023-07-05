@@ -1,8 +1,12 @@
 import cors from "cors";
 import express from "express";
-import { activityHandler, postHandler, postsHandler } from "./handlers";
+import {
+  activityHandler,
+  postHandler,
+  postsHandler,
+  userHandler,
+} from "./handlers";
 import { errorHandler, setHeaders } from "./middlewares";
-import userHandler from "./handlers/user";
 
 require("dotenv").config();
 

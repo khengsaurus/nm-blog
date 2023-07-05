@@ -175,22 +175,24 @@ userHandler.patch("/*", async (req, res) => {
   }
 });
 
-userHandler.patch("/*", async (req, res) => {
+userHandler.delete("/*", async (req, res) => {
+  const { userId } = req.query as { userId: string };
+  if (!userId) return res.status(400);
+
+  console.log(userId);
+
   const { mongoErrorStatus, mongoConn } = await handleMongoConn(req, res);
   if (mongoErrorStatus) return;
 
-  const { userId } = req.body;
-  mongoConn
+  await mongoConn
     .deleteUser(userId)
-    .then((_) => {
-      res.status(200).json({ message: ServerInfo.USER_DELETED });
-    })
-    .catch((err) => {
+    .then((_) => res.status(200).json({ message: ServerInfo.USER_DELETED }))
+    .catch((err) =>
       res.status(500).json({
         error: true,
         message: `${ErrorMessage.U_DELETE_FAILED}, trace: ${err?.message}`,
-      });
-    });
+      })
+    );
 });
 
 export default userHandler;

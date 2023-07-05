@@ -2,7 +2,7 @@ import { CenteredMain, Input, Row, StyledButton } from "components";
 import { ApiAction, DbService, HttpRequest, PageRoute } from "enums";
 import { usePageReady } from "hooks";
 import { AppContext } from "hooks/context";
-import { nextHttpService } from "lib/client";
+import { clientHttpService, nextHttpService } from "lib/client";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
@@ -22,12 +22,11 @@ const NewUser = () => {
 
   const cancelRegister = useCallback(() => {
     setToDeleteIfUnload(false);
-    nextHttpService.makeAuthHttpReq(DbService.USERS, HttpRequest.DELETE, {
-      user,
-    })
+    clientHttpService
+      .delete("user", { params: { userId: user.id } })
       .catch(console.error)
       .finally(() => logout(true));
-  }, [user, logout]);
+  }, [user?.id, logout]);
 
   // If user ends session before setting username, delete records of email from DB to preserve email availability
   useEffect(() => {
@@ -42,11 +41,12 @@ const NewUser = () => {
   }, []);
 
   function registerUsername(email: string, username: string) {
-    nextHttpService.makeAuthHttpReq(DbService.USERS, HttpRequest.PATCH, {
-      email,
-      username,
-      action: ApiAction.USER_SET_USERNAME,
-    })
+    nextHttpService
+      .makeAuthHttpReq(DbService.USERS, HttpRequest.PATCH, {
+        email,
+        username,
+        action: ApiAction.USER_SET_USERNAME,
+      })
       .then((res) => {
         if (res.data?.token) {
           setToDeleteIfUnload(false);

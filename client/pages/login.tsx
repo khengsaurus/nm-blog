@@ -28,14 +28,12 @@ const Login = () => {
   usePageReady();
 
   useFirstEffect(() => {
-    if (!!user) {
+    if (user) {
       routerPush(PageRoute.HOME);
     }
   }, [routerPush, user]);
 
-  useEffect(() => {
-    setConfirmPassword("");
-  }, [showRegister]);
+  useEffect(() => setConfirmPassword(""), [showRegister]);
 
   const loginDisabled = useMemo(
     () => username.trim() === "" || password.trim() === "",
@@ -66,11 +64,12 @@ const Login = () => {
   );
 
   const handleLogin = useCallback(() => {
-    nextHttpService.makeAuthHttpReq(DbService.USERS, HttpRequest.POST, {
-      username,
-      password,
-      action: ApiAction.LOGIN,
-    })
+    nextHttpService
+      .makeAuthHttpReq(DbService.USERS, HttpRequest.POST, {
+        username,
+        password,
+        action: ApiAction.LOGIN,
+      })
       .then((res) => {
         if (res.status === 200 && res?.data?.token) {
           cleanup(res, PageRoute.HOME);
@@ -83,17 +82,19 @@ const Login = () => {
 
   const handleRegister = useCallback(() => {
     if (password === confirmPassword) {
-      nextHttpService.makeAuthHttpReq(DbService.USERS, HttpRequest.POST, {
-        email,
-        password,
-        action: ApiAction.REGISTER,
-      }).then((res) => {
-        if (res?.data?.token) {
-          cleanup(res, PageRoute.NEW_USER);
-        } else {
-          toast.error(res?.data?.message);
-        }
-      });
+      nextHttpService
+        .makeAuthHttpReq(DbService.USERS, HttpRequest.POST, {
+          email,
+          password,
+          action: ApiAction.REGISTER,
+        })
+        .then((res) => {
+          if (res?.data?.token) {
+            cleanup(res, PageRoute.NEW_USER);
+          } else {
+            toast.error(res?.data?.message);
+          }
+        });
     } else {
       toast.error(ToastMessage.PW_NOT_MATCHING);
     }
@@ -105,26 +106,6 @@ const Login = () => {
       (showRegister ? handleRegister : handleLogin)();
     }, [showRegister, handleLogin, handleRegister]),
     true
-  );
-
-  const renderLoginButton = () => (
-    <StyledButton
-      label="Login"
-      type="submit"
-      autoFocus
-      disabled={loginDisabled}
-      onClick={handleLogin}
-    />
-  );
-
-  const renderRegisterButton = () => (
-    <StyledButton
-      label="Register"
-      type="submit"
-      autoFocus
-      disabled={registerDisabled}
-      onClick={handleRegister}
-    />
   );
 
   return (
@@ -157,10 +138,26 @@ const Login = () => {
           label={showRegister ? "Back" : "Register"}
           onClick={() => {
             resetFrom();
-            setShowRegister(!showRegister);
+            setShowRegister((p) => !p);
           }}
         />
-        {showRegister ? renderRegisterButton() : renderLoginButton()}
+        {showRegister ? (
+          <StyledButton
+            label="Register"
+            type="submit"
+            autoFocus
+            disabled={registerDisabled}
+            onClick={handleRegister}
+          />
+        ) : (
+          <StyledButton
+            label="Login"
+            type="submit"
+            autoFocus
+            disabled={loginDisabled}
+            onClick={handleLogin}
+          />
+        )}
       </Row>
     </CenteredMain>
   );
