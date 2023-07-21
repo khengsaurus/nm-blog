@@ -15,31 +15,33 @@ import { CSSProperties, useMemo } from "react";
 import { IPost } from "types";
 
 interface IPostFeed {
+  title?: string;
+  initPosts?: IPost[];
+  username?: string;
+  paginateLimit?: number;
+  byCurrUser?: boolean;
   hasAuthorLink?: boolean;
   hasDate?: boolean;
-  initPosts?: IPost[];
-  paginateLimit?: number;
+  hasSearch?: boolean;
   publicPosts?: boolean;
   ready?: boolean;
-  username?: string;
   windowReady?: boolean;
-  title?: string;
-  hasSearch?: boolean;
 }
 
 export const initFeedWidth: CSSProperties = { width: 4 * Dimension.CARD_W };
 
 const PostFeed = ({
+  title = "",
+  initPosts = [],
+  username = "",
+  paginateLimit = PAGINATE_LIMIT,
+  byCurrUser = false,
   hasAuthorLink = true,
   hasDate = true,
-  initPosts = [],
-  paginateLimit = PAGINATE_LIMIT,
+  hasSearch = false,
   publicPosts = true,
   ready = true,
-  username = "",
   windowReady = true,
-  title = "",
-  hasSearch = false,
 }: IPostFeed) => {
   const windowLoaded = useWindowLoaded();
   const [searchStr, setSearchStr] = useQueryState("q", { history: "replace" });
@@ -96,6 +98,7 @@ const PostFeed = ({
             post={post}
             hasAuthorLink={hasAuthorLink}
             hasDate={hasDate}
+            byCurrUser={byCurrUser}
           />
         ))}
         {status !== Status.PENDING && posts.length === 0 && (

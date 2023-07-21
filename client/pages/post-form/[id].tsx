@@ -31,7 +31,7 @@ import {
   usePreviewImg,
   useRealtimePost,
 } from "hooks";
-import { nextHttpService, deleteFiles } from "lib/client";
+import { authHttpService, deleteFiles } from "lib/client";
 import { ServerError } from "lib/server";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import Dropzone from "react-dropzone";
@@ -50,7 +50,11 @@ export async function getServerSideProps({ params }) {
 
 const EditPost = ({ id }: IPostPage) => {
   const { theme, user, routerPush, updatePostSlugs } = useContext(AppContext);
-  const { realtimePost, refreshPost } = useRealtimePost({ id, user }, true);
+  const { realtimePost, refreshPost } = useRealtimePost(
+    { id, user },
+    true,
+    true
+  );
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [body, setBody] = useState("");
@@ -150,9 +154,9 @@ const EditPost = ({ id }: IPostPage) => {
             };
           }),
       };
-      nextHttpService
+      authHttpService
         .makeAuthHttpReq(
-          DbService.POSTS,
+          DbService.POST,
           isNewPost ? HttpRequest.POST : HttpRequest.PATCH,
           post
         )

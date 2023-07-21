@@ -3,7 +3,7 @@ import isEmpty from "lodash.isempty";
 import { DEFAULT_EXPIRE_S } from "../consts";
 import { ErrorMessage, ServerInfo } from "../enums";
 import { castAsBoolean, processPost } from "../utils";
-import { handleMongoConn, handleRedisConn } from "./util";
+import { handleMongoConn, handleRedisConn, validateAuth } from "./util";
 
 const postHandler = express.Router();
 
@@ -18,10 +18,14 @@ postHandler.get("/*", async (req, res) => {
     const redisKey = `NM_${username}-${slug}`;
     const post = await redisConn.get(null, redisKey);
     if (post) {
-      return res.status(200).json({
-        message: ServerInfo.POST_RETRIEVED_CACHED,
-        post,
-      });
+      const userAllowed =
+        !post?.isPrivate || Boolean(validateAuth(req, post.user?.id));
+      return userAllowed
+        ? res.status(200).json({
+            message: ServerInfo.POST_RETRIEVED_CACHED,
+            post,
+          })
+        : res.sendStatus(401);
     }
   }
 
@@ -37,22 +41,24 @@ postHandler.get("/*", async (req, res) => {
         res.status(200).json({ message: ServerInfo.POST_NA, error: true });
       } else {
         const post = processPost(_post);
+        if (post?.isPrivate && !Boolean(validateAuth(req, post.user?.id)))
+          return res.sendStatus(401);
+
         const redisKey = `NM_${post.username}-${post.slug}`;
         if (!redisErrorStatus)
           redisConn.setKeyValue(redisKey, post, DEFAULT_EXPIRE_S);
         return res.status(200).json({
-          post,
           message: ServerInfo.POST_RETRIEVED,
-          data: { post },
+          post,
         });
       }
     })
     .catch((err) => {
       res.status(500).json({
         message: ErrorMessage.P_RETRIEVE_FAIL,
-        post: null,
         trace: err?.message,
         error: true,
+        post: null,
       });
     });
 });
@@ -119,7 +125,7 @@ postHandler.post("/*", async (req, res) => {
     });
 });
 
-postHandler.put("/*", async (req, res) => {
+postHandler.patch("/*", async (req, res) => {
   const { mongoErrorStatus, mongoConn } = await handleMongoConn(req, res);
   if (mongoErrorStatus) return;
 

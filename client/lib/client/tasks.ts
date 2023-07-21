@@ -2,16 +2,14 @@ import axios from "axios";
 import { ApiAction, DbService, ErrorMessage, HttpRequest } from "enums";
 import fileDownload from "js-file-download";
 import { IPost, IResponse } from "types";
-import { nextHttpService } from ".";
+import { authHttpService } from ".";
+import { IS_DEV_S } from "consts";
 
-// Tasks to be run as non-render-blocking
-
-export async function getPostSlugs(username: string): Promise<IResponse> {
+export async function getPostSlugs(): Promise<IResponse> {
   return new Promise((resolve, reject) => {
     try {
-      nextHttpService
-        .makeAuthHttpReq(DbService.USERS, HttpRequest.GET, {
-          username,
+      authHttpService
+        .makeAuthHttpReq(DbService.USER, HttpRequest.GET, {
           action: ApiAction.GET_POST_SLUGS,
         })
         .then(resolve);
@@ -28,8 +26,8 @@ export function deletePost(post: IPost): Promise<IResponse> {
     const fileKeys = files?.map((f) => f.key);
     if (imageKey) fileKeys.push(imageKey);
     if (fileKeys.length) deleteFiles(fileKeys);
-    nextHttpService
-      .makeAuthHttpReq(DbService.POSTS, HttpRequest.DELETE, {
+    authHttpService
+      .makeAuthHttpReq(DbService.POST, HttpRequest.DELETE, {
         id,
         username,
         isPrivate,
@@ -43,7 +41,7 @@ export async function getPresignedS3URL(
   userId: string,
   signal?: AbortSignal
 ): Promise<IResponse | null> {
-  return nextHttpService.makeAuthHttpReq(
+  return authHttpService.makeAuthHttpReq(
     DbService.FILES,
     HttpRequest.POST,
     { action: ApiAction.GET_UPLOAD_KEY, userId },
@@ -51,32 +49,46 @@ export async function getPresignedS3URL(
   );
 }
 
+/**
+ * Upload a file to S3 via a presigned `PutObject` URL.
+ * Invokes a PUT fetch with header "Content-Type": "multipart/form-data"
+ *
+ * https://github.com/localstack/localstack/issues/3266
+ * Localstack S3: ensure the same `Content-Type` header is sent when
+ * generating the presigned-url as when uploading to it via PUT request
+ */
 export async function getUploadedFileKey(
   userId: string,
   file: File,
   signal?: AbortSignal
 ): Promise<string> {
-  let url = "";
-  let key = "";
+  let resolvedKey = "";
   return new Promise(async (resolve, reject) => {
     if (!file) resolve("");
-    await getPresignedS3URL(userId, signal)
+
+    getPresignedS3URL(userId, signal)
       .then((res) => {
-        url = res?.data?.url;
-        key = res?.data?.Key;
+        const { url, key } = res?.data;
+        if (!url || !key) reject(new Error(ErrorMessage.F_UPLOAD_500));
+        resolvedKey = key;
+        return fetch(url, {
+          method: HttpRequest.PUT,
+          headers: IS_DEV_S
+            ? {
+                "Content-Type": "application/json",
+                "x-amz-acl": "public-read-write",
+                "x-amz-tagging": `user_id=${userId}&file_name=${file.name}`,
+              }
+            : {
+                "Content-Type": "multipart/form-data",
+                // "x-amz-tagging": tag,
+              },
+          body: file,
+          signal,
+        });
       })
-      .catch((err) => {
-        reject(err);
-        return;
-      });
-    if (url && key) {
-      await nextHttpService
-        .uploadFile(url, userId, file, signal)
-        .then(() => resolve(key))
-        .catch(reject);
-    } else {
-      reject(new Error(ErrorMessage.F_UPLOAD_500));
-    }
+      .then(() => resolve(resolvedKey))
+      .catch(reject);
   });
 }
 
@@ -85,7 +97,7 @@ export async function downloadFile(
   key: string,
   errorHandler: (msg: string) => void
 ) {
-  nextHttpService
+  authHttpService
     .makeAuthHttpReq(DbService.FILES, HttpRequest.POST, {
       action: ApiAction.GET_DOWNLOAD_KEY,
       key,
@@ -111,7 +123,7 @@ export async function downloadFile(
 
 export async function deleteFiles(keys: string[]) {
   if (!keys?.length) return;
-  return nextHttpService.makeAuthHttpReq(DbService.FILES, HttpRequest.DELETE, {
+  return authHttpService.makeAuthHttpReq(DbService.FILES, HttpRequest.DELETE, {
     keys: JSON.stringify(keys),
   });
 }

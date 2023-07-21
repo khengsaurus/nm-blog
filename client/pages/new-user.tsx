@@ -2,7 +2,7 @@ import { CenteredMain, Input, Row, StyledButton } from "components";
 import { ApiAction, DbService, HttpRequest, PageRoute } from "enums";
 import { usePageReady } from "hooks";
 import { AppContext } from "hooks/context";
-import { clientHttpService, nextHttpService } from "lib/client";
+import { authHttpService, commonHttpService } from "lib/client";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
@@ -22,7 +22,7 @@ const NewUser = () => {
 
   const cancelRegister = useCallback(() => {
     setToDeleteIfUnload(false);
-    clientHttpService
+    commonHttpService
       .delete("user", { params: { userId: user.id } })
       .catch(console.error)
       .finally(() => logout(true));
@@ -41,8 +41,8 @@ const NewUser = () => {
   }, []);
 
   function registerUsername(email: string, username: string) {
-    nextHttpService
-      .makeAuthHttpReq(DbService.USERS, HttpRequest.PATCH, {
+    authHttpService
+      .makeAuthHttpReq(DbService.USER, HttpRequest.PATCH, {
         email,
         username,
         action: ApiAction.USER_SET_USERNAME,

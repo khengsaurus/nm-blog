@@ -8,7 +8,7 @@ import {
   processPosts,
   userDocToObj,
 } from "../utils";
-import { handleMongoConn, handleRedisConn } from "./util";
+import { handleMongoConn, handleRedisConn, validateAuth } from "./util";
 
 const postsHandler = express.Router();
 
@@ -31,9 +31,9 @@ async function getRecent(req: Request, res: Response) {
   if (mongoErrorStatus) return;
 
   mongoConn
-    .findPosts()
+    .findPostsByQuery({ isPrivate: false })
     .sort({ createdAt: -1 })
-    .limit(50)
+    .limit(20)
     .lean()
     .exec()
     .then((posts) => {
@@ -102,6 +102,10 @@ async function getByQuery(req: Request, res: Response) {
     limit = PAGINATE_LIMIT,
   } = req.query as Partial<IPostReq>;
   const isPrivate = castAsBoolean(_isPrivate);
+
+  if (isPrivate && (!username || username !== validateAuth(req)?.username)) {
+    return res.sendStatus(401);
+  }
 
   const { redisErrorStatus, redisConn } = await handleRedisConn(req, res, true);
 

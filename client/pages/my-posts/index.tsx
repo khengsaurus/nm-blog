@@ -17,6 +17,7 @@ const MyPosts = () => {
           windowReady={!!user}
           title="My posts"
           hasSearch
+          byCurrUser
         />
       ) : (
         <PageLoader />

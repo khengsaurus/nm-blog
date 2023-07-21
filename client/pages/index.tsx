@@ -1,7 +1,7 @@
 import { PostFeed } from "components";
 import { CACHE_DEFAULT } from "consts";
 import { useNavShortcuts, usePageReady } from "hooks";
-import { clientHttpService } from "lib/client";
+import { commonHttpService } from "lib/client";
 import { IPost } from "types";
 
 interface IHomeProps {
@@ -12,7 +12,7 @@ export async function getServerSideProps(args) {
   const { res } = args;
   res.setHeader("Cache-Control", CACHE_DEFAULT);
 
-  const initPosts = await clientHttpService
+  const initPosts = await commonHttpService
     .get("posts/home")
     .then((res) => {
       const { message, posts, error } = res?.data;

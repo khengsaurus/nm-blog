@@ -8,8 +8,9 @@ export enum Status {
 
 export enum DbService {
   FILES = "files",
+  POST = "post",
   POSTS = "posts",
-  USERS = "users",
+  USER = "user",
 }
 
 export enum HttpRequest {

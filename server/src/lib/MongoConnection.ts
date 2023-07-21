@@ -132,10 +132,6 @@ class MongoConnection extends ConnectionInstance {
     return this.post.exists({ user: userId, slug });
   }
 
-  findPosts() {
-    return this.post.find();
-  }
-
   findPost(filter: FilterQuery<IPost>) {
     const { username, slug } = filter;
     return this.post.findOne({ username, slug });

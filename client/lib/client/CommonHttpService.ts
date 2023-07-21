@@ -2,12 +2,14 @@ import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { SERVER_URL } from "consts";
 import ip from "ip";
 
-class ClientHttpService {
+class CommonHttpService {
   private instance: AxiosInstance;
 
   constructor() {
-    this.instance = axios.create({ baseURL: SERVER_URL });
-    this.instance.defaults.headers.common["x-client-ip"] = ip.address();
+    this.instance = axios.create({
+      baseURL: SERVER_URL,
+      headers: { "x-client-ip": ip.address() },
+    });
   }
 
   head(url: string, config?: AxiosRequestConfig) {
@@ -23,4 +25,4 @@ class ClientHttpService {
   }
 }
 
-export default ClientHttpService;
+export default CommonHttpService;

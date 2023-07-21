@@ -1,46 +1,65 @@
-import { clientHttpService } from "lib/client";
-import { useCallback, useRef, useState } from "react";
+import { authHttpService, commonHttpService } from "lib/client";
+import { useRef, useState } from "react";
 import { IPost } from "types";
 import { processPost } from "utils";
 import useIsoEffect from "./useIsoEffect";
+import { DbService, HttpRequest } from "enums";
+import { useRouter } from "next/router";
 
-const useRealtimePost = (post: IPost, fresh = false) => {
+const useRealtimePost = (
+  post: IPost,
+  byCurrUser = false,
+  fresh = false,
+  disabled = false
+) => {
+  const { id, username, slug } = post;
   const [realtimePost, setRealtimePost] = useState(post);
   const isFetching = useRef(false);
+  const router = useRouter();
 
-  const fetchPost = useCallback(
-    (): Promise<IPost> => {
-      return new Promise((resolve) => {
-        const { id, slug, username } = post;
-        const reqTime = new Date().valueOf(); // prevent loading disk cached
-        const params = { id, slug, username, fresh, reqTime };
-        clientHttpService
-          .get("post", { params })
-          .then((res) => resolve(processPost(res.data?.post)))
-          .catch((err) => {
-            console.error(err);
-            resolve(post);
-          });
-      });
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [post?.id, fresh]
-  );
+  function fetchPost(): Promise<IPost> {
+    return new Promise((resolve) => {
+      const reqTime = new Date().valueOf(); // prevent loading disk cached
+      const params = { id, username, slug, fresh, reqTime };
+      (byCurrUser
+        ? authHttpService.makeAuthHttpReq(
+            DbService.POST,
+            HttpRequest.GET,
+            params
+          )
+        : commonHttpService.get("post", { params })
+      )
+        .then((res) => resolve(processPost(res.data?.post)))
+        .catch((err) => {
+          console.error(err);
+          if (err?.response?.status === 401) router.push("/401");
+          else resolve(post);
+        });
+    });
+  }
 
-  const refreshPost = useCallback(async () => {
+  function refreshPost() {
     if (!isFetching.current) {
       isFetching.current = true;
-      await fetchPost().then((post) => {
+      fetchPost().then((post) => {
         isFetching.current = false;
         setRealtimePost(post);
       });
     }
-  }, [fetchPost]);
+  }
 
   useIsoEffect(() => {
-    if (!post?.id || post.id == "new") setRealtimePost(null);
-    else refreshPost();
-  }, []);
+    if (disabled) return;
+
+    if (byCurrUser) {
+      if (id || (username && slug)) refreshPost();
+      else setRealtimePost(null);
+    } else if ((username && slug) || (id && id !== "new")) {
+      refreshPost();
+    } else {
+      setRealtimePost(null);
+    }
+  }, [id, username, slug]);
 
   return { realtimePost, refreshPost };
 };

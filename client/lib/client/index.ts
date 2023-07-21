@@ -1,6 +1,6 @@
-import ClientHttpService from "./ClientHttpService";
+import CommonHttpService from "./CommonHttpService";
 import { HomeTheme, avatarStyles } from "./MuiStyles";
-import NextHttpService from "./NextHttpService";
+import AuthHttpService from "./AuthHttpService";
 import markdown from "./markdown";
 import {
   deleteFiles,
@@ -11,19 +11,19 @@ import {
 } from "./tasks";
 import themes from "./themes";
 
-const nextHttpService = new NextHttpService();
-const clientHttpService = new ClientHttpService();
+const authHttpService = new AuthHttpService();
+const commonHttpService = new CommonHttpService();
 
 export {
   HomeTheme,
   avatarStyles,
-  clientHttpService,
+  commonHttpService,
   deleteFiles,
   deletePost,
   getPostSlugs,
   getPresignedS3URL,
   getUploadedFileKey,
   markdown,
-  nextHttpService,
+  authHttpService,
   themes,
 };

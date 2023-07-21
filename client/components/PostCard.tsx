@@ -11,8 +11,9 @@ import { getBannerSrc, getCardSrc } from "utils";
 
 interface IPostCard {
   post: IPost;
-  hasDate?: boolean;
+  byCurrUser?: boolean;
   hasAuthorLink?: boolean;
+  hasDate?: boolean;
   disable?: boolean;
   showingPreview?: boolean;
 }
@@ -25,8 +26,9 @@ const imgStyle: any = {
 
 const PostCard = ({
   post,
-  hasDate = true,
+  byCurrUser = false,
   hasAuthorLink = true,
+  hasDate = true,
   disable = false,
   showingPreview = false,
 }: IPostCard) => {
@@ -41,7 +43,7 @@ const PostCard = ({
 
   const handleClick = () => {
     if (disable) return;
-    routerPush(`/${username}/${slug}`);
+    routerPush(`/${byCurrUser ? "my-posts" : username}/${slug}`);
   };
 
   return (

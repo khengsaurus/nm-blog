@@ -1,6 +1,6 @@
 import { DEFAULT_THEME } from "consts";
 import { PageRoute, Status } from "enums";
-import { getPostSlugs, nextHttpService, themes } from "lib/client";
+import { authHttpService, getPostSlugs, themes } from "lib/client";
 import { useRouter } from "next/router";
 import { createContext, useCallback, useEffect, useRef, useState } from "react";
 import { IAppContext, IUser } from "types";
@@ -66,22 +66,19 @@ const AppContextProvider = (props: any) => {
 
   /* -------------------- End router stuff -------------------- */
 
-  const updatePostSlugs = useCallback(
-    (user: IUser) => {
-      getPostSlugs(user?.username).then((res) => {
-        if (res.status === 200 && res.data.user) {
-          const _user = { ...user };
-          _user.posts = res.data.user.posts || [];
-          setUser(_user);
-        }
-      });
-    },
-    [setUser]
-  );
+  const updatePostSlugs = useCallback((updatedUser: IUser) => {
+    getPostSlugs().then((res) => {
+      if (res.status === 200 && res.data.user) {
+        const _user = { ...updatedUser };
+        _user.posts = res.data.user.posts || [];
+        setUser(_user);
+      }
+    });
+  }, []);
 
   const handleUser = useCallback(
     (token: string, user: IUser) => {
-      nextHttpService.setBearer(token, user.id);
+      authHttpService.setBearer(user.id, token);
       setUserToken(token);
       setUser(user);
       updatePostSlugs(user);
@@ -92,12 +89,12 @@ const AppContextProvider = (props: any) => {
   const userTokenLogin = useCallback(async () => {
     return new Promise((resolve) => {
       if (userToken) {
-        nextHttpService.setBearer(userToken, user?.id);
-        nextHttpService
+        authHttpService.setBearer(user?.id, userToken);
+        authHttpService
           .handleTokenLogin(userToken)
           .then((res) => {
             if (res.status === 200 && res.data?.user) {
-              handleUser(userToken, res.data.user);
+              handleUser(res?.data?.token, res.data.user);
               resolve(true);
             } else {
               resolve(false);
@@ -133,7 +130,7 @@ const AppContextProvider = (props: any) => {
 
   const logout = useCallback(
     (login = false) => {
-      nextHttpService.setBearer("", "");
+      authHttpService.setBearer("", "");
       setUserToken("");
       setUser(null);
       if (login) {

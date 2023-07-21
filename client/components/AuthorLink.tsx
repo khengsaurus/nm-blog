@@ -8,21 +8,23 @@ import { StyledText } from "./StyledMui";
 interface IAuthorLinkProps {
   username?: string;
   title?: boolean;
+  byCurrUser?: boolean;
   disable?: boolean;
 }
 
 const AuthorLink = ({
   username,
   title = false,
+  byCurrUser = false,
   disable = false,
 }: IAuthorLinkProps) => {
   const { history, user, routerPush } = useContext(AppContext);
-  const label = `By ${username}`;
+  const label = byCurrUser ? `You authored` : `By ${username}`;
 
   function handleClick(e: any) {
     e.preventDefault();
     e.stopPropagation();
-    if (!disable) {
+    if (!disable && !byCurrUser) {
       routerPush(
         username === user?.username ? PageRoute.MY_POSTS : `/${username}`
       );

@@ -12,7 +12,8 @@ activityHandler.get("/info", (_, res) => {
 
   res.status(200).json({
     status: ServerInfo.SERVER_ACTIVE,
-    data: { mongo, redis },
+    mongo,
+    redis,
   });
 });
 

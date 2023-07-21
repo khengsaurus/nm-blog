@@ -2,7 +2,7 @@ import { Avatar } from "@mui/material";
 import { Column, DarkText, PostFeed } from "components";
 import { CACHE_DEFAULT } from "consts";
 import { useNavShortcuts, usePageReady } from "hooks";
-import { avatarStyles, clientHttpService } from "lib/client";
+import { avatarStyles, commonHttpService } from "lib/client";
 import { IUser } from "types";
 import { getAvatarLarge } from "utils";
 import FourOFour from "../404";
@@ -15,7 +15,7 @@ export async function getServerSideProps({ params, res }) {
   const { username } = params;
   res.setHeader("Cache-Control", CACHE_DEFAULT);
 
-  const user = await clientHttpService
+  const user = await commonHttpService
     .get("posts/user", { params: { username } })
     .then((res) => {
       const { message, user, error } = res?.data;

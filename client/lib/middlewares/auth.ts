@@ -19,11 +19,9 @@ export function decodeToken<T>(req: NextApiRequest) {
  */
 export async function validateAuth(req: NextApiRequest): Promise<boolean> {
   return new Promise((resolve, reject) => {
-    const userId = req.headers?.["user-id"];
     let userToken: any = req.headers?.["user-token"];
-    if (!userToken) reject(new ServerError(401));
     userToken = jwt.verify(userToken, secretKey) as object;
-    if (userToken?.id === userId) resolve(true);
-    else reject(new ServerError(401));
+    if (!userToken?.id) reject(new ServerError(401));
+    else resolve(true);
   });
 }

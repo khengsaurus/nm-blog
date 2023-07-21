@@ -17,7 +17,7 @@ import {
   usePreviewImg,
 } from "hooks";
 import {
-  nextHttpService,
+  authHttpService,
   avatarStyles,
   deleteFiles,
   getUploadedFileKey,
@@ -62,8 +62,8 @@ const EditProfile = () => {
           });
       }
       if (!imageError) {
-        await nextHttpService
-          .makeAuthHttpReq(DbService.USERS, HttpRequest.PATCH, {
+        await authHttpService
+          .makeAuthHttpReq(DbService.USER, HttpRequest.PATCH, {
             bio,
             avatarKey: imageKey,
           })

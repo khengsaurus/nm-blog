@@ -1,10 +1,10 @@
 import bcrypt from "bcryptjs";
 import { type Request, type Response } from "express";
 import jwt from "jsonwebtoken";
+import isEmpty from "lodash.isempty";
 import { IS_DEV } from "../consts";
 import { ServerInfo } from "../enums";
 import { MongoConnectionPool, RedisConnectionPool } from "../lib";
-import ServerError from "../lib/ServerError";
 
 const envSecretKey = process.env.SECRET_KEY || "secret-key";
 
@@ -98,24 +98,44 @@ function verifyPassword(pw: string, hash: string) {
   return bcrypt.compareSync(pw, hash);
 }
 
-/**
- * @return Promise<boolean> true if valid auth, else false
- * @throws ServerError 401
- */
-export async function validateAuth(req: Request): Promise<boolean> {
-  return new Promise((resolve, reject) => {
-    const userId = req.headers?.["user-id"];
-    let userToken: any = req.headers?.["user-token"];
-    if (!userToken) reject(new ServerError(401));
-    userToken = jwt.verify(userToken, envSecretKey) as object;
-    if (userToken?.id === userId) resolve(true);
-    else reject(new ServerError(401));
-  });
+export function validateAuth(req: Request, id?: string): Partial<IUser> | null {
+  let userToken: any = req.headers?.["user-token"] || req.body?.token;
+  if (!userToken) return null;
+  const user = jwt.verify(userToken, envSecretKey) as Partial<IUser>;
+  return !id || id === user?.id ? user : null;
 }
 
-export function verify(req: Partial<IUserReq>, user: any) {
+export function verify(req: Partial<IUserReq>, user: Partial<IUser>) {
   return (
     req.username === user.username &&
     verifyPassword(req.password, user.password)
   );
+}
+
+export function forwardAuthResponse(
+  res: Response,
+  user: IUser,
+  username?: string,
+  password?: string
+) {
+  if (isEmpty(user)) {
+    return res.status(200).json({
+      message: ServerInfo.USER_BAD_LOGIN,
+      token: null,
+    });
+  }
+  if (username && password && !verify({ username, password }, user)) {
+    return res.status(200).json({
+      message: ServerInfo.USER_BAD_LOGIN,
+      token: null,
+    });
+  }
+
+  const { _id, email, isAdmin } = user;
+  const id = _id.toString();
+  return res.status(200).json({
+    message: ServerInfo.USER_LOGIN,
+    token: generateToken(id, email, user.username, isAdmin),
+    user: processUserData(user, id, true),
+  });
 }

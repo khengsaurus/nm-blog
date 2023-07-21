@@ -13,7 +13,7 @@ import {
   useKeyListener,
   usePageReady,
 } from "hooks";
-import { nextHttpService } from "lib/client";
+import { authHttpService } from "lib/client";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
 import { IResponse } from "types";
@@ -64,8 +64,8 @@ const Login = () => {
   );
 
   const handleLogin = useCallback(() => {
-    nextHttpService
-      .makeAuthHttpReq(DbService.USERS, HttpRequest.POST, {
+    authHttpService
+      .makeAuthHttpReq(DbService.USER, HttpRequest.POST, {
         username,
         password,
         action: ApiAction.LOGIN,
@@ -82,8 +82,8 @@ const Login = () => {
 
   const handleRegister = useCallback(() => {
     if (password === confirmPassword) {
-      nextHttpService
-        .makeAuthHttpReq(DbService.USERS, HttpRequest.POST, {
+      authHttpService
+        .makeAuthHttpReq(DbService.USER, HttpRequest.POST, {
           email,
           password,
           action: ApiAction.REGISTER,

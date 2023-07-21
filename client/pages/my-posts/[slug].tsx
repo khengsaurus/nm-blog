@@ -1,14 +1,19 @@
-import { Avatar } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import { Avatar, Fab } from "@mui/material";
 import Container from "@mui/system/Container";
 import {
   AuthorLink,
   DarkContainer,
   DarkText,
+  DeletePostModal,
   Files,
   PostBanner,
   Row,
   StyledText,
 } from "components";
+import { IS_DEV } from "consts";
+import { PageRoute } from "enums";
 import {
   AppContext,
   useMarkdown,
@@ -16,78 +21,41 @@ import {
   usePageReady,
   useRealtimePost,
 } from "hooks";
-import { commonHttpService } from "lib/client";
 import moment from "moment";
 import { GetStaticPropsResult } from "next";
 import FourOFour from "pages/404";
-import { useContext, useMemo } from "react";
+import { useContext, useMemo, useState } from "react";
 import { IPost } from "types";
 import { getAvatarMedium, processPost } from "utils";
-import FourOOne from "../401";
 
-interface IPostPage {
-  post: IPost;
-  username: string;
+interface MyPostPage {
   slug: string;
-  status?: number;
 }
 
 export async function getStaticPaths() {
-  const paths = await commonHttpService
-    .get("posts/recent")
-    .then((res) => {
-      const { message, paths, error } = res?.data;
-      if (error) throw new Error(message);
-      return paths;
-    })
-    .catch((err) => {
-      console.error(`Error in [slug] getStaticPaths: ${err?.message}`);
-      return [];
-    });
-
   return {
-    paths,
+    paths: [],
     fallback: "blocking", // fall back to SSR
   };
 }
 
 export async function getStaticProps({
   params,
-}): Promise<GetStaticPropsResult<IPostPage>> {
-  const { username, slug } = params;
-  let status = 200;
-
-  const post = await commonHttpService
-    .get("post", { params })
-    .then((res) => {
-      const { message, post, error } = res?.data;
-      if (error) throw new Error(message);
-      const _post = processPost(post);
-      return _post;
-    })
-    .catch((err) => {
-      status = err?.response?.status || 500;
-      console.error(
-        `Error in [${username}]/[${slug}] getStaticProps: ${err?.message}`
-      );
-      return {};
-    });
-
-  return {
-    props: { username, slug, post, status },
-    revalidate: 60,
-  };
+}): Promise<GetStaticPropsResult<MyPostPage>> {
+  return { props: { slug: params.slug } };
 }
 
-const Post = ({ username, slug, post, status }: IPostPage) => {
-  const { theme, user: currUser } = useContext(AppContext);
+const MyPost = ({ slug }: MyPostPage) => {
+  const { theme, user: currUser, routerPush } = useContext(AppContext);
+  const [showDelete, setShowDelete] = useState(false);
   const { realtimePost } = useRealtimePost(
-    post || { username, slug },
-    false,
-    false,
-    status === 401
+    { username: currUser?.username, slug },
+    true,
+    true
   );
+
   const {
+    id,
     title,
     body,
     imageKey,
@@ -108,7 +76,14 @@ const Post = ({ username, slug, post, status }: IPostPage) => {
     }
   }, [createdAt, updatedAt]);
 
-  if (status === 401) return <FourOOne />;
+  function handleEdit() {
+    routerPush(`${PageRoute.POST_FORM}/${id}`);
+  }
+
+  function handleDeleteClick(e: React.MouseEvent) {
+    e.stopPropagation();
+    setShowDelete(true);
+  }
 
   return realtimePost?.id ? (
     <main className="left">
@@ -117,7 +92,7 @@ const Post = ({ username, slug, post, status }: IPostPage) => {
         <DarkText text={title} variant="h2" />
         <Row style={{ justifyContent: "flex-start", alignItems: "flex-end" }}>
           <DarkContainer>
-            <AuthorLink username={username} title />
+            <AuthorLink title byCurrUser />
           </DarkContainer>
           {author?.avatarKey && (
             <Avatar
@@ -140,10 +115,27 @@ const Post = ({ username, slug, post, status }: IPostPage) => {
         </section>
       )}
       <Files files={realtimePost?.files} disableDelete />
+      <div className="edit-container">
+        <Fab className="edit-button" onClick={handleEdit} disableRipple>
+          <EditIcon style={{ width: 40, height: 40 }} />
+        </Fab>
+        <Fab
+          className="delete-button"
+          onClick={handleDeleteClick}
+          disableRipple
+        >
+          <DeleteIcon style={{ width: 25, height: 25 }} />
+        </Fab>
+      </div>
+      <DeletePostModal
+        post={realtimePost}
+        showDelete={showDelete}
+        setShowDelete={setShowDelete}
+      />
     </main>
   ) : (
     <FourOFour />
   );
 };
 
-export default Post;
+export default MyPost;
