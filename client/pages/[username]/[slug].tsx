@@ -36,7 +36,7 @@ export async function getStaticPaths() {
   const paths = await commonHttpService
     .get("posts/recent")
     .then((res) => {
-      const { message, paths, error } = res?.data;
+      const { message, paths, error } = res?.data || {};
       if (error) throw new Error(message);
       return paths;
     })
@@ -60,7 +60,7 @@ export async function getStaticProps({
   const post = await commonHttpService
     .get("post", { params })
     .then((res) => {
-      const { message, post, error } = res?.data;
+      const { message, post, error } = res?.data || {};
       if (error) throw new Error(message);
       const _post = processPost(post);
       return _post;

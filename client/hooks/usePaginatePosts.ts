@@ -10,7 +10,7 @@ import {
   useState,
 } from "react";
 import toast from "react-hot-toast";
-import { IObject, IPost } from "types";
+import { IPost } from "types";
 
 const usePaginatePosts = (
   ready: boolean,
@@ -62,7 +62,7 @@ const usePaginatePosts = (
         prevSearch.current = search || "";
       }
 
-      const query: IObject<any> = {
+      const query: Record<string, any> = {
         limit,
         isPrivate: true,
       };

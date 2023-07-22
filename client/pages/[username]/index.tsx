@@ -18,7 +18,7 @@ export async function getServerSideProps({ params, res }) {
   const user = await commonHttpService
     .get("posts/user", { params: { username } })
     .then((res) => {
-      const { message, user, error } = res?.data;
+      const { message, user, error } = res?.data || {};
       if (error) {
         console.error(
           `Error building [username] getServerSideProps: ${message}`

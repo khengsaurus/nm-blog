@@ -8,6 +8,7 @@ import {
   generateUploadURL,
 } from "lib/server";
 import { NextApiRequest, NextApiResponse } from "next";
+import { IUser } from "types";
 
 export const config = EXPERIMENTAL_RUNTIME;
 
@@ -17,10 +18,11 @@ export default async function handler(
 ) {
   switch (req.method) {
     case HttpRequest.POST:
-      const action = req.body.action;
-      switch (action) {
+      switch (req.body.action) {
         case ApiAction.GET_UPLOAD_KEY:
-          return handleAuthRequest(req, res, () => getS3UploadURL(req));
+          return handleAuthRequest(req, res, (_, tokenUser) =>
+            getS3UploadURL(tokenUser)
+          );
         case ApiAction.GET_DOWNLOAD_KEY:
           return handleAuthRequest(req, res, () => getS3DownloadURL(req));
         default:
@@ -33,12 +35,12 @@ export default async function handler(
   }
 }
 
-async function getS3UploadURL(req: NextApiRequest) {
-  const { userId } = req.body;
+async function getS3UploadURL(tokenUser: Partial<IUser>) {
   return new Promise(async (resolve, reject) => {
-    if (!userId) reject(new ServerError(400));
-    await generateUploadURL(userId)
-      .then((data) => resolve({ status: 200, data }))
+    if (!tokenUser?.id) reject(new ServerError(400));
+
+    await generateUploadURL(tokenUser.id)
+      .then((data) => resolve({ status: 200, ...data }))
       .catch((err) => reject(new ServerError(500, err?.message)));
   });
 }
@@ -48,7 +50,7 @@ async function getS3DownloadURL(req: NextApiRequest) {
     const { key } = req.body;
     if (key && typeof key === "string") {
       generateDownloadURL(key)
-        .then((data) => resolve({ status: 200, data }))
+        .then((data) => resolve({ status: 200, ...data }))
         .catch((err) => reject(new ServerError(500, err?.message)));
     } else {
       reject(new ServerError(400));
@@ -58,8 +60,7 @@ async function getS3DownloadURL(req: NextApiRequest) {
 
 async function deleteCallback(req) {
   return new Promise(async (resolve, reject) => {
-    let { keys } = req.query;
-    const _keys = JSON.parse(keys || "") as string[];
+    const _keys = JSON.parse(req.query?.keys || "") as string[];
     if (!_keys?.length) reject(new ServerError(400));
     await deleteFile(_keys).then(resolve).catch(reject);
   });

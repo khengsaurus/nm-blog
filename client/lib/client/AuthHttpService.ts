@@ -81,6 +81,14 @@ class AuthHttpService {
         return null;
     }
   }
+
+  getNextHeaders() {
+    return this.nextInstance.defaults.headers;
+  }
+
+  getServerHeaders() {
+    return this.serverInstance.defaults.headers;
+  }
 }
 
 export default AuthHttpService;

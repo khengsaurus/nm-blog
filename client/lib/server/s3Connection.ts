@@ -2,7 +2,6 @@ import S3 from "aws-sdk/clients/s3";
 import { IS_DEV_S } from "consts";
 import { randomBytes } from "crypto";
 import { ServerInfo } from "enums";
-import { IObject } from "types";
 import ServerError from "./ServerError";
 
 const Bucket = process.env.ENV_AWS_BUCKET;
@@ -25,28 +24,29 @@ const s3 = new S3(
       }
 );
 
-export const generateUploadURL = async (
+export const generateUploadURL = (
   userId: string
-): Promise<IObject<String>> => {
-  return new Promise(async (resolve, reject) => {
-    const rawBytes = await randomBytes(16);
-    const Key = `user_${userId}/${rawBytes.toString("hex")}`;
-    const params = {
-      Bucket,
-      Key,
-      Expires: 60,
-      Tagging: "",
-    };
-    await s3
+): Promise<{ url: string; key: string }> => {
+  const rawBytes = randomBytes(16);
+  const key = `user_${userId}/${rawBytes.toString("hex")}`;
+  const params = {
+    Bucket,
+    Key: key,
+    Expires: 60,
+    Tagging: "",
+  };
+
+  return new Promise((resolve, reject) =>
+    s3
       .getSignedUrlPromise("putObject", params)
-      .then((url) => resolve({ url, Key }))
-      .catch(reject);
-  });
+      .then((url) => resolve({ url, key }))
+      .catch(reject)
+  );
 };
 
 export const generateDownloadURL = async (
   Key: string
-): Promise<IObject<String>> => {
+): Promise<{ url: string }> => {
   return new Promise(async (resolve, reject) => {
     const params = {
       Bucket,
@@ -61,10 +61,7 @@ export const generateDownloadURL = async (
 };
 
 export function getFileStream(fileKey) {
-  const downloadParams = {
-    Bucket,
-    Key: fileKey,
-  };
+  const downloadParams = { Bucket, Key: fileKey };
   return s3.getObject(downloadParams).createReadStream();
 }
 

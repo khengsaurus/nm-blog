@@ -31,7 +31,7 @@ const useFileUploads = (user: IUser, post: IPost) => {
 
       const controller = new AbortController();
       uploadController.current.set(controllerKey, controller);
-      getUploadedFileKey(user.id, _file, controller.signal)
+      getUploadedFileKey(_file, user.id, controller.signal)
         .then((key) => {
           /* important: use updater fn */
           setFiles((fs) =>
@@ -143,7 +143,7 @@ const useFileUploads = (user: IUser, post: IPost) => {
   const setNewImg = (img: File) => {
     if (!user?.id) return;
     _setNewImg(img);
-    getUploadedFileKey(user.id, img)
+    getUploadedFileKey(img, user.id)
       .then((key) => {
         setImgKey(key);
         removeSavedImg();

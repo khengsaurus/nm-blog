@@ -1,4 +1,4 @@
-import { decodeToken } from "./auth";
+import { validateAuth } from "./auth";
 import { forwardResponse, handleAPIError, handleAuthRequest } from "./util";
 
-export { decodeToken, forwardResponse, handleAPIError, handleAuthRequest };
+export { forwardResponse, handleAPIError, handleAuthRequest, validateAuth };

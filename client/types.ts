@@ -13,10 +13,6 @@ export interface IResponse<T = any> {
 
 /*------------------------------ . ------------------------------*/
 
-export interface IObject<T = any> {
-  [key: string]: T;
-}
-
 export interface IAppContext {
   pageReady: boolean;
   user: IUser;

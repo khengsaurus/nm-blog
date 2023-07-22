@@ -6,7 +6,6 @@ import {
   deleteFiles,
   deletePost,
   getPostSlugs,
-  getPresignedS3URL,
   getUploadedFileKey,
 } from "./tasks";
 import themes from "./themes";
@@ -21,7 +20,6 @@ export {
   deleteFiles,
   deletePost,
   getPostSlugs,
-  getPresignedS3URL,
   getUploadedFileKey,
   markdown,
   authHttpService,

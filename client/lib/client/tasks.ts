@@ -37,18 +37,6 @@ export function deletePost(post: IPost): Promise<IResponse> {
   });
 }
 
-export async function getPresignedS3URL(
-  userId: string,
-  signal?: AbortSignal
-): Promise<IResponse | null> {
-  return authHttpService.makeAuthHttpReq(
-    DbService.FILES,
-    HttpRequest.POST,
-    { action: ApiAction.GET_UPLOAD_KEY, userId },
-    { signal }
-  );
-}
-
 /**
  * Upload a file to S3 via a presigned `PutObject` URL.
  * Invokes a PUT fetch with header "Content-Type": "multipart/form-data"
@@ -58,17 +46,23 @@ export async function getPresignedS3URL(
  * generating the presigned-url as when uploading to it via PUT request
  */
 export async function getUploadedFileKey(
-  userId: string,
   file: File,
+  userId: string,
   signal?: AbortSignal
 ): Promise<string> {
   let resolvedKey = "";
   return new Promise(async (resolve, reject) => {
     if (!file) resolve("");
 
-    getPresignedS3URL(userId, signal)
+    authHttpService
+      .makeAuthHttpReq(
+        DbService.FILES,
+        HttpRequest.POST,
+        { action: ApiAction.GET_UPLOAD_KEY },
+        { signal }
+      )
       .then((res) => {
-        const { url, key } = res?.data;
+        const { url, key } = res?.data || {};
         if (!url || !key) reject(new Error(ErrorMessage.F_UPLOAD_500));
         resolvedKey = key;
         return fetch(url, {
@@ -79,10 +73,7 @@ export async function getUploadedFileKey(
                 "x-amz-acl": "public-read-write",
                 "x-amz-tagging": `user_id=${userId}&file_name=${file.name}`,
               }
-            : {
-                "Content-Type": "multipart/form-data",
-                // "x-amz-tagging": tag,
-              },
+            : { "Content-Type": "multipart/form-data" },
           body: file,
           signal,
         });

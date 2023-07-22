@@ -53,7 +53,8 @@ const EditPost = ({ id }: IPostPage) => {
   const { realtimePost, refreshPost } = useRealtimePost(
     { id, user },
     true,
-    true
+    true,
+    id === "new"
   );
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
@@ -91,10 +92,7 @@ const EditPost = ({ id }: IPostPage) => {
   useEffect(() => {
     if (!hasEditedSlug.current) {
       setSlug(
-        title
-          ?.toLocaleLowerCase()
-          .replace(/[?/]/g, "")
-          .replaceAll(" ", "-")
+        title?.toLocaleLowerCase().replace(/[?/]/g, "").replaceAll(" ", "-")
       );
     }
   }, [title]);
