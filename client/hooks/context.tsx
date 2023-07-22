@@ -42,7 +42,7 @@ const AppContextProvider = (props: any) => {
     (route: string) => {
       setPageReady(false);
       if (route === PageRoute.HOME) {
-        historyRef.current = new Array();
+        historyRef.current = [];
       } else {
         historyRef.current.push(router.asPath);
       }
@@ -112,7 +112,7 @@ const AppContextProvider = (props: any) => {
 
   const sessionValidation = useFirstEffectAsync(
     userTokenLogin,
-    !!userToken ? [userToken] : [],
+    userToken ? [userToken] : [],
     true
   );
 

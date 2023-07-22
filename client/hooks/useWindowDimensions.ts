@@ -5,7 +5,6 @@ import { useWindowListener } from ".";
 /**
  * Returns a window width and height, changes on window resize.
  * Uses singletonHook from react-singleton-hook
- *
  * @return { height, width }
  */
 const useWindowDimensionsImpl = () => {

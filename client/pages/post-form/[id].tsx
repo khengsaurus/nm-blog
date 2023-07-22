@@ -93,7 +93,7 @@ const EditPost = ({ id }: IPostPage) => {
       setSlug(
         title
           ?.toLocaleLowerCase()
-          .replace(/[\?\/]/g, "")
+          .replace(/[?/]/g, "")
           .replaceAll(" ", "-")
       );
     }
@@ -129,7 +129,7 @@ const EditPost = ({ id }: IPostPage) => {
     return new Promise((resolve, reject) => {
       // If existing post with new slug || new post -> check if slug avail
       if (isNewPost || slug.trim() !== realtimePost?.slug?.trim()) {
-        if (!!user?.posts?.find((post) => post.slug === slug)) {
+        if (user?.posts?.find((post) => post.slug === slug)) {
           reject(new Error(ErrorMessage.P_SLUG_USED));
           return;
         }
@@ -346,7 +346,7 @@ const EditPost = ({ id }: IPostPage) => {
         <DeletePostModal
           post={realtimePost}
           showDelete={showDelete}
-          setShowDelete={setShowDelete}
+          close={() => setShowDelete(false)}
         />
       )}
     </main>

@@ -1,8 +1,7 @@
 import { Row, StyledButton } from "components";
 import { PageRoute } from "enums";
 import { AppContext } from "hooks";
-import React, { useContext, useState } from "react";
-import CheckBox from "./CheckBox";
+import { useContext, useState } from "react";
 
 interface IEditPostButtons {
   saveDisabled: boolean;

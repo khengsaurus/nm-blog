@@ -47,6 +47,7 @@ const PostFeed = ({
   const [searchStr, setSearchStr] = useQueryState("q", { history: "replace" });
   const { width } = useWindowDimensions();
   const { posts, limitReached, status, loadMore } = usePaginatePosts(
+    // eslint-disable-next-line valid-typeof
     ready && typeof window !== undefined,
     publicPosts,
     initPosts,

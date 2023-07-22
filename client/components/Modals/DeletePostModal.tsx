@@ -2,7 +2,7 @@ import { PageRoute, Status, ToastMessage } from "enums";
 import { AppContext, useAsync, useKeyListener, useRefClick } from "hooks";
 import { deletePost } from "lib/client";
 import { ServerError } from "lib/server";
-import { useCallback, useContext, useRef } from "react";
+import { useContext, useRef } from "react";
 import { toast } from "react-hot-toast";
 import { IPost, IResponse } from "types";
 import ActionModal from "./ActionModal";
@@ -10,20 +10,15 @@ import ActionModal from "./ActionModal";
 interface IDeletePostModal {
   post: IPost;
   showDelete: boolean;
-  setShowDelete: (b: boolean) => void;
+  close: () => void;
 }
 
-const DeletePostModal = ({
-  post,
-  showDelete,
-  setShowDelete,
-}: IDeletePostModal) => {
+const DeletePostModal = ({ post, showDelete, close }: IDeletePostModal) => {
   const { user, routerPush, updatePostSlugs } = useContext(AppContext);
-  const handleClose = useCallback(() => setShowDelete(false), [setShowDelete]);
   const modalRef = useRef(null);
-  useRefClick(modalRef, handleClose, showDelete);
+  useRefClick(modalRef, close, showDelete);
 
-  useKeyListener("Escape", handleClose);
+  useKeyListener("Escape", close);
 
   const { execute: handleDelete, status: deleteStatus } = useAsync<
     IResponse,
@@ -43,7 +38,7 @@ const DeletePostModal = ({
   const buttons = [
     {
       text: "Cancel",
-      action: handleClose,
+      action: close,
     },
     {
       text: "Delete",

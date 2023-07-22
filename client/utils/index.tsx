@@ -44,6 +44,7 @@ export async function sleepSync(ms = 1000): Promise<void> {
 
 export function processPost(data: any): IPost {
   if (!data) return null;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { id, _id, user, createdAt, updatedAt, isPrivate, __v, ...post } =
     data._doc || data;
   post.id = id || _id?.toString();
@@ -51,6 +52,7 @@ export function processPost(data: any): IPost {
   post.updatedAt = updatedAt?.toString() || "";
   post.isPrivate = castAsBoolean(isPrivate);
   if (user?._id || user?.id) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id, _id, updatedAt, createdAt, __v, ..._user } = user;
     _user.id = id || _id.toString();
     post.user = _user;
@@ -62,7 +64,7 @@ export function checkOneFileSelected(
   event: any,
   errorHandler: (msg: string) => void
 ) {
-  let files = event.target.files;
+  const files = event.target.files;
   if (files.length === 0) return;
   if (files.length > 1) {
     event.target.value = null;
@@ -76,7 +78,7 @@ export function checkFileSize(
   event: any,
   errorHandler: (msg?: string) => void
 ) {
-  let file = event.target.files[0];
+  const file = event.target.files[0];
   if (file.size > MAX_FILE_SIZE_MB * 1000_000) {
     errorHandler(`The maximum file size is ${MAX_FILE_SIZE_MB}MB\n`);
     event.target.value = null;
@@ -89,7 +91,7 @@ export function checkFileType(
   event: React.ChangeEvent<HTMLInputElement>,
   errorHandler: (msg?: string) => void
 ) {
-  let file = event.target.files[0];
+  const file = event.target.files[0];
   if (file.type?.startsWith("image")) return true;
   errorHandler("File type not supported");
 }

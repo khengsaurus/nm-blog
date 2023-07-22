@@ -19,9 +19,7 @@ const useOnWindowUnload = (callback: () => void, unmount = true) => {
 
   useEffect(() => {
     return () => {
-      if (unmount) {
-        callback();
-      }
+      if (unmount) callback();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [unmount]);

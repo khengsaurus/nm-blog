@@ -32,7 +32,7 @@ function Files({
   return (
     <div className="selected-files">
       {files?.map((file) => {
-        const { name, status, uploaded, key } = file;
+        const { name, status, key } = file;
         const isUploaded = status !== FileStatus.PENDING;
         const fileName = name || file.file?.name;
         if (!fileName) return null;

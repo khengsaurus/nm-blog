@@ -80,7 +80,7 @@ export async function getStaticProps({
 }
 
 const Post = ({ username, slug, post, status }: IPostPage) => {
-  const { theme, user: currUser } = useContext(AppContext);
+  const { theme } = useContext(AppContext);
   const { realtimePost } = useRealtimePost(
     post || { username, slug },
     false,
@@ -110,7 +110,7 @@ const Post = ({ username, slug, post, status }: IPostPage) => {
 
   if (status === 401) return <FourOOne />;
 
-  return realtimePost?.id ? (
+  return realtimePost ? (
     <main className="left">
       {imageKey && <PostBanner imageKey={imageKey} />}
       <section className={`header column ${imageKey ? "pad-top" : ""}`}>
@@ -129,7 +129,7 @@ const Post = ({ username, slug, post, status }: IPostPage) => {
         </Row>
         <DarkText text={dateText} variant="h4" />
       </section>
-      {realtimePost?.hasMarkdown ? (
+      {realtimePost.hasMarkdown ? (
         <Container
           className="markdown-view"
           dangerouslySetInnerHTML={{ __html: markdown }}
@@ -139,7 +139,7 @@ const Post = ({ username, slug, post, status }: IPostPage) => {
           <StyledText text={body} variant="body1" paragraph />
         </section>
       )}
-      <Files files={realtimePost?.files} disableDelete />
+      <Files files={realtimePost.files} disableDelete />
     </main>
   ) : (
     <FourOFour />

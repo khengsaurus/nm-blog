@@ -15,7 +15,7 @@ export async function getServerSideProps(args) {
   const initPosts = await commonHttpService
     .get("posts/home")
     .then((res) => {
-      const { message, posts, error } = res?.data;
+      const { message, posts, error } = res?.data || {};
       if (error) throw new Error(message);
       return posts;
     })

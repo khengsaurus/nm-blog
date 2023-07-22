@@ -12,7 +12,6 @@ import {
   Row,
   StyledText,
 } from "components";
-import { IS_DEV } from "consts";
 import { PageRoute } from "enums";
 import {
   AppContext,
@@ -25,8 +24,7 @@ import moment from "moment";
 import { GetStaticPropsResult } from "next";
 import FourOFour from "pages/404";
 import { useContext, useMemo, useState } from "react";
-import { IPost } from "types";
-import { getAvatarMedium, processPost } from "utils";
+import { getAvatarMedium } from "utils";
 
 interface MyPostPage {
   slug: string;
@@ -130,7 +128,7 @@ const MyPost = ({ slug }: MyPostPage) => {
       <DeletePostModal
         post={realtimePost}
         showDelete={showDelete}
-        setShowDelete={setShowDelete}
+        close={() => setShowDelete(false)}
       />
     </main>
   ) : (

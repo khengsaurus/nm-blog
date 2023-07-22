@@ -6,6 +6,7 @@ const useWindowLoadedImpl = () => {
   const [windowLoaded, setWindowLoaded] = useState(false);
 
   useIsoEffect(() => {
+    // eslint-disable-next-line valid-typeof
     if (typeof window !== undefined) setWindowLoaded(true);
   }, []);
 
