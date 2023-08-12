@@ -18,9 +18,7 @@ postHandler.get("/*", async (req, res) => {
     const redisKey = `NM_${username}-${slug}`;
     const post = await redisConn.get(null, redisKey);
     if (post) {
-      const userAllowed =
-        !post?.isPrivate || Boolean(validateAuth(req, post.user?.id));
-      return userAllowed
+      return !post?.isPrivate || Boolean(validateAuth(req, post.user?.id))
         ? res.status(200).json({
             message: ServerInfo.POST_RETRIEVED_CACHED,
             post,
@@ -41,7 +39,7 @@ postHandler.get("/*", async (req, res) => {
         res.status(200).json({ message: ServerInfo.POST_NA, error: true });
       } else {
         const post = processPost(_post);
-        if (post?.isPrivate && !Boolean(validateAuth(req, post.user?.id)))
+        if (post?.isPrivate && !validateAuth(req, post.user?.id))
           return res.sendStatus(401);
 
         const redisKey = `NM_${post.username}-${post.slug}`;
@@ -162,8 +160,8 @@ postHandler.delete("/*", async (req, res) => {
   const { mongoErrorStatus, mongoConn } = await handleMongoConn(req, res);
   if (mongoErrorStatus) return;
 
-  let { id, userId, username, isPrivate } = req.body as Partial<IPostReq>;
-  isPrivate = castAsBoolean(isPrivate);
+  const { id, userId, username } = req.body as Partial<IPostReq>;
+  const isPrivate = castAsBoolean(req.body.isPrivate);
   let txnSuccess = true;
   let slug = "";
 
@@ -177,7 +175,7 @@ postHandler.delete("/*", async (req, res) => {
             userId,
             { $pullAll: { posts: [id] } },
             { lean: true, new: true },
-            (err, _) => {
+            (err) => {
               if (err) throw err;
               return res.status(200).json({ message: ServerInfo.POST_DELETED });
             }

@@ -70,7 +70,7 @@ export function deleteFile(keys: string[]) {
     let allDeleted = true;
     const failedDelete = [];
     for (const Key of keys) {
-      s3.deleteObject({ Bucket, Key }, function (err, _) {
+      s3.deleteObject({ Bucket, Key }, function (err) {
         if (err) {
           allDeleted = false;
           failedDelete.push(Key);

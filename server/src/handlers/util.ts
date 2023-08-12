@@ -68,7 +68,7 @@ export function processUserData(
   return forSelf ? { ..._user, isAdmin } : _user;
 }
 
-export function createUserObject(params: Object) {
+export function createUserObject(params: object) {
   const baseUser = {
     avatar: "",
     bio: "",
@@ -99,7 +99,7 @@ function verifyPassword(pw: string, hash: string) {
 }
 
 export function validateAuth(req: Request, id?: string): Partial<IUser> | null {
-  let userToken: any = req.headers?.["user-token"] || req.body?.token;
+  const userToken = req.headers?.["user-token"] || req.body?.token;
   if (!userToken) return null;
   const user = jwt.verify(userToken, envSecretKey) as Partial<IUser>;
   return !id || id === user?.id ? user : null;

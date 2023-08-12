@@ -52,12 +52,8 @@ async function getByQuery(req: Request, res: Response) {
   const { mongoErrorStatus, mongoConn } = await handleMongoConn(req, res);
   if (mongoErrorStatus) return;
 
-  const {
-    id,
-    isPrivate,
-    action /* should be undefined */,
-    ...restQuery
-  }: Partial<IUserReq> = req.query;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
+  const { id, isPrivate, action, ...restQuery }: Partial<IUserReq> = req.query;
 
   await (id
     ? mongoConn.findUserById(id as string)
@@ -87,7 +83,12 @@ async function getByQuery(req: Request, res: Response) {
 }
 
 userHandler.post("/*", async (req, res) => {
-  let { action, username, email, password } = req.body as Partial<IUserReq>;
+  const {
+    action,
+    username,
+    email,
+    password: _password,
+  } = req.body as Partial<IUserReq>;
 
   const { mongoErrorStatus, mongoConn } = await handleMongoConn(req, res);
   if (mongoErrorStatus) return;
@@ -121,8 +122,8 @@ userHandler.post("/*", async (req, res) => {
           .status(200)
           .json({ error: true, message: ServerInfo.EMAIL_USED });
       } else {
-        // Create acc without setting username
-        password = hashPassword(password);
+        // create acc without setting username
+        const password = hashPassword(_password);
         const user = createUserObject({ email, password });
         mongoConn.createUser(user).then((newUser) => {
           if (newUser.id) {
@@ -200,23 +201,22 @@ userHandler.patch("/*", async (req, res) => {
   }
 });
 
-// Currently not called from FE - no need to authenticate
-userHandler.delete("/*", async (req, res) => {
-  const { userId } = req.query as { userId: string };
-  if (!userId) return res.status(400);
+// userHandler.delete("/*", async (req, res) => {
+//   const { userId } = req.query as { userId: string };
+//   if (!userId) return res.status(400);
 
-  const { mongoErrorStatus, mongoConn } = await handleMongoConn(req, res);
-  if (mongoErrorStatus) return;
+//   const { mongoErrorStatus, mongoConn } = await handleMongoConn(req, res);
+//   if (mongoErrorStatus) return;
 
-  await mongoConn
-    .deleteUser(userId)
-    .then((_) => res.status(200).json({ message: ServerInfo.USER_DELETED }))
-    .catch((err) =>
-      res.status(500).json({
-        error: true,
-        message: `${ErrorMessage.U_DELETE_FAILED}, trace: ${err?.message}`,
-      })
-    );
-});
+//   await mongoConn
+//     .deleteUser(userId)
+//     .then(() => res.status(200).json({ message: ServerInfo.USER_DELETED }))
+//     .catch((err) =>
+//       res.status(500).json({
+//         error: true,
+//         message: `${ErrorMessage.U_DELETE_FAILED}, trace: ${err?.message}`,
+//       })
+//     );
+// });
 
 export default userHandler;

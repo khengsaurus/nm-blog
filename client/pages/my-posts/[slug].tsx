@@ -68,9 +68,13 @@ const MyPost = ({ slug }: MyPostPage) => {
 
   const dateText = useMemo(() => {
     if (createdAt === updatedAt) {
-      return `Posted on ${moment(new Date(createdAt)).format("DD/MM/YY")}`;
+      return `Posted on ${
+        createdAt ? moment(new Date(createdAt)).format("DD/MM/YY") : "-"
+      }`;
     } else {
-      return `Updated on ${moment(new Date(updatedAt)).format("DD/MM/YY")}`;
+      return `Updated on ${
+        updatedAt ? moment(new Date(updatedAt)).format("DD/MM/YY") : "-"
+      }`;
     }
   }, [createdAt, updatedAt]);
 
@@ -83,11 +87,11 @@ const MyPost = ({ slug }: MyPostPage) => {
     setShowDelete(true);
   }
 
-  return realtimePost?.id ? (
+  return realtimePost ? (
     <main className="left">
       {imageKey && <PostBanner imageKey={imageKey} />}
       <section className={`header column ${imageKey ? "pad-top" : ""}`}>
-        <DarkText text={title} variant="h2" />
+        <DarkText text={title || slug} variant="h2" />
         <Row style={{ justifyContent: "flex-start", alignItems: "flex-end" }}>
           <DarkContainer>
             <AuthorLink title byCurrUser />

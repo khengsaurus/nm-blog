@@ -8,7 +8,7 @@ const FourOFour = () => {
     <main className="left pad-top">
       <DarkText text="Whoops!" variant="h2" />
       <br />
-      <DarkText text="We are unable to find that page :/" variant="h3" />;
+      <DarkText text="We are unable to find that page :/" variant="h3" />
     </main>
   );
 };

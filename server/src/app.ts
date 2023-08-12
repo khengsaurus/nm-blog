@@ -1,4 +1,5 @@
 import cors from "cors";
+import dotenv from "dotenv";
 import express from "express";
 import {
   activityHandler,
@@ -8,7 +9,7 @@ import {
 } from "./handlers";
 import { errorHandler, setHeaders } from "./middlewares";
 
-require("dotenv").config();
+dotenv.config();
 
 const app = express();
 app.use(cors());
@@ -18,8 +19,8 @@ app.use(setHeaders(6 * 60 * 60));
 
 app.get("/", (_, res) => res.send("Server ready").status(200));
 app.use("/activity", activityHandler);
-app.use("/post", postHandler);
 app.use("/posts", postsHandler);
+app.use("/post", postHandler);
 app.use("/user", userHandler);
 app.use(errorHandler);
 

@@ -43,7 +43,7 @@ class ConnectionPool<T extends ConnectionInstance> {
 
       try {
         let count = defaultExists ? 1 : 0;
-        while (this.connectionMap.has(`${id}-${count}`)) count++;
+        while (this.connectionMap.has(`${id}_${count}`)) count++;
         const _id = `${id}_${count}`;
 
         const newConnection = this.connectionFactory.createConnection(_id);
@@ -56,7 +56,7 @@ class ConnectionPool<T extends ConnectionInstance> {
           } else {
             this.connectionMap.delete(_id);
             throw new Error(
-              `ConnectionPool - failed to create ${this.type}-${_id}`
+              `ConnectionPool - failed to create ${this.type}_${_id}`
             );
           }
         });

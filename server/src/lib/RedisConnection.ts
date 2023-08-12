@@ -113,7 +113,7 @@ class RedisConnection extends ConnectionInstance {
     });
   }
 
-  _get<T extends any>(defaultVal: T, pKey: string, sKey?: string): Promise<T> {
+  _get<T = any>(defaultVal: T, pKey: string, sKey?: string): Promise<T> {
     return new Promise(async (resolve) => {
       const isHGet = sKey !== undefined;
       this.initConnection()

@@ -18,17 +18,14 @@ const AuthorLink = ({
   byCurrUser = false,
   disable = false,
 }: IAuthorLinkProps) => {
-  const { history, user, routerPush } = useContext(AppContext);
+  const { history, routerPush } = useContext(AppContext);
   const label = byCurrUser ? `You authored` : `By ${username}`;
 
   function handleClick(e: any) {
     e.preventDefault();
     e.stopPropagation();
-    if (!disable && !byCurrUser) {
-      routerPush(
-        username === user?.username ? PageRoute.MY_POSTS : `/${username}`
-      );
-    }
+    if (disable) return;
+    routerPush(byCurrUser ? PageRoute.MY_POSTS : `/${username}`);
   }
 
   const renderText = useMemo(() => {

@@ -80,7 +80,7 @@ export async function getStaticProps({
 }
 
 const Post = ({ username, slug, post, status }: IPostPage) => {
-  const { theme } = useContext(AppContext);
+  const { theme, user } = useContext(AppContext);
   const { realtimePost } = useRealtimePost(
     post || { username, slug },
     false,
@@ -117,7 +117,11 @@ const Post = ({ username, slug, post, status }: IPostPage) => {
         <DarkText text={title} variant="h2" />
         <Row style={{ justifyContent: "flex-start", alignItems: "flex-end" }}>
           <DarkContainer>
-            <AuthorLink username={username} title />
+            <AuthorLink
+              username={username}
+              byCurrUser={user?.id === author?.id}
+              title
+            />
           </DarkContainer>
           {author?.avatarKey && (
             <Avatar

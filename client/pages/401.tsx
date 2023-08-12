@@ -8,7 +8,10 @@ const FourOOne = () => {
     <main className="left pad-top">
       <DarkText text="Whoops!" variant="h2" />
       <br />
-      <DarkText text="Are you sure you're allowed to see this? 🫣" variant="h3" />;
+      <DarkText
+        text="Are you sure you're allowed to see this? 🫣"
+        variant="h3"
+      />
     </main>
   );
 };

@@ -111,7 +111,7 @@ async function getByQuery(req: Request, res: Response) {
 
   if (!search?.trim()) {
     // if there is a search key, don't return cached
-    let posts = await redisConn.read(
+    const posts = await redisConn.read(
       username,
       isPrivate,
       createdAt,
