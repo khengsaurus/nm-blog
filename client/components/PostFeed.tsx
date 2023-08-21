@@ -10,8 +10,7 @@ import {
 import { PAGINATE_LIMIT, SEARCHBOX_ID } from "consts";
 import { Dimension, Size, Status } from "enums";
 import { usePaginatePosts, useWindowDimensions, useWindowLoaded } from "hooks";
-import { useQueryState } from "next-usequerystate";
-import { CSSProperties, useMemo } from "react";
+import { CSSProperties, useMemo, useState } from "react";
 import { IPost } from "types";
 
 interface IPostFeed {
@@ -44,7 +43,9 @@ const PostFeed = ({
   windowReady = true,
 }: IPostFeed) => {
   const windowLoaded = useWindowLoaded();
-  const [searchStr, setSearchStr] = useQueryState("q", { history: "replace" });
+  // TODO: fix for proxy deployment with baseHref
+  // const [searchStr, setSearchStr] = useQueryState("q", { history: "replace" });
+  const [searchStr, setSearchStr] = useState("");
   const { width } = useWindowDimensions();
   const { posts, limitReached, status, loadMore } = usePaginatePosts(
     // eslint-disable-next-line valid-typeof
@@ -81,11 +82,9 @@ const PostFeed = ({
                 id={SEARCHBOX_ID}
                 label="Search"
                 value={searchStr || ""}
-                onChange={(e) =>
-                  setSearchStr(e.target.value, {
-                    scroll: false,
-                    shallow: true,
-                  })
+                onChange={
+                  (e) => setSearchStr(e.target.value || "")
+                  // setSearchStr(e.target.value, {scroll: false, shallow: true})
                 }
                 inputProps={{ maxLength: 50 }}
                 style={{ marginLeft: "12px" }}

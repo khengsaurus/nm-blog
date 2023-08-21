@@ -27,12 +27,15 @@ class ConnectionPool<T extends ConnectionInstance> {
         defaultExists = true;
         let error = false;
         if (existingConn.ready) {
+          // console.log(`reusing ${this.type}-${defaultId}`);
           existingConn.deferMarkForClose();
         } else {
+          // console.log(`awaiting ready ${this.type}-${defaultId}`);
           await existingConn.awaitReady().catch((err) => {
             console.info(
-              `ConnectionPool getConnection ${this.type}-${defaultId} failed: ${err?.message}`
+              `ConnectionPool.getConnection ${this.type}-${defaultId} failed: ${err?.message}`
             );
+            existingConn.clearEventListeners();
             error = true;
           });
         }
@@ -46,6 +49,7 @@ class ConnectionPool<T extends ConnectionInstance> {
         while (this.connectionMap.has(`${id}_${count}`)) count++;
         const _id = `${id}_${count}`;
 
+        // console.log(`creating ${this.type}-${_id}`);
         const newConnection = this.connectionFactory.createConnection(_id);
         this.connectionMap.set(_id, newConnection);
 

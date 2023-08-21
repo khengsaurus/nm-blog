@@ -20,19 +20,25 @@ abstract class ConnectionInstance {
     this.connTimeout = connTimeout;
   }
 
-  deferMarkForClose(close = false, connTimeout = this.connTimeout) {
-    if (this.closeTimeout) clearTimeout(this.closeTimeout);
-    this.closeTimeout = setTimeout(() => {
-      this.markedForClose = true;
-      if (close) this.close();
-    }, connTimeout);
-  }
-
   awaitReady(timeout = 5_000) {
     return setPromiseTimeout(
       () => new Promise((resolve) => this.emitter.on("ready", resolve)),
       timeout
     );
+  }
+
+  clearEventListeners() {
+    // console.log(`clearing all listeners ${this.type}-${this.id}`);
+    this.emitter.removeAllListeners();
+  }
+
+  deferMarkForClose(close = false, connTimeout = this.connTimeout) {
+    if (this.closeTimeout) clearTimeout(this.closeTimeout);
+    this.closeTimeout = setTimeout(() => {
+      this.clearEventListeners();
+      this.markedForClose = true;
+      if (close) this.close();
+    }, connTimeout);
   }
 }
 

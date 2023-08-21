@@ -1,6 +1,5 @@
 export const CACHE_DEFAULT =
-  // "public, maxage=30, s-maxage=30, stale-while-revalidate=604800"; // 7 days swr
-  "public, maxage=1, s-maxage=1, stale-while-revalidate=1";
+  "public, maxage=21600, s-maxage=21600, stale-while-revalidate=300"; // cache 6 hours
 export const DEFAULT_THEME = "dark";
 export const DEFAULT_EXPIRE_S = 600;
 export const EXPERIMENTAL_RUNTIME = { runtime: "experimental-edge" };

@@ -83,6 +83,7 @@ class MongoConnection extends ConnectionInstance {
   }
 
   close() {
+    // console.log(`closing connection mongo-${this.id}`);
     return this.connection?.close() || Promise.resolve();
   }
 
