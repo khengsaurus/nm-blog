@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
-import { SERVER_URL } from "consts";
+import { IS_DEV, SERVER_URL } from "consts";
 import { ApiAction, DbService, HttpRequest } from "enums";
 import ip from "ip";
 import { IFileReq, IPostReq, IUserReq } from "types";
@@ -12,7 +12,7 @@ class AuthHttpService {
 
   constructor() {
     this.nextInstance = axios.create({
-      baseURL: "/api/",
+      baseURL: IS_DEV ? "/api/" : "/blog/api/",
       headers: {
         Authorization: `Bearer ${process.env.BEARER}`,
         "Content-Type": "application/json",
