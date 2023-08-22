@@ -3,7 +3,12 @@ import isEmpty from "lodash.isempty";
 import { DEFAULT_EXPIRE_S } from "../consts";
 import { ErrorMessage, ServerInfo } from "../enums";
 import { castAsBoolean, processPost } from "../utils";
-import { handleMongoConn, handleRedisConn, validateAuth } from "./util";
+import {
+  handleAuth,
+  handleMongoConn,
+  handleRedisConn,
+  validateAuth,
+} from "./util";
 
 const postHandler = express.Router();
 
@@ -62,6 +67,9 @@ postHandler.get("/*", async (req, res) => {
 });
 
 postHandler.post("/*", async (req, res) => {
+  const { id: userId } = handleAuth(req, res) || {};
+  if (!userId) return;
+
   const { mongoErrorStatus, mongoConn } = await handleMongoConn(req, res);
   if (mongoErrorStatus) return;
 
@@ -72,11 +80,11 @@ postHandler.post("/*", async (req, res) => {
     .startSession()
     .then((session) =>
       session.withTransaction(async () => {
-        const { isPrivate, userId, slug, ...postPayload } =
+        const { isPrivate, slug, ...postPayload } =
           req.body as Partial<IPostReq>;
 
         // if post by that userId & slug exists, return error
-        const exists = await mongoConn.checkPostExists({ slug, userId });
+        const exists = await mongoConn.checkPostExists(userId, slug);
         if (exists) {
           return res.status(200).json({
             message: ErrorMessage.P_SLUG_USED,
@@ -124,6 +132,8 @@ postHandler.post("/*", async (req, res) => {
 });
 
 postHandler.patch("/*", async (req, res) => {
+  if (!handleAuth(req, res)) return;
+
   const { mongoErrorStatus, mongoConn } = await handleMongoConn(req, res);
   if (mongoErrorStatus) return;
 
@@ -157,19 +167,31 @@ postHandler.patch("/*", async (req, res) => {
 });
 
 postHandler.delete("/*", async (req, res) => {
+  const { id: userId, username } = handleAuth(req, res) || {};
+  if (!userId) return;
+
   const { mongoErrorStatus, mongoConn } = await handleMongoConn(req, res);
   if (mongoErrorStatus) return;
 
-  const { id, userId, username } = req.body as Partial<IPostReq>;
-  const isPrivate = castAsBoolean(req.body.isPrivate);
+  const { id, isPrivate } = req.query as Partial<IPostReq>;
   let txnSuccess = true;
   let slug = "";
+
+  const post = await mongoConn
+    .findPostById(id)
+    .select("user")
+    .populate(
+      "user",
+      "-email -password -username -isAdmin -posts -createdAt -updatedAt"
+    );
+  if (!post?.user?.id || userId !== post.user.id.toString())
+    return res.status(401);
 
   mongoConn
     .startSession()
     .then((session) =>
-      session.withTransaction(() =>
-        mongoConn.deletePost(id).then((deleteRes) => {
+      session.withTransaction(async () => {
+        await mongoConn.deletePost(id).then((deleteRes) => {
           slug = deleteRes?.slug || "";
           mongoConn.updateUser(
             userId,
@@ -180,8 +202,8 @@ postHandler.delete("/*", async (req, res) => {
               return res.status(200).json({ message: ServerInfo.POST_DELETED });
             }
           );
-        })
-      )
+        });
+      })
     )
     .catch((err) => {
       txnSuccess = false;
@@ -192,10 +214,14 @@ postHandler.delete("/*", async (req, res) => {
     })
     .finally(() => {
       if (txnSuccess && slug) {
-        // ensure some delay before FE queries posts
         handleRedisConn(req, res, true)
           .then(({ redisConn }) =>
-            redisConn?.resetCache({ id, username, isPrivate, slug })
+            redisConn?.resetCache({
+              id,
+              username,
+              slug,
+              isPrivate: castAsBoolean(isPrivate),
+            })
           )
           .catch(console.error);
       }

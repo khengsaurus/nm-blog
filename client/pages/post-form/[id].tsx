@@ -158,7 +158,10 @@ const EditPost = ({ id }: IPostPage) => {
           isNewPost ? HttpRequest.POST : HttpRequest.PATCH,
           post
         )
-        .then((res) => {
+        .then((res: any) => {
+          if (res?.data?.error) {
+            throw new Error(res?.data?.message || "Failed to create post");
+          }
           toast.success(
             isNewPost ? ToastMessage.POST_CREATED : ToastMessage.POST_EDITED
           );

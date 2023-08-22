@@ -22,7 +22,7 @@ class RedisConnection extends ConnectionInstance {
   }
 
   initConnection(): Promise<RedisConnection> {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       if (this.client?.isOpen) {
         resolve(this);
       } else {
@@ -45,10 +45,10 @@ class RedisConnection extends ConnectionInstance {
     return this.client.quit();
   }
 
-  async getCurrent(): Promise<string> {
+  getCurrent(): Promise<string> {
     return new Promise((resolve) => {
-      this.initConnection()
-        .then(() => this.client.get(CURR))
+      this.client
+        .get(CURR)
         .then(resolve)
         .catch((err) => {
           console.error(err);
@@ -57,12 +57,12 @@ class RedisConnection extends ConnectionInstance {
     });
   }
 
-  async updateCurrent() {
-    return new Promise(async (resolve) => {
+  updateCurrent() {
+    return new Promise((resolve) => {
       const d1 = new Date();
       const d2 = new Date(d1.getTime() + DurationMS.MIN).valueOf(); // 1 min delay
-      this.initConnection()
-        .then(() => this.client.set(CURR, d2))
+      this.client
+        .set(CURR, d2)
         .then(resolve)
         .catch((err) => {
           console.info(
@@ -73,16 +73,11 @@ class RedisConnection extends ConnectionInstance {
     });
   }
 
-  async set(value: any, pKey: string, sKey?: string): Promise<any | void> {
+  set(value: any, pKey: string, sKey?: string): Promise<any | void> {
     const val = typeof value === "string" ? value : JSON.stringify(value);
     const isHSet = sKey !== undefined;
-    return new Promise(async (resolve) => {
-      this.initConnection()
-        .then(() => {
-          isHSet
-            ? this.client.HSET(pKey, sKey, val)
-            : this.client.set(pKey, val);
-        })
+    return new Promise((resolve) => {
+      (isHSet ? this.client.HSET(pKey, sKey, val) : this.client.set(pKey, val))
         .then(() => this.client.expire(pKey, DEFAULT_EXPIRE_S))
         .then(resolve)
         .catch((err) => {
@@ -96,14 +91,11 @@ class RedisConnection extends ConnectionInstance {
     });
   }
 
-  async setKeyValue(key: string, value: any, ttl?: number): Promise<number> {
+  setKeyValue(key: string, value: any, ttl?: number): Promise<number> {
     const val = typeof value === "string" ? value : JSON.stringify(value);
-    return new Promise(async (resolve) => {
-      this.initConnection()
-        .then(() => {
-          this.client.set(key, val);
-          if (ttl) this.client.expire(key, ttl);
-        })
+    return new Promise((resolve) => {
+      this.client
+        .set(key, val)
         .then(() => resolve(1))
         .catch((err) => {
           console.info(
@@ -111,17 +103,15 @@ class RedisConnection extends ConnectionInstance {
           );
           console.info(`Error: ${err?.message}`);
           resolve(-1);
-        });
+        })
+        .finally(() => ttl && this.client.expire(key, ttl));
     });
   }
 
   _get<T = any>(defaultVal: T, pKey: string, sKey?: string): Promise<T> {
-    return new Promise(async (resolve) => {
+    return new Promise((resolve) => {
       const isHGet = sKey !== undefined;
-      this.initConnection()
-        .then(() =>
-          isHGet ? this.client.HGET(pKey, sKey) : this.client.get(pKey)
-        )
+      (isHGet ? this.client.HGET(pKey, sKey) : this.client.get(pKey))
         .then((val) => {
           if (!val) resolve(defaultVal);
           else {
@@ -142,8 +132,8 @@ class RedisConnection extends ConnectionInstance {
 
   _hget<T = any>(key: string): Promise<T> {
     return new Promise((resolve) => {
-      this.initConnection()
-        .then(() => this.client.HGETALL(key))
+      this.client
+        .HGETALL(key)
         .then((res) => resolve(res as unknown as T))
         .catch((err) => {
           console.error(err);
@@ -156,12 +146,9 @@ class RedisConnection extends ConnectionInstance {
     defaultVal: Record<string, T>[],
     keys: string[]
   ): Promise<Record<string, T>[]> {
-    return new Promise(async (resolve) => {
-      this.initConnection()
-        .then(() => {
-          const queries = keys.map((key) => this._hget<Record<string, T>>(key));
-          Promise.all(queries).then((maps) => resolve(maps));
-        })
+    return new Promise((resolve) => {
+      Promise.all(keys.map((key) => this._hget<Record<string, T>>(key)))
+        .then((maps) => resolve(maps))
         .catch((err) => {
           console.info(
             `RedisConenction ${this.id} ${
@@ -174,33 +161,25 @@ class RedisConnection extends ConnectionInstance {
     });
   }
 
-  async get<T = any>(defaultVal: T, pKey: string, sKey?: string): Promise<T> {
+  get<T = any>(defaultVal: T, pKey: string, sKey?: string): Promise<T> {
     return setPromiseTimeout<T>(
-      () => this.initConnection().then(() => this._get(defaultVal, pKey, sKey)),
+      () => this._get(defaultVal, pKey, sKey),
       2000,
       defaultVal
     );
   }
 
-  async getMaps<T = any>(
-    keys: string | string[]
-  ): Promise<Record<string, T>[]> {
+  getMaps<T = any>(keys: string | string[]): Promise<Record<string, T>[]> {
     const _keys = typeof keys === "string" ? [keys] : keys;
-    return setPromiseTimeout(
-      () => this.initConnection().then(() => this._hgetall<T>([], _keys)),
-      2000,
-      []
-    );
+    return setPromiseTimeout(() => this._hgetall<T>([], _keys), 2000, []);
   }
 
-  async del(keys: string | string[]): Promise<void> {
+  del(keys: string | string[]): Promise<void> {
     const _keys = typeof keys === "string" ? [keys] : keys;
     return _keys?.length
       ? new Promise((resolve) => {
           try {
-            this.initConnection().then(() =>
-              _keys.forEach((key) => this.client.del(key))
-            );
+            _keys.forEach((key) => this.client.del(key));
           } catch (err) {
             console.info(
               `${ServerInfo.REDIS_DEL_FAIL}: ${JSON.stringify(_keys)}`
@@ -216,10 +195,10 @@ class RedisConnection extends ConnectionInstance {
   /**
    * @TODO how to hdel(pKey, ...sKeys)
    */
-  async hdel(pKey: string, sKey: string): Promise<number> {
+  hdel(pKey: string, sKey: string): Promise<number> {
     return new Promise((resolve) => {
-      this.initConnection()
-        .then(() => this.client.HDEL(pKey, sKey))
+      this.client
+        .HDEL(pKey, sKey)
         .then(resolve)
         .catch((err) => {
           console.error(err);
@@ -238,12 +217,10 @@ class RedisConnection extends ConnectionInstance {
     const _date = date || (await this.getCurrent());
     const { pKey, sKey, fullKey } = this.getKeys(uN, pr, _date, search, limit);
     return new Promise((resolve) => {
-      this.initConnection()
-        .then(() => this.getMaps<object>(pKey))
-        .then((maps) => {
-          if (isEmpty(maps) || !maps[0]?.[sKey]) resolve([]);
-          else this.get<IPost[]>([], fullKey).then(resolve);
-        });
+      this.getMaps<object>(pKey).then((maps) => {
+        if (isEmpty(maps) || !maps[0]?.[sKey]) resolve([]);
+        else this.get<IPost[]>([], fullKey).then(resolve);
+      });
     });
   }
 

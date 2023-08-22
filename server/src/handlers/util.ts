@@ -105,6 +105,12 @@ export function validateAuth(req: Request, id?: string): Partial<IUser> | null {
   return !id || id === user?.id ? user : null;
 }
 
+export function handleAuth(req: Request, res: Response): Partial<IUser> | null {
+  const user = validateAuth(req);
+  if (!user) res.sendStatus(401);
+  return user;
+}
+
 export function verify(req: Partial<IUserReq>, user: Partial<IUser>) {
   return (
     req.username === user.username &&

@@ -59,8 +59,8 @@ class MongoConnection extends ConnectionInstance {
     MongoUserSchema.set("timestamps", true);
     MongoPostSchema.set("timestamps", true);
     MongoPostSchema.set("toObject", { getters: true, flattenMaps: true });
-    this.user = mongoose.models.User || mongoose.model("User", MongoUserSchema);
-    this.post = mongoose.models.Post || mongoose.model("Post", MongoPostSchema);
+    this.user = mongoose.model("User", MongoUserSchema);
+    this.post = mongoose.model("Post", MongoPostSchema);
   }
 
   initConnection(): Promise<MongoConnection> {
@@ -128,8 +128,7 @@ class MongoConnection extends ConnectionInstance {
 
   // -------------------- Post --------------------
 
-  checkPostExists(filter: FilterQuery<IPost>) {
-    const { userId, slug } = filter;
+  checkPostExists(userId: string, slug: string) {
     return this.post.exists({ user: userId, slug });
   }
 

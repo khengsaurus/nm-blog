@@ -6,9 +6,9 @@ import {
   createUserObject,
   forwardAuthResponse,
   generateToken,
+  handleAuth,
   handleMongoConn,
   processUserData,
-  validateAuth,
 } from "./util";
 
 const userHandler = express.Router();
@@ -23,15 +23,15 @@ userHandler.get("/*", (req, res) => {
 });
 
 async function getSlugs(req: Request, res: Response) {
+  const { id, username } = handleAuth(req, res) || {};
+  if (!id) return;
+
   const { mongoErrorStatus, mongoConn } = await handleMongoConn(req, res);
   if (mongoErrorStatus) return;
 
   try {
-    const tokenUser = validateAuth(req);
-    if (!tokenUser?.username) return res.sendStatus(401);
-
     await mongoConn
-      .findUser({ username: tokenUser.username })
+      .findUser({ username })
       .populate(
         "posts",
         "-__v -user -username -title -body -isPrivate -createdAt -updatedAt -imageKey"
@@ -94,11 +94,11 @@ userHandler.post("/*", async (req, res) => {
   if (mongoErrorStatus) return;
 
   if (action === APIAction.USER_TOKEN_LOGIN) {
-    const user = validateAuth(req);
-    if (!user?.id) return res.sendStatus(401);
+    const { id } = handleAuth(req, res) || {};
+    if (!id) return;
 
     return mongoConn
-      .findUserById(user.id)
+      .findUserById(id)
       .then((userData) => forwardAuthResponse(res, userData?._doc))
       .catch((err) =>
         res.status(500).json({ error: true, message: err?.message })
@@ -145,19 +145,18 @@ userHandler.post("/*", async (req, res) => {
 });
 
 userHandler.patch("/*", async (req, res) => {
+  const { id, email } = handleAuth(req, res) || {};
+  if (!id) return;
+
   const { mongoErrorStatus, mongoConn } = await handleMongoConn(req, res);
   if (mongoErrorStatus) return;
-
-  const tokenUser = validateAuth(req);
-  if (!tokenUser) return res.sendStatus(401);
 
   const { action, ...updatedUserInfo } = req.body as Partial<IUserReq>;
 
   try {
     let editOk = true;
     if (action === APIAction.USER_SET_USERNAME) {
-      if (tokenUser?.email !== updatedUserInfo?.email)
-        return res.sendStatus(401);
+      if (email !== updatedUserInfo?.email) return res.sendStatus(401);
 
       await mongoConn
         .checkUserExists({ username: updatedUserInfo.username })
@@ -174,7 +173,7 @@ userHandler.patch("/*", async (req, res) => {
 
     if (!editOk) return;
 
-    const existingUser = await mongoConn.findUser({ email: tokenUser.email });
+    const existingUser = await mongoConn.findUser({ email });
     if (action === APIAction.USER_SET_USERNAME) {
       existingUser.username = updatedUserInfo.username;
     } else {
