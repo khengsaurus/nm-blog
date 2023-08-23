@@ -1,5 +1,6 @@
 import { PostFeed } from "components";
 import { CACHE_DEFAULT } from "consts";
+import { DbService } from "enums";
 import { useNavShortcuts, usePageReady } from "hooks";
 import { commonHttpService } from "lib/client";
 import { IPost } from "types";
@@ -13,7 +14,7 @@ export async function getServerSideProps(args) {
   res.setHeader("Cache-Control", CACHE_DEFAULT);
 
   const initPosts = await commonHttpService
-    .get("posts/home")
+    .get(DbService.POSTS_HOME)
     .then((res) => {
       const { message, posts, error } = res?.data || {};
       if (error) throw new Error(message);

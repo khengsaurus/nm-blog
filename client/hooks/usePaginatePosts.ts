@@ -72,12 +72,12 @@ const usePaginatePosts = (
       if (search) query.search = search;
 
       (publicPosts
-        ? commonHttpService.get("posts", {
+        ? commonHttpService.get(DbService.POSTS_QUERY, {
             params: query,
             signal: newAbortController.signal,
           })
         : authHttpService.makeAuthHttpReq(
-            DbService.POSTS,
+            DbService.POSTS_QUERY,
             HttpRequest.GET,
             query,
             { signal: newAbortController.signal }

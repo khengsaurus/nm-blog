@@ -1,6 +1,6 @@
+import AuthHttpService from "./AuthHttpService";
 import CommonHttpService from "./CommonHttpService";
 import { HomeTheme, avatarStyles } from "./MuiStyles";
-import AuthHttpService from "./AuthHttpService";
 import markdown from "./markdown";
 import {
   deleteFiles,
@@ -15,6 +15,7 @@ const commonHttpService = new CommonHttpService();
 
 export {
   HomeTheme,
+  authHttpService,
   avatarStyles,
   commonHttpService,
   deleteFiles,
@@ -22,6 +23,5 @@ export {
   getPostSlugs,
   getUploadedFileKey,
   markdown,
-  authHttpService,
   themes,
 };

@@ -51,12 +51,14 @@ async function getRecent(req: Request, res: Response) {
 
 async function getHome(req: Request, res: Response) {
   const { redisErrorStatus, redisConn } = await handleRedisConn(req, res, true);
+  let cached = true;
 
   let posts = redisErrorStatus ? [] : (await redisConn.get([], HOME)) || [];
   if (!posts.length) {
     const { mongoErrorStatus, mongoConn } = await handleMongoConn(req, res);
     if (mongoErrorStatus) return;
 
+    cached = false;
     const postQuery = await mongoConn
       .findPostsByQuery({ isPrivate: false })
       .select(["-user"])
@@ -67,9 +69,15 @@ async function getHome(req: Request, res: Response) {
     if (!redisErrorStatus) redisConn.setKeyValue(HOME, posts);
   }
 
-  res.status(200).json({ message: ServerInfo.POST_RETRIEVED, posts });
+  res.status(200).json({
+    message: cached
+      ? ServerInfo.POST_RETRIEVED_CACHED
+      : ServerInfo.POST_RETRIEVED,
+    posts,
+  });
 }
 
+// only called by [username].getServerSideProps - fetch fresh
 async function getUserPosts(req: Request, res: Response) {
   const { mongoErrorStatus, mongoConn } = await handleMongoConn(req, res);
   if (mongoErrorStatus) return;
@@ -77,7 +85,7 @@ async function getUserPosts(req: Request, res: Response) {
   const { username, limit = PAGINATE_LIMIT } = req.query as Partial<IPostReq>;
   const userQuery = await mongoConn
     .findUser({ username })
-    .select(["-password -posts"])
+    .select("-password")
     .populate({
       path: "posts",
       match: { isPrivate: false },
@@ -109,13 +117,13 @@ async function getByQuery(req: Request, res: Response) {
 
   const { redisErrorStatus, redisConn } = await handleRedisConn(req, res, true);
 
+  // if there is a search key, don't return cached
   if (!search?.trim()) {
-    // if there is a search key, don't return cached
     const posts = await redisConn.read(
       username,
       isPrivate,
       createdAt,
-      search,
+      "",
       limit
     );
     if (posts?.length) {

@@ -21,7 +21,7 @@ export async function getPostSlugs(): Promise<IResponse> {
 }
 
 export function deletePost(post: IPost): Promise<IResponse> {
-  const { id, username, isPrivate, imageKey, files = [] } = post;
+  const { id, isPrivate, imageKey, files = [] } = post;
   return new Promise((resolve, reject) => {
     const fileKeys = files?.map((f) => f.key);
     if (imageKey) fileKeys.push(imageKey);
@@ -29,7 +29,6 @@ export function deletePost(post: IPost): Promise<IResponse> {
     authHttpService
       .makeAuthHttpReq(DbService.POST, HttpRequest.DELETE, {
         id,
-        username,
         isPrivate,
       })
       .then(resolve)

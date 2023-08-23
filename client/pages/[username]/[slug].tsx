@@ -9,6 +9,7 @@ import {
   Row,
   StyledText,
 } from "components";
+import { DbService } from "enums";
 import {
   AppContext,
   useMarkdown,
@@ -34,7 +35,7 @@ interface IPostPage {
 
 export async function getStaticPaths() {
   const paths = await commonHttpService
-    .get("posts/recent")
+    .get(DbService.POSTS_RECENT)
     .then((res) => {
       const { message, paths, error } = res?.data || {};
       if (error) throw new Error(message);

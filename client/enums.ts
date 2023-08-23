@@ -9,7 +9,10 @@ export enum Status {
 export enum DbService {
   FILES = "files",
   POST = "post",
-  POSTS = "posts",
+  POSTS_HOME = "posts/home",
+  POSTS_QUERY = "posts",
+  POSTS_RECENT = "posts/recent",
+  POSTS_USER = "posts/user",
   USER = "user",
 }
 

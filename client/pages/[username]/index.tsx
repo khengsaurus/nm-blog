@@ -1,6 +1,7 @@
 import { Avatar } from "@mui/material";
 import { Column, DarkText, PostFeed } from "components";
 import { CACHE_DEFAULT } from "consts";
+import { DbService } from "enums";
 import { useNavShortcuts, usePageReady } from "hooks";
 import { avatarStyles, commonHttpService } from "lib/client";
 import { IUser } from "types";
@@ -16,7 +17,7 @@ export async function getServerSideProps({ params, res }) {
   res.setHeader("Cache-Control", CACHE_DEFAULT);
 
   const user = await commonHttpService
-    .get("posts/user", { params: { username } })
+    .get(DbService.POSTS_USER, { params: { username } })
     .then((res) => {
       const { message, user, error } = res?.data || {};
       if (error) {
