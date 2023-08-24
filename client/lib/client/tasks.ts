@@ -11,6 +11,7 @@ export async function getPostSlugs(): Promise<IResponse> {
       authHttpService
         .makeAuthHttpReq(DbService.USER, HttpRequest.GET, {
           action: ApiAction.GET_POST_SLUGS,
+          timestamp: new Date().valueOf(),
         })
         .then(resolve);
     } catch (err) {

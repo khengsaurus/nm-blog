@@ -64,8 +64,11 @@ const EditPost = ({ id }: IPostPage) => {
   const [showDelete, setShowDelete] = useState(false);
   const deleteOnUnloadRef = useRef(true);
   const hasEditedSlug = useRef(false);
+  const updateOkTimer = useRef(null);
+  const updateOkRef = useRef(true);
   const isNewPost = id === "new";
   const isAdmin = Boolean(user?.isAdmin);
+  usePageReady();
 
   const {
     newImg,
@@ -82,7 +85,7 @@ const EditPost = ({ id }: IPostPage) => {
     handleRemoveFile,
     handleDropFiles,
   } = useFileUploads(user, realtimePost);
-  usePageReady();
+
   useOnWindowUnload(() => {
     if (deleteOnUnloadRef.current) {
       deleteFiles(getAddedFileKeys());
@@ -97,8 +100,6 @@ const EditPost = ({ id }: IPostPage) => {
     }
   }, [title]);
 
-  const updateOkRef = useRef(true);
-  const updateOkTimer = useRef(null);
   useEffect(() => {
     if (updateOkTimer.current) {
       clearTimeout(updateOkTimer.current);
@@ -202,13 +203,13 @@ const EditPost = ({ id }: IPostPage) => {
     !body?.trim() ||
     saveStatus !== Status.IDLE ||
     (id !== "new" &&
-      title === realtimePost?.title &&
-      slug === realtimePost?.slug &&
-      body === realtimePost?.body &&
       isPrivate === realtimePost?.isPrivate &&
       hasMarkdown === realtimePost?.hasMarkdown &&
       !imgUpdated &&
-      !filesChanged);
+      !filesChanged &&
+      title === realtimePost?.title &&
+      slug === realtimePost?.slug &&
+      body === realtimePost?.body);
 
   function handleDelete(e: React.MouseEvent) {
     e.stopPropagation();

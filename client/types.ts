@@ -51,8 +51,9 @@ export interface IAlert {
 }
 
 interface IRequest {
-  userId?: string;
   action?: ApiAction;
+  timestamp?: number;
+  userId?: string;
 }
 
 interface IHasId {
