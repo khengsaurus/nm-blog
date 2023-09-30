@@ -38,9 +38,8 @@ async function getRecent(req: Request, res: Response) {
     .exec()
     .then((posts) => {
       const paths =
-        posts.map(({ username, slug }) => {
-          return { params: { username, slug } };
-        }) || [];
+        posts?.map(({ username, slug }) => ({ params: { username, slug } })) ||
+        [];
       res.status(200).json({ paths });
     })
     .catch((err) => {
@@ -65,7 +64,7 @@ async function getHome(req: Request, res: Response) {
       .sort({ createdAt: -1 })
       .limit(PAGINATE_LIMIT)
       .lean();
-    posts = postQuery.map((post) => processPost(post));
+    posts = postQuery.map(processPost);
     if (!redisErrorStatus) redisConn.setKeyValue(HOME, posts);
   }
 

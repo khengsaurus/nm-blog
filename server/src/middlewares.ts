@@ -5,11 +5,11 @@ export function errorHandler(req, res) {
     `Failed ${req?.method} request, res.statusCode: ${res?.statusCode}, originalUrl: ${req?.originalUrl}, params: ${req?.params}, query: ${req?.query}`
   );
   switch (res?.statusCode) {
-    case 404:
-      res.json({ message: "Failed to find resource" });
-      break;
     case 400:
       res.json({ message: "Bad request!" });
+      break;
+    case 404:
+      res.json({ message: "Failed to find resource" });
       break;
     default:
       res.status(500);

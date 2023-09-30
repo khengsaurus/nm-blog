@@ -64,9 +64,9 @@ class MongoConnection extends ConnectionInstance {
   }
 
   initConnection(): Promise<MongoConnection> {
-    return new Promise((resolve, reject) => {
-      if (this.connection) return resolve(this);
+    if (this.connection) return Promise.resolve(this);
 
+    return new Promise((resolve, reject) => {
       // https://mongoosejs.com/docs/connections.html#connection_pools
       mongoose
         .connect(this.mongoUrl, { connectTimeoutMS: 4_000, maxPoolSize: 5 })

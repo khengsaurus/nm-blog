@@ -12,9 +12,9 @@ class ConnectionPool<T extends ConnectionInstance> {
   private type: ConnectionType;
 
   constructor(type: ConnectionType, cleanupInterval = 30_000) {
-    this.type = type;
-    this.connectionMap = new Map();
     this.connectionFactory = new ConnectionFactory<T>(type);
+    this.connectionMap = new Map();
+    this.type = type;
     this.initCleanup(cleanupInterval);
   }
 

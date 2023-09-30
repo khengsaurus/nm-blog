@@ -9,11 +9,14 @@
   "rules": {
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-unused-vars": [
-      "error",
-      { "argsIgnorePattern": "^_" }
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_"
+      }
     ],
     "no-async-promise-executor": "off",
-    "no-unused-vars": "error",
     "unused-imports/no-unused-imports": "error"
   }
 }

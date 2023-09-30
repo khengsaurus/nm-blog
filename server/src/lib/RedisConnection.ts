@@ -22,22 +22,20 @@ class RedisConnection extends ConnectionInstance {
   }
 
   initConnection(): Promise<RedisConnection> {
-    return new Promise((resolve, reject) => {
-      if (this.client?.isOpen) {
-        resolve(this);
-      } else {
-        this.client
-          .connect()
-          .then(() => {
-            // TEST: wrap the following in setTimeout to test creating duplicate connections in the case of connection delay/failure
-            this.ready = true;
-            this.emitter.emit("ready");
-            this.deferMarkForClose();
-            resolve(this);
-          })
-          .catch(reject);
-      }
-    });
+    if (this.client?.isOpen) return Promise.resolve(this);
+
+    return new Promise((resolve, reject) =>
+      this.client
+        .connect()
+        .then(() => {
+          // TEST: wrap the following in setTimeout to test creating duplicate connections in the case of connection delay/failure
+          this.ready = true;
+          this.emitter.emit("ready");
+          this.deferMarkForClose();
+          resolve(this);
+        })
+        .catch(reject)
+    );
   }
 
   close() {
@@ -147,7 +145,7 @@ class RedisConnection extends ConnectionInstance {
     keys: string[]
   ): Promise<Record<string, T>[]> {
     return new Promise((resolve) => {
-      Promise.all(keys.map((key) => this._hget<Record<string, T>>(key)))
+      Promise.all(keys.map(this._hget<Record<string, T>>))
         .then((maps) => resolve(maps))
         .catch((err) => {
           console.info(
