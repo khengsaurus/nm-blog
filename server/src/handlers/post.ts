@@ -23,12 +23,16 @@ postHandler.get("/*", async (req, res) => {
     const redisKey = `NM_${username}-${slug}`;
     const post = await redisConn.get(null, redisKey);
     if (post) {
-      return !post?.isPrivate || Boolean(validateAuth(req, post.user?.id))
-        ? res.status(200).json({
-            message: ServerInfo.POST_RETRIEVED_CACHED,
-            post,
-          })
-        : res.sendStatus(401);
+      if (post?.isPrivate && !validateAuth(req, post.user?.id)) {
+        res.status(200).json({
+          message: ServerInfo.POST_RETRIEVED_CACHED,
+          post,
+        });
+      } else {
+        res.sendStatus(401);
+      }
+      redisConn.setInUse(false);
+      return;
     }
   }
 
@@ -48,8 +52,11 @@ postHandler.get("/*", async (req, res) => {
           return res.sendStatus(401);
 
         const redisKey = `NM_${post.username}-${post.slug}`;
-        if (!redisErrorStatus)
-          redisConn.setKeyValue(redisKey, post, DEFAULT_EXPIRE_S);
+        if (!redisErrorStatus) {
+          redisConn
+            .setKeyValue(redisKey, post, DEFAULT_EXPIRE_S)
+            .finally(() => redisConn.setInUse(false));
+        }
         return res.status(200).json({
           message: ServerInfo.POST_RETRIEVED,
           post,
@@ -63,7 +70,8 @@ postHandler.get("/*", async (req, res) => {
         error: true,
         post: null,
       });
-    });
+    })
+    .finally(() => mongoConn.setInUse(false));
 });
 
 postHandler.post("/*", async (req, res) => {
@@ -122,11 +130,20 @@ postHandler.post("/*", async (req, res) => {
       txnSuccess = false;
       res.status(200).json({ message: err?.message, error: true });
     })
-    .finally(() => {
+    .finally(async () => {
+      mongoConn.setInUse(false);
+
       if (txnSuccess && newPostDoc) {
-        handleRedisConn(req, res, true)
-          .then(({ redisConn }) => redisConn?.newPostCreated(newPostDoc))
-          .catch(console.error);
+        const { redisErrorStatus, redisConn } = await handleRedisConn(
+          req,
+          res,
+          true
+        );
+        if (redisErrorStatus) return;
+        redisConn
+          .newPostCreated(newPostDoc)
+          .catch(console.error)
+          .finally(() => redisConn.setInUse(false));
       }
     });
 });
@@ -154,6 +171,8 @@ postHandler.patch("/*", async (req, res) => {
     );
 
     res.status(200).json({ message: ServerInfo.POST_UPDATED, post: req.body });
+    mongoConn.setInUse(false);
+
     if (!redisErrorStatus) {
       redisConn
         .resetCache(
@@ -161,7 +180,8 @@ postHandler.patch("/*", async (req, res) => {
           // Reset home keys if isPrivate changed
           _set.isPrivate === wasPrivate ? 0 : _set.isPrivate ? 1 : 2
         )
-        .catch(console.error);
+        .catch(console.error)
+        .finally(() => redisConn.setInUse(false));
     }
   });
 });
@@ -212,18 +232,25 @@ postHandler.delete("/*", async (req, res) => {
         error: true,
       });
     })
-    .finally(() => {
+    .finally(async () => {
+      mongoConn.setInUse(false);
+
       if (txnSuccess && slug) {
-        handleRedisConn(req, res, true)
-          .then(({ redisConn }) =>
-            redisConn?.resetCache({
-              id,
-              username,
-              slug,
-              isPrivate: castAsBoolean(isPrivate),
-            })
-          )
-          .catch(console.error);
+        const { redisErrorStatus, redisConn } = await handleRedisConn(
+          req,
+          res,
+          true
+        );
+        if (redisErrorStatus) return;
+        redisConn
+          ?.resetCache({
+            id,
+            username,
+            slug,
+            isPrivate: castAsBoolean(isPrivate),
+          })
+          .catch(console.error)
+          .finally(() => redisConn.setInUse(false));
       }
     });
 });

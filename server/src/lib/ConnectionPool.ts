@@ -19,48 +19,39 @@ class ConnectionPool<T extends ConnectionInstance> {
   }
 
   getConnection(id: string): ConnectionReq<T> {
-    const defaultId = `${id}_0`;
-    let defaultExists = false;
+    let index = 0;
+    let searching = true;
+    let connId = "";
     return new Promise(async (resolve) => {
-      const existingConn = this.connectionMap.get(defaultId);
-      if (existingConn) {
-        defaultExists = true;
-        let error = false;
-        if (existingConn.ready) {
-          // console.log(`reusing ${this.type}-${defaultId}`);
-          existingConn.deferMarkForClose();
+      while (searching) {
+        connId = `${id}_${index}`;
+        const existingConn = this.connectionMap.get(connId);
+        if (existingConn) {
+          if (existingConn.ready && !existingConn.isInUse()) {
+            // console.log(`reusing ${this.type}-${connId}`);
+            existingConn.deferMarkForClose();
+            return resolve({ errorStatus: 0, conn: existingConn });
+          } else {
+            index++;
+          }
         } else {
-          // console.log(`awaiting ready ${this.type}-${defaultId}`);
-          await existingConn.awaitReady().catch((err) => {
-            console.info(
-              `ConnectionPool.getConnection ${this.type}-${defaultId} failed: ${err?.message}`
-            );
-            existingConn.clearEventListeners();
-            error = true;
-          });
-        }
-        if (!error) {
-          return resolve({ errorStatus: 0, conn: existingConn });
+          searching = false;
         }
       }
 
       try {
-        let count = defaultExists ? 1 : 0;
-        while (this.connectionMap.has(`${id}_${count}`)) count++;
-        const _id = `${id}_${count}`;
-
-        // console.log(`creating ${this.type}-${_id}`);
-        const newConnection = this.connectionFactory.createConnection(_id);
-        this.connectionMap.set(_id, newConnection);
+        // console.log(`creating ${this.type}-${connId}`);
+        const newConnection = this.connectionFactory.createConnection(connId);
+        this.connectionMap.set(connId, newConnection);
 
         await newConnection.initConnection().then(async (connection) => {
           if (connection) {
-            this.connectionMap.set(_id, connection);
+            this.connectionMap.set(connId, connection);
             resolve({ errorStatus: 0, conn: connection });
           } else {
-            this.connectionMap.delete(_id);
+            this.connectionMap.delete(connId);
             throw new Error(
-              `ConnectionPool - failed to create ${this.type}_${_id}`
+              `ConnectionPool - failed to create ${this.type}_${connId}`
             );
           }
         });

@@ -29,23 +29,23 @@ async function getSlugs(req: Request, res: Response) {
   const { mongoErrorStatus, mongoConn } = await handleMongoConn(req, res);
   if (mongoErrorStatus) return;
 
-  try {
-    await mongoConn
-      .findUser({ username })
-      .populate(
-        "posts",
-        "-__v -user -username -title -body -isPrivate -createdAt -updatedAt -imageKey"
-      )
-      .then((userData) => {
-        const user = userData?._doc;
-        res.status(200).json({
-          message: ServerInfo.POST_SLUGS_RETRIEVED,
-          user: processUserData(user, user._id?.toString()),
-        });
+  return mongoConn
+    .findUser({ username })
+    .populate(
+      "posts",
+      "-__v -user -username -title -body -isPrivate -createdAt -updatedAt -imageKey"
+    )
+    .then((userData) => {
+      const user = userData?._doc;
+      res.status(200).json({
+        message: ServerInfo.POST_SLUGS_RETRIEVED,
+        user: processUserData(user, user._id?.toString()),
       });
-  } catch (err) {
-    res.status(500).json({ error: true, message: err?.message });
-  }
+    })
+    .catch((err) =>
+      res.status(500).json({ error: true, message: err?.message })
+    )
+    .finally(() => mongoConn.setInUse(false));
 }
 
 async function getByQuery(req: Request, res: Response) {
@@ -55,9 +55,8 @@ async function getByQuery(req: Request, res: Response) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { id, isPrivate, action, ...restQuery }: Partial<IUserReq> = req.query;
 
-  await (id
-    ? mongoConn.findUserById(id as string)
-    : mongoConn.findUser(restQuery)
+  return (
+    id ? mongoConn.findUserById(id as string) : mongoConn.findUser(restQuery)
   )
     .then((userData) => {
       const user = userData?._doc;
@@ -79,7 +78,8 @@ async function getByQuery(req: Request, res: Response) {
         error: true,
         message: `${ErrorMessage.U_RETRIEVE_FAILED}, trace: ${err?.message}`,
       })
-    );
+    )
+    .finally(() => mongoConn.setInUse(false));
 }
 
 userHandler.post("/*", async (req, res) => {
@@ -102,7 +102,8 @@ userHandler.post("/*", async (req, res) => {
       .then((userData) => forwardAuthResponse(res, userData?._doc))
       .catch((err) =>
         res.status(500).json({ error: true, message: err?.message })
-      );
+      )
+      .finally(() => mongoConn.setInUse(false));
   }
 
   if (action === APIAction.LOGIN) {
@@ -111,7 +112,8 @@ userHandler.post("/*", async (req, res) => {
       .then((userData) => forwardAuthResponse(res, userData?._doc))
       .catch((err) =>
         res.status(500).json({ error: true, message: err?.message })
-      );
+      )
+      .finally(() => mongoConn.setInUse(false));
   }
 
   return mongoConn
@@ -141,7 +143,8 @@ userHandler.post("/*", async (req, res) => {
     })
     .catch((err) =>
       res.status(500).json({ error: true, message: err?.message })
-    );
+    )
+    .finally(() => mongoConn.setInUse(false));
 });
 
 userHandler.patch("/*", async (req, res) => {
@@ -160,15 +163,15 @@ userHandler.patch("/*", async (req, res) => {
 
       await mongoConn
         .checkUserExists({ username: updatedUserInfo.username })
-        .then(async (exists) => {
+        .then((exists) => {
           if (exists) {
             res.status(200).json({ message: ServerInfo.USERNAME_TAKEN });
             editOk = false;
           }
         })
-        .catch((err) =>
-          res.status(500).json({ error: true, message: err?.message })
-        );
+        .catch((err) => {
+          res.status(500).json({ error: true, message: err?.message });
+        });
     }
 
     if (!editOk) return;
@@ -197,6 +200,8 @@ userHandler.patch("/*", async (req, res) => {
       error: true,
       message: `${ErrorMessage.U_UPDATE_FAILED}, trace: ${err?.message}`,
     });
+  } finally {
+    mongoConn.setInUse(false);
   }
 });
 

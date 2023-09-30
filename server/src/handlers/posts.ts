@@ -45,7 +45,8 @@ async function getRecent(req: Request, res: Response) {
     .catch((err) => {
       console.error(err);
       res.status(500).json({ message: ErrorMessage.P_RETRIEVE_FAIL });
-    });
+    })
+    .finally(() => mongoConn.setInUse(false));
 }
 
 async function getHome(req: Request, res: Response) {
@@ -65,7 +66,15 @@ async function getHome(req: Request, res: Response) {
       .limit(PAGINATE_LIMIT)
       .lean();
     posts = postQuery.map(processPost);
-    if (!redisErrorStatus) redisConn.setKeyValue(HOME, posts);
+
+    mongoConn.setInUse(false);
+    if (!redisErrorStatus) {
+      redisConn
+        .setKeyValue(HOME, posts)
+        .finally(() => redisConn.setInUse(false));
+    }
+  } else {
+    redisConn.setInUse(false);
   }
 
   res.status(200).json({
@@ -95,8 +104,9 @@ async function getUserPosts(req: Request, res: Response) {
       },
     })
     .lean();
-  const user = userDocToObj(userQuery);
+  mongoConn.setInUse(false);
 
+  const user = userDocToObj(userQuery);
   res.status(200).json({ message: ServerInfo.POST_RETRIEVED, user });
 }
 
@@ -166,6 +176,10 @@ async function getByQuery(req: Request, res: Response) {
         trace: err?.message,
         error: true,
       });
+    })
+    .finally(() => {
+      mongoConn.setInUse(false);
+      redisConn.setInUse(false);
     });
 }
 

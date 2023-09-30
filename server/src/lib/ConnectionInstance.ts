@@ -8,16 +8,17 @@ abstract class ConnectionInstance {
   public connTimeout: number; // how long the connection stays open for
   public closeTimeout: NodeJS.Timeout; // timeout to close the connection
   public emitter = new EventEmitter();
-  public markedForClose = false;
   public ready = false;
+  public markedForClose = false;
+  private _isInUse = false;
 
   abstract initConnection(): Promise<any>;
   abstract close(): Promise<any>;
 
   constructor(id: string, connTimeout = 15_000) {
+    this.connTimeout = connTimeout;
     this.id = id;
     this.markedForClose = false;
-    this.connTimeout = connTimeout;
   }
 
   awaitReady(timeout = 5_000) {
@@ -39,6 +40,14 @@ abstract class ConnectionInstance {
       this.markedForClose = true;
       if (close) this.close();
     }, connTimeout);
+  }
+
+  isInUse() {
+    return this._isInUse;
+  }
+
+  setInUse(inUse: boolean) {
+    this._isInUse = inUse;
   }
 }
 

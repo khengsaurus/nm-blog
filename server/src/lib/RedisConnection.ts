@@ -30,7 +30,6 @@ class RedisConnection extends ConnectionInstance {
         .then(() => {
           // TEST: wrap the following in setTimeout to test creating duplicate connections in the case of connection delay/failure
           this.ready = true;
-          this.emitter.emit("ready");
           this.deferMarkForClose();
           resolve(this);
         })

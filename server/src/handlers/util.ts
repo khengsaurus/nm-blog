@@ -20,9 +20,14 @@ export async function handleMongoConn(
       .status(500)
       .json({ message: ServerInfo.MONGO_CONNECTION_FAIL, error: true });
   }
+  mongoConn.setInUse(true);
   return { mongoErrorStatus, mongoConn };
 }
 
+/**
+ * @param skipResError
+ * @default false: send status 500 if error
+ */
 export async function handleRedisConn(
   req: Request,
   res: Response,
@@ -35,7 +40,7 @@ export async function handleRedisConn(
       .status(500)
       .json({ message: ServerInfo.REDIS_CONNECTION_FAIL, error: true });
   }
-
+  redisConn.setInUse(true);
   return { redisErrorStatus, redisConn };
 }
 
