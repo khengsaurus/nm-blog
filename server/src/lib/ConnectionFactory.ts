@@ -10,7 +10,7 @@ class ConnectionFactory<T extends ConnectionInstance> {
     this.connectionType = connectionType;
   }
 
-  createConnection(id: string) {
+  createConnection(id: string): T {
     switch (this.connectionType) {
       case ConnectionType.MONGO:
         return new MongoConnection(id) as unknown as T;

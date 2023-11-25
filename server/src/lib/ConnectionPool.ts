@@ -4,8 +4,6 @@ import ConnectionInstance from "./ConnectionInstance";
 import MongoConnection from "./MongoConnection";
 import RedisConnection from "./RedisConnection";
 
-type ConnectionReq<T> = Promise<{ errorStatus: number; conn: T }>;
-
 class ConnectionPool<T extends ConnectionInstance> {
   private connectionFactory: ConnectionFactory<T>;
   private connectionMap: Map<string, T>;
@@ -18,7 +16,7 @@ class ConnectionPool<T extends ConnectionInstance> {
     this.initCleanup(cleanupInterval);
   }
 
-  getConnection(id: string): ConnectionReq<T> {
+  getConnection(id: string): Promise<{ errorStatus: number; conn: T }> {
     const defaultId = `${id}_0`;
     let defaultExists = false;
     return new Promise(async (resolve) => {
@@ -49,13 +47,12 @@ class ConnectionPool<T extends ConnectionInstance> {
         while (this.connectionMap.has(`${id}_${count}`)) count++;
         const _id = `${id}_${count}`;
 
-        // console.log(`creating ${this.type}-${_id}`);
+        console.log(`creating ${this.type}-${_id}`);
         const newConnection = this.connectionFactory.createConnection(_id);
         this.connectionMap.set(_id, newConnection);
 
-        await newConnection.initConnection().then(async (connection) => {
-          if (connection) {
-            this.connectionMap.set(_id, connection);
+        await newConnection.initConnection().then((connection: T) => {
+          if (connection?.ready) {
             resolve({ errorStatus: 0, conn: connection });
           } else {
             this.connectionMap.delete(_id);

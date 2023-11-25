@@ -145,7 +145,8 @@ class RedisConnection extends ConnectionInstance {
     keys: string[]
   ): Promise<Record<string, T>[]> {
     return new Promise((resolve) => {
-      Promise.all(keys.map(this._hget<Record<string, T>>))
+      // https://stackoverflow.com/questions/34930771/why-is-this-undefined-inside-class-method-when-using-promises
+      Promise.all(keys.map((key) => this._hget<Record<string, T>>(key)))
         .then((maps) => resolve(maps))
         .catch((err) => {
           console.info(

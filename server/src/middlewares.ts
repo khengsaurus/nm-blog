@@ -18,7 +18,7 @@ export function errorHandler(req, res) {
   }
 }
 
-export function setHeaders(cacheDuration = 600) {
+export function setCacheControl(cacheDuration = 30) {
   return (req: Request, res: Response, next: NextFunction) => {
     if (req.method === "GET") {
       res.setHeader("Cache-Control", `public, max-age=${cacheDuration}`);

@@ -7,7 +7,7 @@ import {
   postsHandler,
   userHandler,
 } from "./handlers";
-import { errorHandler, setHeaders } from "./middlewares";
+import { errorHandler, setCacheControl } from "./middlewares";
 
 dotenv.config();
 
@@ -15,7 +15,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.enable("trust proxy");
-app.use(setHeaders(6 * 60 * 60));
+app.use(setCacheControl());
 
 app.get("/", (_, res) => res.send("Server ready").status(200));
 app.use("/activity", activityHandler);
