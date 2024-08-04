@@ -27,7 +27,6 @@
 
 $card-width: 280px;
 $nav-bar-height: 50px;
-$main-margin: 50px;
 $speed-fast: 150ms;
 $speed-medium: 350ms;
 $init-bg-color: rgb(40, 40, 40);
@@ -49,7 +48,7 @@ main {
   @include flex-(column);
   @include orientate-contents-(center);
   font-family: "Roboto", sans-serif;
-  margin: $main-margin $main-margin 120px;
+  margin: 50px 50px 120px;
 
   &.left {
     @include orientate-contents-(flex-start);
@@ -153,6 +152,42 @@ h6 {
   height: 23px;
   padding: 0px !important;
   margin: 0;
+}
+
+@media only screen and (max-width: 800px) {
+  main {
+    margin: 50px 20px 120px !important;
+  }
+
+  pre code {
+    font-size: 10px;
+    padding: 10px 6px;
+  }
+
+  h1 {
+    font-size: 28px !important;
+  }
+
+  h2 {
+    font-size: 24px !important;
+  }
+
+  h3 {
+    font-size: 22px !important;
+  }
+
+  h4 {
+    font-size: 20px !important;
+  }
+
+  h5 {
+    font-size: 18px !important;
+  }
+
+  h6 {
+    @include ellipsis;
+    font-size: 17px;
+  }
 }
 
 p {
