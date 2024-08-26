@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { createContext, useCallback, useEffect, useRef, useState } from "react";
 import { IAppContext, IUser } from "types";
 import useFirstEffectAsync from "./useFirstEffectAsync";
-import useLocalStorage from "./useLocalStorage";
+import useSessionStorage from "./useSessionStorage";
 import useTheme from "./useTheme";
 import useWindowListener from "./useWindowListener";
 
@@ -32,7 +32,7 @@ const AppContextProvider = (props: any) => {
   const [pageReady, setPageReady] = useState(false);
   const [user, setUser] = useState<IUser>();
   const [userSessionActive, setUserSessionActive] = useState(true);
-  const [userToken, setUserToken] = useLocalStorage("userToken", "");
+  const [userToken, setUserToken] = useSessionStorage("userToken", "");
   const [theme, setThemeName] = useTheme();
   const historyRef = useRef([]);
   const router = useRouter();
