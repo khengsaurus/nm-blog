@@ -11,7 +11,7 @@ APP="nm-server"
 
 # Build app image if not exists
 if [[ "$(docker images -q $APP:$1 2> /dev/null)" == "" ]]; 
-  then docker build . -t $APP:$1
+  then docker build . -t $APP:$1 || exit 1
 fi
 
 function _run(){

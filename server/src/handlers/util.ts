@@ -101,8 +101,13 @@ function verifyPassword(pw: string, hash: string) {
 export function validateAuth(req: Request, id?: string): Partial<IUser> | null {
   const userToken = req.headers?.["user-token"] || req.body?.token;
   if (!userToken) return null;
-  const user = jwt.verify(userToken, envSecretKey) as Partial<IUser>;
-  return !id || id === user?.id ? user : null;
+  try {
+    const user = jwt.verify(userToken, envSecretKey) as Partial<IUser>;
+    return !id || id === user?.id ? user : null;
+  } catch (err) {
+    // malformed token or bad signature -> treat as unauthenticated
+    return null;
+  }
 }
 
 export function handleAuth(req: Request, res: Response): Partial<IUser> | null {

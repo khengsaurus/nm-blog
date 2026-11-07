@@ -1,9 +1,10 @@
 import { authHttpService, commonHttpService } from "lib/client";
 import { useRef, useState } from "react";
+import { toast } from "react-hot-toast";
 import { IPost } from "types";
 import { processPost } from "utils";
 import useIsoEffect from "./useIsoEffect";
-import { DbService, HttpRequest } from "enums";
+import { DbService, HttpRequest, ToastMessage } from "enums";
 import { useRouter } from "next/router";
 
 const useRealtimePost = (
@@ -14,37 +15,49 @@ const useRealtimePost = (
 ) => {
   const { id, username, slug } = post;
   const [realtimePost, setRealtimePost] = useState(post);
+  const [isLoading, setIsLoading] = useState(!disabled);
   const isFetching = useRef(false);
   const router = useRouter();
 
   function fetchPost(): Promise<IPost> {
-    return new Promise((resolve) => {
-      const reqTime = new Date().valueOf(); // prevent loading disk cached
-      const params = { id, username, slug, fresh, reqTime };
-      (byCurrUser
+    const reqTime = new Date().valueOf(); // prevent loading disk cached
+    const params = { id, username, slug, fresh, reqTime };
+    return (
+      byCurrUser
         ? authHttpService.makeAuthHttpReq(
             DbService.POST,
             HttpRequest.GET,
             params
           )
         : commonHttpService.get("post", { params })
-      )
-        .then((res) => resolve(processPost(res.data?.post)))
-        .catch((err) => {
-          console.error(err);
-          if (err?.response?.status === 401) router.push("/401");
-          else resolve(post);
-        });
+    ).then((res) => {
+      // server responds 200 with error: true when the post is not found
+      if (res.data?.error) throw new Error(res.data.message);
+      return processPost(res.data?.post);
     });
   }
 
   function refreshPost() {
     if (!isFetching.current) {
       isFetching.current = true;
-      fetchPost().then((post) => {
-        isFetching.current = false;
-        setRealtimePost(post);
-      });
+      setIsLoading(true);
+      fetchPost()
+        .then(setRealtimePost)
+        .catch((err) => {
+          console.error(err);
+          if (err?.response?.status === 401) {
+            router.push("/401");
+          } else {
+            const message = err?.response
+              ? err.response.data?.message
+              : err?.message;
+            toast.error(message || ToastMessage.POST_FETCH_FAILED);
+          }
+        })
+        .finally(() => {
+          isFetching.current = false;
+          setIsLoading(false);
+        });
     }
   }
 
@@ -53,15 +66,19 @@ const useRealtimePost = (
 
     if (byCurrUser) {
       if (id || (username && slug)) refreshPost();
-      else setRealtimePost(null);
+      else {
+        setRealtimePost(null);
+        setIsLoading(false);
+      }
     } else if ((username && slug) || (id && id !== "new")) {
       refreshPost();
     } else {
       setRealtimePost(null);
+      setIsLoading(false);
     }
   }, [id, username, slug]);
 
-  return { realtimePost, refreshPost };
+  return { realtimePost, isLoading, refreshPost };
 };
 
 export default useRealtimePost;

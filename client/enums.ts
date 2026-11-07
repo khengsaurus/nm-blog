@@ -98,6 +98,7 @@ export enum ToastMessage {
 
   POST_DELETED = "Post deleted successfully",
   POST_DELETE_FAILED = "Failed to delete post",
+  POST_FETCH_FAILED = "Failed to load post",
 
   PROFILE_SAVED = "Profile saved successfully",
   PROFILE_SAVE_FAILED = "Failed to save profile",

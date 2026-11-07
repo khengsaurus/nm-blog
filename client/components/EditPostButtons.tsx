@@ -12,6 +12,7 @@ interface IEditPostButtons {
   saveDisabled: boolean;
   isEdit: boolean;
   privateOnly?: boolean;
+  disabled?: boolean;
   togglePrivate: () => void;
   toggleMarkdown: () => void;
   handleSave: () => Promise<any>;
@@ -26,6 +27,7 @@ const EditPostButtons = ({
   saveButtonLabel,
   saveDisabled,
   privateOnly = true,
+  disabled = false,
   togglePrivate,
   toggleMarkdown,
   handleSave,
@@ -44,7 +46,11 @@ const EditPostButtons = ({
             routerPush(PageRoute.MY_POSTS);
           }}
         />
-        <StyledButton label="Delete" onClick={handleDelete} />
+        <StyledButton
+          label="Delete"
+          onClick={handleDelete}
+          disabled={disabled}
+        />
       </>
     );
   }
@@ -70,7 +76,7 @@ const EditPostButtons = ({
             value={privateOnly || isPrivate}
             toggleValue={togglePrivate}
             label="Private"
-            disabled={privateOnly}
+            disabled={privateOnly || disabled}
           />
         </div>
       </Tooltip>
@@ -79,6 +85,7 @@ const EditPostButtons = ({
           value={markdown}
           toggleValue={toggleMarkdown}
           label="Markdown"
+          disabled={disabled}
         />
       </div>
       <Row

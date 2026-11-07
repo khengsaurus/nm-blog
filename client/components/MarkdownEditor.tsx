@@ -6,18 +6,27 @@ interface IMarkdownEditorProps {
   value: string;
   fullWidth: boolean;
   rows?: number;
+  disabled?: boolean;
   setValue: (val: string) => void;
 }
 
 const MarkdownEditor = forwardRef<MutableRefObject<any>, IMarkdownEditorProps>(
   (props: IMarkdownEditorProps, ref?: MutableRefObject<any>) => {
-    const { label, value, fullWidth, rows = 18, setValue } = props;
+    const {
+      label,
+      value,
+      fullWidth,
+      rows = 18,
+      disabled = false,
+      setValue,
+    } = props;
 
     return (
       <TextField
         value={value}
         onChange={(e) => setValue(e.target.value)}
         label={label}
+        disabled={disabled}
         multiline
         rows={rows}
         type="text"

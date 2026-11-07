@@ -50,7 +50,7 @@ export async function getServerSideProps({ params }) {
 
 const EditPost = ({ id }: IPostPage) => {
   const { theme, user, routerPush, updatePostSlugs } = useContext(AppContext);
-  const { realtimePost, refreshPost } = useRealtimePost(
+  const { realtimePost, isLoading, refreshPost } = useRealtimePost(
     { id, user },
     true,
     true,
@@ -64,8 +64,6 @@ const EditPost = ({ id }: IPostPage) => {
   const [showDelete, setShowDelete] = useState(false);
   const deleteOnUnloadRef = useRef(true);
   const hasEditedSlug = useRef(false);
-  const updateOkTimer = useRef(null);
-  const updateOkRef = useRef(true);
   const isNewPost = id === "new";
   const isAdmin = Boolean(user?.isAdmin);
   usePageReady();
@@ -101,28 +99,24 @@ const EditPost = ({ id }: IPostPage) => {
   }, [title]);
 
   useEffect(() => {
-    if (updateOkTimer.current) {
-      clearTimeout(updateOkTimer.current);
-    }
-    updateOkTimer.current = setTimeout(() => {
-      updateOkRef.current = false;
-    }, 1000);
-
-    if (isNewPost) {
-      if (user?.posts?.length >= MAX_POSTS_PER_USER && !isAdmin)
-        routerPush(PageRoute.HOME);
-    } else {
-      if (!updateOkRef.current) return;
-
-      const { title, slug, body, isPrivate, hasMarkdown } = realtimePost || {};
-      setTitle(title);
-      setSlug(slug);
-      setBody(body);
-      setIsPrivate(isPrivate);
-      setHasMarkdown(hasMarkdown);
-    }
+    if (isNewPost && user?.posts?.length >= MAX_POSTS_PER_USER && !isAdmin)
+      routerPush(PageRoute.HOME);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.posts?.length, isAdmin, isNewPost, realtimePost]);
+  }, [user?.posts?.length, isAdmin, isNewPost]);
+
+  // Populate the form each time a fetch of the post completes
+  useEffect(() => {
+    if (isNewPost || isLoading) return;
+
+    const { title, slug, body, isPrivate, hasMarkdown } = realtimePost || {};
+    // keep the saved slug instead of regenerating it from the title
+    hasEditedSlug.current = Boolean(slug);
+    setTitle(title);
+    setSlug(slug);
+    setBody(body);
+    setIsPrivate(isPrivate);
+    setHasMarkdown(hasMarkdown);
+  }, [isNewPost, isLoading, realtimePost]);
 
   const _handlePut = () => {
     return new Promise((resolve, reject) => {
@@ -197,7 +191,10 @@ const EditPost = ({ id }: IPostPage) => {
     ServerError
   >(_handlePut, _cleanup, (r: IResponse) => r.status === 200, false);
 
+  const formDisabled = !isNewPost && isLoading;
+
   const saveDisabled =
+    formDisabled ||
     !title?.trim() ||
     !slug?.trim() ||
     !body?.trim() ||
@@ -226,6 +223,7 @@ const EditPost = ({ id }: IPostPage) => {
           value={title || ""}
           onChange={(e) => setTitle(e.target.value)}
           inputProps={{ maxLength: 50 }}
+          readonly={formDisabled}
           maxWidth
         />
         <Input
@@ -238,11 +236,12 @@ const EditPost = ({ id }: IPostPage) => {
             }
           }}
           onClick={() => (hasEditedSlug.current = true)}
+          readonly={formDisabled}
           maxWidth
         />
         <br />
         {isAdmin ? (
-          <Dropzone onDrop={handleDropFiles} noClick>
+          <Dropzone onDrop={handleDropFiles} noClick disabled={formDisabled}>
             {({ getRootProps, isDragActive }) => (
               <div
                 {...getRootProps()}
@@ -259,6 +258,7 @@ const EditPost = ({ id }: IPostPage) => {
                   markdown={hasMarkdown}
                   setBody={setBody}
                   style={{ opacity: isDragActive ? 0.2 : 1 }}
+                  disabled={formDisabled}
                 />
                 {isDragActive && (
                   <StyledText
@@ -282,6 +282,7 @@ const EditPost = ({ id }: IPostPage) => {
             body={body}
             markdown={hasMarkdown}
             setBody={setBody}
+            disabled={formDisabled}
           />
         )}
         <Files files={files} handleRemoveFile={handleRemoveFile} />
@@ -307,6 +308,7 @@ const EditPost = ({ id }: IPostPage) => {
               hasImg={!!imageKey || !!newImg}
               setImg={setNewImg}
               rmImg={rmImg}
+              disabled={formDisabled}
             />
             <Tooltip
               title={isAdmin ? "" : "Only admin users can add files"}
@@ -314,7 +316,7 @@ const EditPost = ({ id }: IPostPage) => {
             >
               <div style={{ alignSelf: "flex-start" }}>
                 <Button
-                  disabled={!isAdmin}
+                  disabled={!isAdmin || formDisabled}
                   component="label"
                   className="add-files-label"
                   disableRipple
@@ -330,6 +332,7 @@ const EditPost = ({ id }: IPostPage) => {
             </Tooltip>
             <EditPostButtons
               privateOnly={!isAdmin}
+              disabled={formDisabled}
               isPrivate={isPrivate}
               togglePrivate={isAdmin ? () => setIsPrivate((b) => !b) : null}
               markdown={hasMarkdown}

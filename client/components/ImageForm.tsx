@@ -9,9 +9,16 @@ interface IImageForm {
   hasImg: boolean;
   setImg: (newImage: any) => void;
   rmImg: () => void;
+  disabled?: boolean;
 }
 
-const ImageForm = ({ label, hasImg, setImg, rmImg }: IImageForm) => {
+const ImageForm = ({
+  label,
+  hasImg,
+  setImg,
+  rmImg,
+  disabled = false,
+}: IImageForm) => {
   const toastError = useCallback((msg: string) => toast.error(msg), []);
 
   function removeImage(e: React.MouseEvent) {
@@ -34,6 +41,7 @@ const ImageForm = ({ label, hasImg, setImg, rmImg }: IImageForm) => {
   return (
     <Row>
       <Button
+        disabled={disabled}
         disableRipple
         component="label"
         style={{

@@ -7,6 +7,7 @@ interface IEditAndPreviewProps {
   label: string;
   setBody: (b: string) => void;
   style?: CSSProperties;
+  disabled?: boolean;
 }
 
 const EditPreviewMarkdown = ({
@@ -15,6 +16,7 @@ const EditPreviewMarkdown = ({
   label,
   setBody,
   style = {},
+  disabled = false,
 }: IEditAndPreviewProps) => {
   return (
     <Row style={{ alignItems: "flex-start", ...style }}>
@@ -23,6 +25,7 @@ const EditPreviewMarkdown = ({
         value={body}
         setValue={setBody}
         fullWidth={!markdown}
+        disabled={disabled}
       />
       <MarkdownViewer
         text={markdown ? body : ""}
